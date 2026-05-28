@@ -3,14 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   Unique,
 } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
 import { CategoriaProducto } from './categoria-producto.entity';
 import { Sucursal } from './sucursal.entity';
 import { Laboratorio } from './laboratorio.entity';
-import { Lote } from './lote.entity';
 
 export enum TipoProducto {
   MEDICAMENTO = 'medicamento',
@@ -59,9 +57,15 @@ export class Producto extends BaseEntity {
   @Column({ default: false })
   requiere_receta!: boolean;
 
+  @Column({ type: 'integer', default: 0 })
+  stock_actual!: number;
+
+  @Column({ type: 'integer', default: 0 })
+  stock_minimo!: number;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  precio_venta!: number;
+
   @Column({ default: true })
   activo!: boolean;
-
-  @OneToMany(() => Lote, (lote) => lote.producto)
-  lotes!: Lote[];
 }

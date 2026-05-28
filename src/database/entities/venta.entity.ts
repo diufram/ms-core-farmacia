@@ -2,7 +2,6 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeor
 import { BaseEntity } from '../../core/entities/base.entity';
 import { Cliente } from './cliente.entity';
 import { Sucursal } from './sucursal.entity';
-import { PagoVenta } from './pago-venta.entity';
 import { Usuario } from './usuario.entity';
 import { VentaDetalle } from './venta-detalle.entity';
 
@@ -10,6 +9,13 @@ export enum EstadoVenta {
   BORRADOR = 'borrador',
   CONFIRMADA = 'confirmada',
   ANULADA = 'anulada',
+}
+
+export enum MetodoPagoVenta {
+  EFECTIVO = 'efectivo',
+  TARJETA = 'tarjeta',
+  TRANSFERENCIA = 'transferencia',
+  QR = 'qr',
 }
 
 @Entity('ventas')
@@ -48,9 +54,9 @@ export class Venta extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   observacion?: string | null;
 
+  @Column({ type: 'enum', enum: MetodoPagoVenta, default: MetodoPagoVenta.EFECTIVO })
+  metodo_pago!: MetodoPagoVenta;
+
   @OneToMany(() => VentaDetalle, (detalle) => detalle.venta)
   detalles!: VentaDetalle[];
-
-  @OneToMany(() => PagoVenta, (pago) => pago.venta)
-  pagos!: PagoVenta[];
 }

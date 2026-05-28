@@ -8,8 +8,8 @@ import { RefreshToken } from '../../database/entities/refresh-token.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
-import { AuthController } from './auth.controller';
 import { AuthRepository } from './auth.repository';
+import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -26,7 +26,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       Sucursal,
     ]),
   ],
-  controllers: [AuthController],
-  providers: [AuthService, AuthRepository, JwtStrategy],
+  providers: [AuthService, AuthRepository, AuthResolver, JwtStrategy],
 })
 export class AuthModule {}

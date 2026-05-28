@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { AppRole } from '../interfaces/app-role.type';
@@ -23,7 +24,9 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<{ user?: JwtPayload }>();
+    const gqlRequest = GqlExecutionContext.create(context).getContext<{ req?: { user?: JwtPayload } }>()
+      .req;
+    const request = gqlRequest ?? context.switchToHttp().getRequest<{ user?: JwtPayload }>();
     const user = request.user;
 
     if (!user || !requiredRoles.includes(user.rol)) {
