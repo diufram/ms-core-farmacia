@@ -11,7 +11,7 @@ export class ProfileType {
   @Field()
   last_name!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   photo!: string | null;
 
   @Field(() => Int)
@@ -26,7 +26,7 @@ export class ProfileType {
   @Field(() => Int, { nullable: true })
   branch_id!: number | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   branch_name!: string | null;
 
   @Field()
@@ -38,7 +38,7 @@ export class CheckUsernameResultType {
   @Field()
   available!: boolean;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   message?: string;
 }
 

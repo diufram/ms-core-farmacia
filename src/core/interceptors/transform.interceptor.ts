@@ -27,6 +27,10 @@ export class TransformInterceptor<T> implements NestInterceptor<
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
+    if (context.getType<string>() === 'graphql') {
+      return next.handle() as Observable<Response<T>>;
+    }
+
     return next.handle().pipe(
       map((data) => {
         let message: string | undefined;

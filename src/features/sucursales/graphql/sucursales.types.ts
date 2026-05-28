@@ -11,25 +11,25 @@ export class SucursalType {
   @Field()
   slug!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   telefono?: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   correo_electronico?: string | null;
 
   @Field()
   direccion!: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   ciudad?: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   departamento?: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   pais?: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   referencia?: string | null;
 
   @Field(() => Float, { nullable: true })
@@ -38,7 +38,7 @@ export class SucursalType {
   @Field(() => Float, { nullable: true })
   longitud?: number | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   descripcion?: string | null;
 
   @Field()

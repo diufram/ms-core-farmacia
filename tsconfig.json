@@ -16,10 +16,9 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
 
-    "baseUrl": ".",
     "paths": {
-      "@entities/*": ["src/database/entities/*"],
-      "@features/*": ["src/features/*"]
+      "@entities/*": ["./src/database/entities/*"],
+      "@features/*": ["./src/features/*"]
     },
 
     "incremental": true,
