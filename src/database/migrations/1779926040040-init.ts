@@ -1,0 +1,126 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class Init1779926040040 implements MigrationInterface {
+    name = 'Init1779926040040'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TABLE "personas" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre" character varying(120) NOT NULL, "apellido" character varying(120) NOT NULL, "celular" character varying(20), "correo_electronico" character varying(150), "tipo_documento" character varying(30), "numero_documento" character varying(40), "fecha_nacimiento" date, "sexo" character varying(20), "direccion" character varying(255), CONSTRAINT "PK_714aa5d028f8f3e6645e971cecd" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "refresh_tokens" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "token_hash" character varying(255) NOT NULL, "expires_at" TIMESTAMP NOT NULL, "revoked_at" TIMESTAMP, "usuario_id" integer NOT NULL, CONSTRAINT "UQ_a7838d2ba25be1342091b6695f1" UNIQUE ("token_hash"), CONSTRAINT "PK_7d8bee0204106019488c4c50ffa" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."usuarios_rol_global_enum" AS ENUM('super_admin', 'user')`);
+        await queryRunner.query(`CREATE TABLE "usuarios" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre_usuario" character varying(60) NOT NULL, "correo_electronico" character varying(150) NOT NULL, "contrasena" character varying(255) NOT NULL, "rol_global" "public"."usuarios_rol_global_enum" NOT NULL DEFAULT 'user', "esta_verificado" boolean NOT NULL DEFAULT false, "activo" boolean NOT NULL DEFAULT true, "foto" character varying(255), "ultimo_acceso" TIMESTAMP, "persona_id" integer NOT NULL, CONSTRAINT "UQ_1a7a36f3dffef210b4c0ba5c6c0" UNIQUE ("nombre_usuario"), CONSTRAINT "UQ_e871b7157e4b74290df9baa9c93" UNIQUE ("correo_electronico"), CONSTRAINT "REL_899199fd151861c079720cc508" UNIQUE ("persona_id"), CONSTRAINT "PK_d7281c63c176e152e4c531594a8" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."usuarios_clinica_rol_enum" AS ENUM('admin')`);
+        await queryRunner.query(`CREATE TABLE "usuarios_clinica" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "rol" "public"."usuarios_clinica_rol_enum" NOT NULL DEFAULT 'admin', "activo" boolean NOT NULL DEFAULT true, "usuario_id" integer NOT NULL, "clinica_id" integer NOT NULL, CONSTRAINT "UQ_usuario_clinica" UNIQUE ("usuario_id", "clinica_id"), CONSTRAINT "PK_9b1e5bae5da6df65c7a48d60a30" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."clinicas_estado_enum" AS ENUM('activa', 'inactiva')`);
+        await queryRunner.query(`CREATE TABLE "clinicas" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre" character varying(150) NOT NULL, "slug" character varying(160) NOT NULL, "telefono" character varying(20), "correo_electronico" character varying(150), "direccion" character varying(255) NOT NULL, "ciudad" character varying(100), "departamento" character varying(100), "pais" character varying(100), "referencia" character varying(255), "latitud" numeric(10,7), "longitud" numeric(10,7), "logo" character varying(255), "descripcion" text, "estado" "public"."clinicas_estado_enum" NOT NULL DEFAULT 'activa', CONSTRAINT "UQ_91326a84d3b40549dc35765494a" UNIQUE ("slug"), CONSTRAINT "PK_3e3bdf302438f0355d70ae52b0e" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."clientes_estado_enum" AS ENUM('activo', 'inactivo')`);
+        await queryRunner.query(`CREATE TABLE "clientes" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "codigo_cliente" character varying(60) NOT NULL, "telefono_secundario" character varying(20), "observaciones" text, "estado" "public"."clientes_estado_enum" NOT NULL DEFAULT 'activo', "clinica_id" integer NOT NULL, "persona_id" integer NOT NULL, CONSTRAINT "UQ_clientes_clinica_persona" UNIQUE ("clinica_id", "persona_id"), CONSTRAINT "PK_d76bf3571d906e4e86470482c08" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."pagos_venta_metodo_enum" AS ENUM('efectivo', 'tarjeta', 'transferencia', 'qr')`);
+        await queryRunner.query(`CREATE TABLE "pagos_venta" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "metodo" "public"."pagos_venta_metodo_enum" NOT NULL, "monto" numeric(12,2) NOT NULL, "referencia" character varying(80), "fecha_pago" TIMESTAMP, "venta_id" integer NOT NULL, "usuario_id" integer NOT NULL, CONSTRAINT "PK_4c86df5e03d591485cb8fd20e96" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."inventario_movimientos_tipo_enum" AS ENUM('entrada', 'salida', 'ajuste', 'devolucion', 'transferencia')`);
+        await queryRunner.query(`CREATE TABLE "inventario_movimientos" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "tipo" "public"."inventario_movimientos_tipo_enum" NOT NULL, "cantidad" integer NOT NULL, "stock_anterior" integer NOT NULL, "stock_resultante" integer NOT NULL, "referencia_tipo" character varying(40), "referencia_id" integer, "observacion" text, "clinica_id" integer NOT NULL, "lote_id" integer NOT NULL, "usuario_id" integer NOT NULL, CONSTRAINT "PK_d587b76cd91104c895491cf10a1" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "categorias_producto" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre" character varying(120) NOT NULL, "codigo" character varying(160) NOT NULL, "descripcion" text, "activo" boolean NOT NULL DEFAULT true, "clinica_id" integer NOT NULL, CONSTRAINT "PK_0821d2a56229a0bb8186dab675b" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "laboratorios" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre" character varying(140) NOT NULL, "telefono" character varying(20), "correo_electronico" character varying(150), "direccion" character varying(255), "activo" boolean NOT NULL DEFAULT true, "clinica_id" integer NOT NULL, CONSTRAINT "PK_f3e5296e106c63a9f075157f4bd" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."productos_tipo_enum" AS ENUM('medicamento', 'insumo', 'otro')`);
+        await queryRunner.query(`CREATE TABLE "productos" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "codigo" character varying(60) NOT NULL, "nombre" character varying(180) NOT NULL, "principio_activo" character varying(120), "presentacion" character varying(80), "tipo" "public"."productos_tipo_enum" NOT NULL DEFAULT 'medicamento', "requiere_receta" boolean NOT NULL DEFAULT false, "activo" boolean NOT NULL DEFAULT true, "clinica_id" integer NOT NULL, "categoria_id" integer NOT NULL, "laboratorio_id" integer, CONSTRAINT "UQ_productos_clinica_codigo" UNIQUE ("clinica_id", "codigo"), CONSTRAINT "PK_04f604609a0949a7f3b43400766" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "lotes" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "numero_lote" character varying(80) NOT NULL, "fecha_vencimiento" date NOT NULL, "costo_compra" numeric(10,2) NOT NULL, "precio_venta" numeric(10,2) NOT NULL, "stock_actual" integer NOT NULL DEFAULT '0', "stock_minimo" integer NOT NULL DEFAULT '0', "activo" boolean NOT NULL DEFAULT true, "clinica_id" integer NOT NULL, "producto_id" integer NOT NULL, CONSTRAINT "UQ_lotes_producto_numero" UNIQUE ("producto_id", "numero_lote"), CONSTRAINT "PK_6eda564423c09706b95cbf8ae1c" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "venta_detalles" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "cantidad" integer NOT NULL, "precio_unitario" numeric(10,2) NOT NULL, "descuento" numeric(10,2) NOT NULL DEFAULT '0', "subtotal" numeric(12,2) NOT NULL, "venta_id" integer NOT NULL, "producto_id" integer NOT NULL, "lote_id" integer NOT NULL, CONSTRAINT "PK_505b25e384908bdf1f67bf3c669" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."ventas_estado_enum" AS ENUM('borrador', 'confirmada', 'anulada')`);
+        await queryRunner.query(`CREATE TABLE "ventas" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "numero_venta" character varying(40) NOT NULL, "fecha_venta" date NOT NULL, "subtotal" numeric(12,2) NOT NULL DEFAULT '0', "descuento_total" numeric(12,2) NOT NULL DEFAULT '0', "total" numeric(12,2) NOT NULL DEFAULT '0', "estado" "public"."ventas_estado_enum" NOT NULL DEFAULT 'confirmada', "observacion" text, "clinica_id" integer NOT NULL, "usuario_id" integer NOT NULL, "cliente_id" integer, CONSTRAINT "UQ_ventas_clinica_numero" UNIQUE ("clinica_id", "numero_venta"), CONSTRAINT "PK_b8b73abe8561829c019531d9a2e" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "proveedores" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre" character varying(160) NOT NULL, "nit" character varying(30), "telefono" character varying(20), "correo_electronico" character varying(150), "direccion" character varying(255), "activo" boolean NOT NULL DEFAULT true, "clinica_id" integer NOT NULL, CONSTRAINT "UQ_proveedores_clinica_nit" UNIQUE ("clinica_id", "nit"), CONSTRAINT "PK_1dcf121f19f362fb1b4c0a493a9" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "compra_detalles" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "cantidad" integer NOT NULL, "costo_unitario" numeric(10,2) NOT NULL, "subtotal" numeric(12,2) NOT NULL, "compra_id" integer NOT NULL, "producto_id" integer NOT NULL, "lote_id" integer NOT NULL, CONSTRAINT "PK_275e76dd0e6fc62eee69072fbba" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."compras_estado_enum" AS ENUM('borrador', 'registrada', 'anulada')`);
+        await queryRunner.query(`CREATE TABLE "compras" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "numero_compra" character varying(40) NOT NULL, "fecha_compra" date NOT NULL, "subtotal" numeric(12,2) NOT NULL DEFAULT '0', "descuento_total" numeric(12,2) NOT NULL DEFAULT '0', "total" numeric(12,2) NOT NULL DEFAULT '0', "estado" "public"."compras_estado_enum" NOT NULL DEFAULT 'registrada', "observacion" text, "clinica_id" integer NOT NULL, "proveedor_id" integer NOT NULL, "usuario_id" integer NOT NULL, CONSTRAINT "UQ_compras_clinica_numero" UNIQUE ("clinica_id", "numero_compra"), CONSTRAINT "PK_63037d5249eefe140e3587ff6f2" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`ALTER TABLE "refresh_tokens" ADD CONSTRAINT "FK_c8349fdadc1bc791125bdd8c855" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "usuarios" ADD CONSTRAINT "FK_899199fd151861c079720cc508f" FOREIGN KEY ("persona_id") REFERENCES "personas"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "usuarios_clinica" ADD CONSTRAINT "FK_53430e4cc8538231608b3655851" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "usuarios_clinica" ADD CONSTRAINT "FK_9a119fbc80629a1d2fb4661f0bb" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "clientes" ADD CONSTRAINT "FK_6cf16202e92515a7413cfce56b4" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "clientes" ADD CONSTRAINT "FK_718a0540a10d174c78f5202d175" FOREIGN KEY ("persona_id") REFERENCES "personas"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "pagos_venta" ADD CONSTRAINT "FK_463dd9a6f5a8957960c34e44572" FOREIGN KEY ("venta_id") REFERENCES "ventas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "pagos_venta" ADD CONSTRAINT "FK_c163cf7e87f48d15589196d45f9" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "inventario_movimientos" ADD CONSTRAINT "FK_21745295adb29ca21af0cabfb54" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "inventario_movimientos" ADD CONSTRAINT "FK_a626c37c9f2e23c577fb2336f2f" FOREIGN KEY ("lote_id") REFERENCES "lotes"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "inventario_movimientos" ADD CONSTRAINT "FK_e9cbf7be09808a9ac02fc9888d0" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "categorias_producto" ADD CONSTRAINT "FK_6db8d8363fa6cb413e0d6eea68f" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "laboratorios" ADD CONSTRAINT "FK_033bda373b203cf89cc91923e27" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "productos" ADD CONSTRAINT "FK_e968133682997c5d7ed66843d9c" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "productos" ADD CONSTRAINT "FK_5aaee6054b643e7c778477193a3" FOREIGN KEY ("categoria_id") REFERENCES "categorias_producto"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "productos" ADD CONSTRAINT "FK_7318bc8b044753aaaa7f0507b75" FOREIGN KEY ("laboratorio_id") REFERENCES "laboratorios"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "lotes" ADD CONSTRAINT "FK_e6ee9259b5adc8e7b81fea04591" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "lotes" ADD CONSTRAINT "FK_947bc42513ff248a61bd30d8900" FOREIGN KEY ("producto_id") REFERENCES "productos"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "venta_detalles" ADD CONSTRAINT "FK_4edde3f0f455374c9d44eb6dbc7" FOREIGN KEY ("venta_id") REFERENCES "ventas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "venta_detalles" ADD CONSTRAINT "FK_9671a1f1ceb22743f5136de907e" FOREIGN KEY ("producto_id") REFERENCES "productos"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "venta_detalles" ADD CONSTRAINT "FK_ba52ed94ca92f5dd5a2bc32c05a" FOREIGN KEY ("lote_id") REFERENCES "lotes"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "ventas" ADD CONSTRAINT "FK_6db69ea684d3d66038d80f1bc84" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "ventas" ADD CONSTRAINT "FK_5c564fe8d2b5182a37211405827" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "ventas" ADD CONSTRAINT "FK_6a9b8170c731e6ca2449ea27c52" FOREIGN KEY ("cliente_id") REFERENCES "clientes"("id") ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "proveedores" ADD CONSTRAINT "FK_73a2f12d2de9027b7db26ab3f32" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "compra_detalles" ADD CONSTRAINT "FK_a3f5e9f7c9f23f76ef2814b0472" FOREIGN KEY ("compra_id") REFERENCES "compras"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "compra_detalles" ADD CONSTRAINT "FK_736491d693c1728023c18dcd56c" FOREIGN KEY ("producto_id") REFERENCES "productos"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "compra_detalles" ADD CONSTRAINT "FK_c3a79e262a44532c40d9adcba50" FOREIGN KEY ("lote_id") REFERENCES "lotes"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "compras" ADD CONSTRAINT "FK_035f2251e585980f9322d87c41d" FOREIGN KEY ("clinica_id") REFERENCES "clinicas"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "compras" ADD CONSTRAINT "FK_d7b3950fea313d15e46e0c59286" FOREIGN KEY ("proveedor_id") REFERENCES "proveedores"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "compras" ADD CONSTRAINT "FK_ec0332a11c8fa9c4330aaca0aea" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "compras" DROP CONSTRAINT "FK_ec0332a11c8fa9c4330aaca0aea"`);
+        await queryRunner.query(`ALTER TABLE "compras" DROP CONSTRAINT "FK_d7b3950fea313d15e46e0c59286"`);
+        await queryRunner.query(`ALTER TABLE "compras" DROP CONSTRAINT "FK_035f2251e585980f9322d87c41d"`);
+        await queryRunner.query(`ALTER TABLE "compra_detalles" DROP CONSTRAINT "FK_c3a79e262a44532c40d9adcba50"`);
+        await queryRunner.query(`ALTER TABLE "compra_detalles" DROP CONSTRAINT "FK_736491d693c1728023c18dcd56c"`);
+        await queryRunner.query(`ALTER TABLE "compra_detalles" DROP CONSTRAINT "FK_a3f5e9f7c9f23f76ef2814b0472"`);
+        await queryRunner.query(`ALTER TABLE "proveedores" DROP CONSTRAINT "FK_73a2f12d2de9027b7db26ab3f32"`);
+        await queryRunner.query(`ALTER TABLE "ventas" DROP CONSTRAINT "FK_6a9b8170c731e6ca2449ea27c52"`);
+        await queryRunner.query(`ALTER TABLE "ventas" DROP CONSTRAINT "FK_5c564fe8d2b5182a37211405827"`);
+        await queryRunner.query(`ALTER TABLE "ventas" DROP CONSTRAINT "FK_6db69ea684d3d66038d80f1bc84"`);
+        await queryRunner.query(`ALTER TABLE "venta_detalles" DROP CONSTRAINT "FK_ba52ed94ca92f5dd5a2bc32c05a"`);
+        await queryRunner.query(`ALTER TABLE "venta_detalles" DROP CONSTRAINT "FK_9671a1f1ceb22743f5136de907e"`);
+        await queryRunner.query(`ALTER TABLE "venta_detalles" DROP CONSTRAINT "FK_4edde3f0f455374c9d44eb6dbc7"`);
+        await queryRunner.query(`ALTER TABLE "lotes" DROP CONSTRAINT "FK_947bc42513ff248a61bd30d8900"`);
+        await queryRunner.query(`ALTER TABLE "lotes" DROP CONSTRAINT "FK_e6ee9259b5adc8e7b81fea04591"`);
+        await queryRunner.query(`ALTER TABLE "productos" DROP CONSTRAINT "FK_7318bc8b044753aaaa7f0507b75"`);
+        await queryRunner.query(`ALTER TABLE "productos" DROP CONSTRAINT "FK_5aaee6054b643e7c778477193a3"`);
+        await queryRunner.query(`ALTER TABLE "productos" DROP CONSTRAINT "FK_e968133682997c5d7ed66843d9c"`);
+        await queryRunner.query(`ALTER TABLE "laboratorios" DROP CONSTRAINT "FK_033bda373b203cf89cc91923e27"`);
+        await queryRunner.query(`ALTER TABLE "categorias_producto" DROP CONSTRAINT "FK_6db8d8363fa6cb413e0d6eea68f"`);
+        await queryRunner.query(`ALTER TABLE "inventario_movimientos" DROP CONSTRAINT "FK_e9cbf7be09808a9ac02fc9888d0"`);
+        await queryRunner.query(`ALTER TABLE "inventario_movimientos" DROP CONSTRAINT "FK_a626c37c9f2e23c577fb2336f2f"`);
+        await queryRunner.query(`ALTER TABLE "inventario_movimientos" DROP CONSTRAINT "FK_21745295adb29ca21af0cabfb54"`);
+        await queryRunner.query(`ALTER TABLE "pagos_venta" DROP CONSTRAINT "FK_c163cf7e87f48d15589196d45f9"`);
+        await queryRunner.query(`ALTER TABLE "pagos_venta" DROP CONSTRAINT "FK_463dd9a6f5a8957960c34e44572"`);
+        await queryRunner.query(`ALTER TABLE "clientes" DROP CONSTRAINT "FK_718a0540a10d174c78f5202d175"`);
+        await queryRunner.query(`ALTER TABLE "clientes" DROP CONSTRAINT "FK_6cf16202e92515a7413cfce56b4"`);
+        await queryRunner.query(`ALTER TABLE "usuarios_clinica" DROP CONSTRAINT "FK_9a119fbc80629a1d2fb4661f0bb"`);
+        await queryRunner.query(`ALTER TABLE "usuarios_clinica" DROP CONSTRAINT "FK_53430e4cc8538231608b3655851"`);
+        await queryRunner.query(`ALTER TABLE "usuarios" DROP CONSTRAINT "FK_899199fd151861c079720cc508f"`);
+        await queryRunner.query(`ALTER TABLE "refresh_tokens" DROP CONSTRAINT "FK_c8349fdadc1bc791125bdd8c855"`);
+        await queryRunner.query(`DROP TABLE "compras"`);
+        await queryRunner.query(`DROP TYPE "public"."compras_estado_enum"`);
+        await queryRunner.query(`DROP TABLE "compra_detalles"`);
+        await queryRunner.query(`DROP TABLE "proveedores"`);
+        await queryRunner.query(`DROP TABLE "ventas"`);
+        await queryRunner.query(`DROP TYPE "public"."ventas_estado_enum"`);
+        await queryRunner.query(`DROP TABLE "venta_detalles"`);
+        await queryRunner.query(`DROP TABLE "lotes"`);
+        await queryRunner.query(`DROP TABLE "productos"`);
+        await queryRunner.query(`DROP TYPE "public"."productos_tipo_enum"`);
+        await queryRunner.query(`DROP TABLE "laboratorios"`);
+        await queryRunner.query(`DROP TABLE "categorias_producto"`);
+        await queryRunner.query(`DROP TABLE "inventario_movimientos"`);
+        await queryRunner.query(`DROP TYPE "public"."inventario_movimientos_tipo_enum"`);
+        await queryRunner.query(`DROP TABLE "pagos_venta"`);
+        await queryRunner.query(`DROP TYPE "public"."pagos_venta_metodo_enum"`);
+        await queryRunner.query(`DROP TABLE "clientes"`);
+        await queryRunner.query(`DROP TYPE "public"."clientes_estado_enum"`);
+        await queryRunner.query(`DROP TABLE "clinicas"`);
+        await queryRunner.query(`DROP TYPE "public"."clinicas_estado_enum"`);
+        await queryRunner.query(`DROP TABLE "usuarios_clinica"`);
+        await queryRunner.query(`DROP TYPE "public"."usuarios_clinica_rol_enum"`);
+        await queryRunner.query(`DROP TABLE "usuarios"`);
+        await queryRunner.query(`DROP TYPE "public"."usuarios_rol_global_enum"`);
+        await queryRunner.query(`DROP TABLE "refresh_tokens"`);
+        await queryRunner.query(`DROP TABLE "personas"`);
+    }
+
+}
