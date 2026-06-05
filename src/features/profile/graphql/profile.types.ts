@@ -11,9 +11,6 @@ export class ProfileType {
   @Field()
   last_name!: string;
 
-  @Field(() => String, { nullable: true })
-  photo!: string | null;
-
   @Field(() => Int)
   user_id!: number;
 
@@ -28,9 +25,6 @@ export class ProfileType {
 
   @Field(() => String, { nullable: true })
   branch_name!: string | null;
-
-  @Field()
-  is_verified!: boolean;
 }
 
 @ObjectType()

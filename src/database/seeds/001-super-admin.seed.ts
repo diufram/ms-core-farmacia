@@ -27,7 +27,6 @@ export const superAdminSeed: Seed = {
     const persona = personaRepository.create({
       nombre: process.env.SEED_SUPER_ADMIN_NOMBRE || 'Super',
       apellido: process.env.SEED_SUPER_ADMIN_APELLIDO || 'Admin',
-      correo_electronico: correo,
       celular: process.env.SEED_SUPER_ADMIN_CELULAR || null,
     });
     const personaGuardada = await personaRepository.save(persona);
@@ -38,8 +37,6 @@ export const superAdminSeed: Seed = {
       contrasena: await hash(password, 10),
       rol_global: RolGlobal.SUPER_ADMIN,
       persona: personaGuardada,
-      activo: true,
-      esta_verificado: true,
     });
 
     await usuarioRepository.save(usuario);

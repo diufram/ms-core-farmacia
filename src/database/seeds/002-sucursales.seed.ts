@@ -1,4 +1,4 @@
-import { EstadoSucursal, Sucursal } from '../entities/sucursal.entity';
+import { Sucursal } from '../entities/sucursal.entity';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
@@ -7,23 +7,15 @@ const SUCURSALES = [
     nombre: 'Sucursal Central',
     slug: 'sucursal-central',
     telefono: '70000001',
-    correo_electronico: 'central@multifarmacia.local',
     direccion: 'Av. Principal #100',
     ciudad: 'Santa Cruz',
-    departamento: 'Andres Ibanez',
-    pais: 'Bolivia',
-    referencia: 'Zona centro',
   },
   {
     nombre: 'Sucursal Norte',
     slug: 'sucursal-norte',
     telefono: '70000002',
-    correo_electronico: 'norte@multifarmacia.local',
     direccion: 'Av. Norte #250',
     ciudad: 'Santa Cruz',
-    departamento: 'Andres Ibanez',
-    pais: 'Bolivia',
-    referencia: 'Zona norte',
   },
 ];
 
@@ -40,7 +32,7 @@ export const sucursalesSeed: Seed = {
         continue;
       }
 
-      const sucursal = repository.create({ ...item, estado: EstadoSucursal.ACTIVA });
+      const sucursal = repository.create({ ...item });
       await repository.save(sucursal);
       console.log(`- Sucursal creada (${item.slug}).`);
     }

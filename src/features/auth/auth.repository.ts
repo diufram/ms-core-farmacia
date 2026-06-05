@@ -33,10 +33,6 @@ export class AuthRepository {
     });
   }
 
-  async actualizarUltimoAcceso(id: number): Promise<void> {
-    await this.usuarioRepository.update(id, { ultimo_acceso: new Date() });
-  }
-
   async buscarSucursalPorId(id: number): Promise<Sucursal | null> {
     return this.sucursalRepository.findOne({ where: { id } });
   }
@@ -49,7 +45,6 @@ export class AuthRepository {
       where: {
         usuario: { id: usuarioId },
         sucursal: { id: sucursalId },
-        activo: true,
       },
       relations: ['sucursal'],
     });

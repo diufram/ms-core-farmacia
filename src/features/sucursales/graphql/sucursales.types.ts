@@ -14,23 +14,11 @@ export class SucursalType {
   @Field(() => String, { nullable: true })
   telefono?: string | null;
 
-  @Field(() => String, { nullable: true })
-  correo_electronico?: string | null;
-
   @Field()
   direccion!: string;
 
   @Field(() => String, { nullable: true })
   ciudad?: string | null;
-
-  @Field(() => String, { nullable: true })
-  departamento?: string | null;
-
-  @Field(() => String, { nullable: true })
-  pais?: string | null;
-
-  @Field(() => String, { nullable: true })
-  referencia?: string | null;
 
   @Field(() => Float, { nullable: true })
   latitud?: number | null;
@@ -39,10 +27,7 @@ export class SucursalType {
   longitud?: number | null;
 
   @Field(() => String, { nullable: true })
-  descripcion?: string | null;
-
-  @Field()
-  estado!: string;
+  logo?: string | null;
 }
 
 @ObjectType()

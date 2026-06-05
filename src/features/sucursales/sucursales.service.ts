@@ -63,15 +63,10 @@ export class SucursalesService {
         nombre: dto.nombre,
         slug,
         telefono: dto.telefono,
-        correo_electronico: dto.correo_electronico,
         direccion: dto.direccion,
         ciudad: dto.ciudad,
-        departamento: dto.departamento,
-        pais: dto.pais,
-        referencia: dto.referencia,
         latitud: dto.latitud,
         longitud: dto.longitud,
-        descripcion: dto.descripcion,
       });
       const sucursalGuardada = await manager.save(sucursal);
 
@@ -119,16 +114,11 @@ export class SucursalesService {
       nombre: sucursal.nombre,
       slug: sucursal.slug,
       telefono: sucursal.telefono,
-      correo_electronico: sucursal.correo_electronico,
       direccion: sucursal.direccion,
       ciudad: sucursal.ciudad,
-      departamento: sucursal.departamento,
-      pais: sucursal.pais,
-      referencia: sucursal.referencia,
       latitud: sucursal.latitud,
       longitud: sucursal.longitud,
-      descripcion: sucursal.descripcion,
-      estado: sucursal.estado,
+      logo: sucursal.logo,
       created_at: sucursal.createdAt,
       updated_at: sucursal.updatedAt,
     };

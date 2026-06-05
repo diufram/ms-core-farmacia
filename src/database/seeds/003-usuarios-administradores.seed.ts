@@ -52,7 +52,6 @@ export const usuariosAdministradoresSeed: Seed = {
         const persona = personaRepository.create({
           nombre: item.nombre,
           apellido: item.apellido,
-          correo_electronico: item.correo,
           celular: item.celular,
         });
         const personaGuardada = await personaRepository.save(persona);
@@ -63,8 +62,6 @@ export const usuariosAdministradoresSeed: Seed = {
           contrasena: await hash(password, 10),
           rol_global: RolGlobal.USER,
           persona: personaGuardada,
-          activo: true,
-          esta_verificado: true,
         });
         usuario = await usuarioRepository.save(usuario);
         console.log(`- Usuario administrador creado (${item.correo}).`);

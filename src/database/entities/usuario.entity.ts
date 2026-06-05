@@ -29,18 +29,6 @@ export class Usuario extends BaseEntity {
   @Column({ type: 'enum', enum: RolGlobal, default: RolGlobal.USER })
   rol_global!: RolGlobal;
 
-  @Column({ name: 'esta_verificado', default: false })
-  esta_verificado!: boolean;
-
-  @Column({ default: true })
-  activo!: boolean;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  foto?: string | null;
-
-  @Column({ type: 'timestamp', nullable: true })
-  ultimo_acceso?: Date | null;
-
   @OneToOne(() => Persona, (persona) => persona.usuario, {
     nullable: false,
     eager: true,

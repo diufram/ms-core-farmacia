@@ -48,9 +48,6 @@ export const clientesSeed: Seed = {
       const persona = personaRepository.create({
         nombre: item.nombre,
         apellido: item.apellido,
-        tipo_documento: 'CI',
-        numero_documento: item.documento,
-        correo_electronico: item.correo,
         celular: item.celular,
       });
       const personaGuardada = await personaRepository.save(persona);

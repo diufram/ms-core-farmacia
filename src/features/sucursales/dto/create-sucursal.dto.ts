@@ -26,12 +26,6 @@ export class CreateSucursalDto {
   @MaxLength(20)
   telefono?: string;
 
-  @ApiPropertyOptional({ example: 'contacto@sucursal.com' })
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsEmail()
-  correo_electronico?: string;
-
   @ApiProperty({ example: 'Av. Principal #123' })
   @Field()
   @IsString()
@@ -46,27 +40,6 @@ export class CreateSucursalDto {
   @MaxLength(100)
   ciudad?: string;
 
-  @ApiPropertyOptional({ example: 'Andres Ibanez' })
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  departamento?: string;
-
-  @ApiPropertyOptional({ example: 'Bolivia' })
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  pais?: string;
-
-  @ApiPropertyOptional({ example: 'Frente a la plaza' })
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  referencia?: string;
-
   @ApiPropertyOptional({ example: -17.783327 })
   @Field(() => Float, { nullable: true })
   @IsOptional()
@@ -78,12 +51,6 @@ export class CreateSucursalDto {
   @IsOptional()
   @IsNumber()
   longitud?: number;
-
-  @ApiPropertyOptional({ example: 'Sucursal para atencion de zona norte' })
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  descripcion?: string;
 
   @ApiProperty({ example: 'Laura' })
   @Field()

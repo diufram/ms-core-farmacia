@@ -40,8 +40,6 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales invalidas.');
     }
 
-    await this.authRepository.actualizarUltimoAcceso(usuario.id);
-
     const tokens = await this.generarTokens(usuario);
     return {
       usuario: this.serializarUsuario(usuario),

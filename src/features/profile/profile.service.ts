@@ -27,13 +27,11 @@ export class ProfileService {
       person_id: persona.id,
       first_name: persona.nombre,
       last_name: persona.apellido,
-      photo: usuario.foto,
       user_id: usuario.id,
       email: usuario.correo_electronico,
       username: usuario.nombre_usuario,
       branch_id: sucursal?.id ?? null,
       branch_name: sucursal?.nombre ?? null,
-      is_verified: usuario.esta_verificado,
     };
   }
 
@@ -62,13 +60,11 @@ export class ProfileService {
       person_id: persona!.id,
       first_name: persona!.nombre,
       last_name: persona!.apellido,
-      photo: updated.foto,
       user_id: updated.id,
       email: updated.correo_electronico,
       username: updated.nombre_usuario,
       branch_id: sucursal?.id ?? null,
       branch_name: sucursal?.nombre ?? null,
-      is_verified: updated.esta_verificado,
     };
   }
 
