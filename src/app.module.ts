@@ -11,6 +11,7 @@ import { ClientesModule } from './features/clientes/clientes.module';
 import { ProductosModule } from './features/productos/productos.module';
 import { ProfileModule } from './features/profile/profile.module';
 import { SucursalesModule } from './features/sucursales/sucursales.module';
+import { VentasModule } from './features/ventas/ventas.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SucursalesModule } from './features/sucursales/sucursales.module';
     CategoriasModule,
     ProductosModule,
     ClientesModule,
+    VentasModule,
   ],
 })
 export class AppModule {}

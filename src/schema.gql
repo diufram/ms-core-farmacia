@@ -89,6 +89,12 @@ type CreateSucursalPayloadType {
   sucursal: SucursalType!
 }
 
+input CreateVentaDto {
+  clienteId: Int
+  detalles: [VentaDetalleInput!]!
+  sucursalId: Int!
+}
+
 input LoginDto {
   contrasena: String!
   correo_electronico: String!
@@ -116,9 +122,11 @@ type Mutation {
   createCliente(input: CreateClienteDto!): ClientePayloadType!
   createProducto(input: CreateProductoDto!): ProductoPayloadType!
   createSucursal(input: CreateSucursalDto!): CreateSucursalPayloadType!
+  createVenta(input: CreateVentaDto!): VentaPayloadType!
   deleteCategoria(id: Int!): CategoriaPayloadType!
   deleteCliente(id: Int!): ClientePayloadType!
   deleteProducto(id: Int!): ProductoPayloadType!
+  deleteVenta(id: Int!): VentaPayloadType!
   login(input: LoginDto!): AuthPayloadType!
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
@@ -179,6 +187,8 @@ type Query {
   profile: ProfileType!
   sucursal(id: Int!): SucursalType!
   sucursales: [SucursalType!]!
+  venta(id: Int!): VentaType!
+  ventas(fechaDesde: String, fechaHasta: String, sucursalId: Int): [VentaType!]!
 }
 
 input RefreshTokenDto {
@@ -240,4 +250,35 @@ type UsuarioAuthType {
   rol_global: String!
   sucursal: SucursalAuthType
   sucursal_id: Int
+}
+
+input VentaDetalleInput {
+  cantidad: Int!
+  precioUnitario: Float
+  productoId: Int!
+}
+
+type VentaDetalleType {
+  cantidad: Int!
+  id: Int!
+  precio_unitario: Float!
+  producto_id: Int!
+  producto_nombre: String!
+  subtotal: Float!
+}
+
+type VentaPayloadType {
+  message: String!
+  venta: VentaType!
+}
+
+type VentaType {
+  cliente_id: Int
+  detalles: [VentaDetalleType!]!
+  fecha_venta: String!
+  id: Int!
+  numero_venta: String!
+  sucursal_id: Int!
+  total: Float!
+  usuario_id: Int!
 }
