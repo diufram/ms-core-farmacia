@@ -21,10 +21,4 @@ export class VentaDetalle extends BaseEntity {
 
   @Column({ type: 'numeric', precision: 10, scale: 2 })
   precio_unitario!: number;
-
-  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
-  descuento!: number;
-
-  @Column({ type: 'numeric', precision: 12, scale: 2 })
-  subtotal!: number;
 }

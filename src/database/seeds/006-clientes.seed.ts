@@ -1,4 +1,4 @@
-import { Cliente, EstadoCliente } from '../entities/cliente.entity';
+import { Cliente } from '../entities/cliente.entity';
 import { Persona } from '../entities/persona.entity';
 import { Sucursal } from '../entities/sucursal.entity';
 import { Seed } from './base.seed';
@@ -57,9 +57,6 @@ export const clientesSeed: Seed = {
           sucursal,
           persona: personaGuardada,
           codigo_cliente: item.codigo,
-          telefono_secundario: null,
-          observaciones: null,
-          estado: EstadoCliente.ACTIVO,
         }),
       );
     }

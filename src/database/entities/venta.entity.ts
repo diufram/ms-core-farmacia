@@ -5,19 +5,6 @@ import { Sucursal } from './sucursal.entity';
 import { Usuario } from './usuario.entity';
 import { VentaDetalle } from './venta-detalle.entity';
 
-export enum EstadoVenta {
-  BORRADOR = 'borrador',
-  CONFIRMADA = 'confirmada',
-  ANULADA = 'anulada',
-}
-
-export enum MetodoPagoVenta {
-  EFECTIVO = 'efectivo',
-  TARJETA = 'tarjeta',
-  TRANSFERENCIA = 'transferencia',
-  QR = 'qr',
-}
-
 @Entity('ventas')
 @Unique('UQ_ventas_sucursal_numero', ['sucursal', 'numero_venta'])
 export class Venta extends BaseEntity {
@@ -40,22 +27,7 @@ export class Venta extends BaseEntity {
   fecha_venta!: string;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
-  subtotal!: number;
-
-  @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
-  descuento_total!: number;
-
-  @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
   total!: number;
-
-  @Column({ type: 'enum', enum: EstadoVenta, default: EstadoVenta.CONFIRMADA })
-  estado!: EstadoVenta;
-
-  @Column({ type: 'text', nullable: true })
-  observacion?: string | null;
-
-  @Column({ type: 'enum', enum: MetodoPagoVenta, default: MetodoPagoVenta.EFECTIVO })
-  metodo_pago!: MetodoPagoVenta;
 
   @OneToMany(() => VentaDetalle, (detalle) => detalle.venta)
   detalles!: VentaDetalle[];

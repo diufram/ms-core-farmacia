@@ -2,7 +2,6 @@ import { superAdminSeed } from './001-super-admin.seed';
 import { sucursalesSeed } from './002-sucursales.seed';
 import { usuariosAdministradoresSeed } from './003-usuarios-administradores.seed';
 import { categoriasProductoSeed } from './004-categorias-producto.seed';
-import { laboratoriosSeed } from './005-laboratorios.seed';
 import { clientesSeed } from './006-clientes.seed';
 import { productosSeed } from './007-productos.seed';
 import { Seed } from './base.seed';
@@ -13,7 +12,6 @@ const seeds: Seed[] = [
   sucursalesSeed,
   usuariosAdministradoresSeed,
   categoriasProductoSeed,
-  laboratoriosSeed,
   clientesSeed,
   productosSeed,
 ];

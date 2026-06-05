@@ -4,9 +4,9 @@ import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
 const CATEGORIAS = [
-  { codigo: 'MED', nombre: 'Medicamentos', descripcion: 'Productos farmacologicos.' },
-  { codigo: 'VEN', nombre: 'Venta Libre', descripcion: 'Productos de venta libre.' },
-  { codigo: 'INS', nombre: 'Insumos', descripcion: 'Material e insumos de farmacia.' },
+  { codigo: 'MED', nombre: 'Medicamentos' },
+  { codigo: 'VEN', nombre: 'Venta Libre' },
+  { codigo: 'INS', nombre: 'Insumos' },
 ];
 
 export const categoriasProductoSeed: Seed = {
@@ -32,8 +32,6 @@ export const categoriasProductoSeed: Seed = {
             sucursal,
             codigo,
             nombre: categoriaBase.nombre,
-            descripcion: categoriaBase.descripcion,
-            activo: true,
           }),
         );
       }

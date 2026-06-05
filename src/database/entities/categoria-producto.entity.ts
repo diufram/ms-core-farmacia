@@ -15,12 +15,6 @@ export class CategoriaProducto extends BaseEntity {
   @Column({ type: 'varchar', length: 160 })
   codigo!: string;
 
-  @Column({ type: 'text', nullable: true })
-  descripcion?: string | null;
-
-  @Column({ default: true })
-  activo!: boolean;
-
   @OneToMany(() => Producto, (producto) => producto.categoria)
   productos!: Producto[];
 }
