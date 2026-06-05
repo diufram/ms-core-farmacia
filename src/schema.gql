@@ -9,6 +9,18 @@ type AuthPayloadType {
   usuario: UsuarioAuthType!
 }
 
+type CategoriaPayloadType {
+  categoria: CategoriaType!
+  message: String!
+}
+
+type CategoriaType {
+  codigo: String!
+  id: Int!
+  nombre: String!
+  sucursal_id: Int
+}
+
 input ChangePasswordDto {
   confirm_password: String!
   current_password: String!
@@ -22,6 +34,12 @@ input CheckUsernameDto {
 type CheckUsernameResultType {
   available: Boolean!
   message: String
+}
+
+input CreateCategoriaDto {
+  codigo: String!
+  nombre: String!
+  sucursalId: Int!
 }
 
 input CreateSucursalDto {
@@ -68,10 +86,13 @@ type MessageResultType {
 
 type Mutation {
   changePassword(input: ChangePasswordDto!): MessageResultType!
+  createCategoria(input: CreateCategoriaDto!): CategoriaPayloadType!
   createSucursal(input: CreateSucursalDto!): CreateSucursalPayloadType!
+  deleteCategoria(id: Int!): CategoriaPayloadType!
   login(input: LoginDto!): AuthPayloadType!
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
+  updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
   updateUsername(input: UpdateUsernameDto!): ProfileType!
 }
 
@@ -87,6 +108,8 @@ type ProfileType {
 }
 
 type Query {
+  categoria(id: Int!): CategoriaType!
+  categorias(sucursalId: Int): [CategoriaType!]!
   checkUsername(input: CheckUsernameDto!): CheckUsernameResultType!
   me: MePayloadType!
   profile: ProfileType!
@@ -121,6 +144,11 @@ type SucursalType {
   nombre: String!
   slug: String!
   telefono: String
+}
+
+input UpdateCategoriaDto {
+  codigo: String
+  nombre: String
 }
 
 input UpdateUsernameDto {
