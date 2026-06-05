@@ -30,17 +30,12 @@ input CreateSucursalDto {
   ciudad: String
   contrasena_admin: String!
   correo_admin: String!
-  correo_electronico: String
-  departamento: String
-  descripcion: String
   direccion: String!
   latitud: Float
   longitud: Float
   nombre: String!
   nombre_admin: String!
   nombre_usuario_admin: String!
-  pais: String
-  referencia: String
   telefono: String
 }
 
@@ -85,10 +80,8 @@ type ProfileType {
   branch_name: String
   email: String!
   first_name: String!
-  is_verified: Boolean!
   last_name: String!
   person_id: Int!
-  photo: String
   user_id: Int!
   username: String!
 }
@@ -120,17 +113,12 @@ type SucursalAuthType {
 
 type SucursalType {
   ciudad: String
-  correo_electronico: String
-  departamento: String
-  descripcion: String
   direccion: String!
-  estado: String!
   id: Int!
   latitud: Float
+  logo: String
   longitud: Float
   nombre: String!
-  pais: String
-  referencia: String
   slug: String!
   telefono: String
 }

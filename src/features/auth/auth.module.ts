@@ -5,7 +5,6 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Persona } from '../../database/entities/persona.entity';
 import { RefreshToken } from '../../database/entities/refresh-token.entity';
-import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
 import { AuthRepository } from './auth.repository';
@@ -23,7 +22,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       Persona,
       RefreshToken,
       UsuarioSucursal,
-      Sucursal,
     ]),
   ],
   providers: [AuthService, AuthRepository, AuthResolver, JwtStrategy],
