@@ -242,7 +242,9 @@ export class AuthService {
     return usuario.sucursales?.[0]?.rol ?? usuario.rol_global;
   }
 
-  private async obtenerSucursalActiva(usuario: Usuario): Promise<number | null> {
+  private async obtenerSucursalActiva(
+    usuario: Usuario,
+  ): Promise<number | null> {
     if (usuario.rol_global === RolGlobal.SUPER_ADMIN) {
       return null;
     }

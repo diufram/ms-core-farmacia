@@ -12,7 +12,11 @@ export class VentaDetalle extends BaseEntity {
   @JoinColumn({ name: 'venta_id' })
   venta!: Venta;
 
-  @ManyToOne(() => Producto, { nullable: false, eager: true, onDelete: 'RESTRICT' })
+  @ManyToOne(() => Producto, {
+    nullable: false,
+    eager: true,
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'producto_id' })
   producto!: Producto;
 

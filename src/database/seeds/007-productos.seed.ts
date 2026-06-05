@@ -36,7 +36,9 @@ export const productosSeed: Seed = {
     const categoriaRepository = seedDataSource.getRepository(CategoriaProducto);
     const productoRepository = seedDataSource.getRepository(Producto);
 
-    const sucursal = await sucursalRepository.findOne({ where: { slug: 'sucursal-central' } });
+    const sucursal = await sucursalRepository.findOne({
+      where: { slug: 'sucursal-central' },
+    });
     if (!sucursal) {
       console.log('- No existe sucursal-central, seed de productos omitido.');
       return;

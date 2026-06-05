@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  Unique,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Unique } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
 import { CategoriaProducto } from './categoria-producto.entity';
 import { Sucursal } from './sucursal.entity';

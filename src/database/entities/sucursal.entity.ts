@@ -29,7 +29,10 @@ export class Sucursal extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   logo?: string | null;
 
-  @OneToMany(() => UsuarioSucursal, (usuarioSucursal) => usuarioSucursal.sucursal)
+  @OneToMany(
+    () => UsuarioSucursal,
+    (usuarioSucursal) => usuarioSucursal.sucursal,
+  )
   usuarios_sucursal!: UsuarioSucursal[];
 
   @OneToMany(() => Cliente, (cliente) => cliente.sucursal)

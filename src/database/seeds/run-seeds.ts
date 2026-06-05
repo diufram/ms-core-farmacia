@@ -17,29 +17,29 @@ const seeds: Seed[] = [
 ];
 
 async function runSeeds() {
-    console.log('Iniciando ejecucion de seeds...\n');
-    await seedDataSource.initialize();
-    console.log('Conexion de seed activa.\n');
+  console.log('Iniciando ejecucion de seeds...\n');
+  await seedDataSource.initialize();
+  console.log('Conexion de seed activa.\n');
 
-    for (const seed of seeds.sort((a, b) => a.order - b.order)) {
-        console.log(`Ejecutando seed: ${seed.name}`);
-        try {
-            await seed.run();
-            console.log(`Seed "${seed.name}" completado\n`);
-        } catch (error) {
-            console.error(`Error en seed "${seed.name}":`, error);
-            throw error;
-        }
+  for (const seed of seeds.sort((a, b) => a.order - b.order)) {
+    console.log(`Ejecutando seed: ${seed.name}`);
+    try {
+      await seed.run();
+      console.log(`Seed "${seed.name}" completado\n`);
+    } catch (error) {
+      console.error(`Error en seed "${seed.name}":`, error);
+      throw error;
     }
+  }
 
-    await seedDataSource.destroy();
-    console.log('Todos los seeds se ejecutaron correctamente');
+  await seedDataSource.destroy();
+  console.log('Todos los seeds se ejecutaron correctamente');
 }
 
 runSeeds().catch((err) => {
-    if (seedDataSource.isInitialized) {
-        seedDataSource.destroy().catch(() => null);
-    }
-    console.error('Error durante la ejecucion de seeds:', err);
-    process.exit(1);
+  if (seedDataSource.isInitialized) {
+    seedDataSource.destroy().catch(() => null);
+  }
+  console.error('Error durante la ejecucion de seeds:', err);
+  process.exit(1);
 });

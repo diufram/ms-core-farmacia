@@ -17,12 +17,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ConfigModule,
     PassportModule,
     JwtModule.register({}),
-    TypeOrmModule.forFeature([
-      Usuario,
-      Persona,
-      RefreshToken,
-      UsuarioSucursal,
-    ]),
+    TypeOrmModule.forFeature([Usuario, Persona, RefreshToken, UsuarioSucursal]),
   ],
   providers: [AuthService, AuthRepository, AuthResolver, JwtStrategy],
 })

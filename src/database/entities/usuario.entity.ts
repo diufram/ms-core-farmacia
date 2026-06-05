@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
 import { Persona } from './persona.entity';
 import { RefreshToken } from './refresh-token.entity';
@@ -37,7 +31,10 @@ export class Usuario extends BaseEntity {
   @JoinColumn({ name: 'persona_id' })
   persona!: Persona;
 
-  @OneToMany(() => UsuarioSucursal, (usuarioSucursal) => usuarioSucursal.usuario)
+  @OneToMany(
+    () => UsuarioSucursal,
+    (usuarioSucursal) => usuarioSucursal.usuario,
+  )
   sucursales!: UsuarioSucursal[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.usuario)

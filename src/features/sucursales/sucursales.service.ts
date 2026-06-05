@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcryptjs';
 import { DataSource, Repository } from 'typeorm';
@@ -46,14 +50,18 @@ export class SucursalesService {
       where: { correo_electronico: dto.correo_admin.toLowerCase() },
     });
     if (existingEmail) {
-      throw new ConflictException('El correo del administrador ya esta registrado.');
+      throw new ConflictException(
+        'El correo del administrador ya esta registrado.',
+      );
     }
 
     const existingUsername = await this.usuarioRepository.findOne({
       where: { nombre_usuario: dto.nombre_usuario_admin },
     });
     if (existingUsername) {
-      throw new ConflictException('El nombre de usuario del administrador ya esta en uso.');
+      throw new ConflictException(
+        'El nombre de usuario del administrador ya esta en uso.',
+      );
     }
 
     const passwordHash = await hash(dto.contrasena_admin, 10);

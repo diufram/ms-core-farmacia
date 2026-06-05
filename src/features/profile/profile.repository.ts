@@ -28,13 +28,18 @@ export class ProfileRepository {
   }
 
   async updateUsername(usuarioId: number, username: string): Promise<Usuario> {
-    await this.usuarioRepository.update(usuarioId, { nombre_usuario: username });
+    await this.usuarioRepository.update(usuarioId, {
+      nombre_usuario: username,
+    });
     const usuario = await this.findUsuarioById(usuarioId);
     if (!usuario) throw new NotFoundException('Usuario no encontrado');
     return usuario;
   }
 
-  async isUsernameTaken(username: string, excludeUserId?: number): Promise<boolean> {
+  async isUsernameTaken(
+    username: string,
+    excludeUserId?: number,
+  ): Promise<boolean> {
     const query = this.usuarioRepository
       .createQueryBuilder('u')
       .where('LOWER(u.nombre_usuario) = LOWER(:username)', { username });
@@ -46,6 +51,8 @@ export class ProfileRepository {
   }
 
   async updatePassword(usuarioId: number, passwordHash: string): Promise<void> {
-    await this.usuarioRepository.update(usuarioId, { contrasena: passwordHash });
+    await this.usuarioRepository.update(usuarioId, {
+      contrasena: passwordHash,
+    });
   }
 }

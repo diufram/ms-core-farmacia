@@ -9,7 +9,9 @@ import { SucursalesResolver } from './sucursales.resolver';
 import { SucursalesService } from './sucursales.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Sucursal, Persona, Usuario, UsuarioSucursal])],
+  imports: [
+    TypeOrmModule.forFeature([Sucursal, Persona, Usuario, UsuarioSucursal]),
+  ],
   providers: [SucursalesService, SucursalesRepository, SucursalesResolver],
   exports: [SucursalesService],
 })

@@ -2,7 +2,10 @@ import { hash } from 'bcryptjs';
 import { Persona } from '../entities/persona.entity';
 import { Sucursal } from '../entities/sucursal.entity';
 import { RolGlobal, Usuario } from '../entities/usuario.entity';
-import { RolSucursal, UsuarioSucursal } from '../entities/usuario-sucursal.entity';
+import {
+  RolSucursal,
+  UsuarioSucursal,
+} from '../entities/usuario-sucursal.entity';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
@@ -32,7 +35,8 @@ export const usuariosAdministradoresSeed: Seed = {
     const usuarioRepository = seedDataSource.getRepository(Usuario);
     const personaRepository = seedDataSource.getRepository(Persona);
     const sucursalRepository = seedDataSource.getRepository(Sucursal);
-    const usuarioSucursalRepository = seedDataSource.getRepository(UsuarioSucursal);
+    const usuarioSucursalRepository =
+      seedDataSource.getRepository(UsuarioSucursal);
     const password = process.env.SEED_ADMIN_SUCURSAL_PASSWORD || 'Admin12345';
 
     for (const item of ADMINISTRADORES) {
@@ -45,7 +49,10 @@ export const usuariosAdministradoresSeed: Seed = {
       }
 
       let usuario = await usuarioRepository.findOne({
-        where: [{ correo_electronico: item.correo }, { nombre_usuario: item.username }],
+        where: [
+          { correo_electronico: item.correo },
+          { nombre_usuario: item.username },
+        ],
       });
 
       if (!usuario) {
@@ -72,7 +79,9 @@ export const usuariosAdministradoresSeed: Seed = {
       });
 
       if (relacion) {
-        console.log(`- Relacion usuario-sucursal ya existe (${item.correo} -> ${item.sucursalSlug}).`);
+        console.log(
+          `- Relacion usuario-sucursal ya existe (${item.correo} -> ${item.sucursalSlug}).`,
+        );
         continue;
       }
 
@@ -85,7 +94,9 @@ export const usuariosAdministradoresSeed: Seed = {
         }),
       );
 
-      console.log(`- Relacion usuario-sucursal creada (${item.correo} -> ${item.sucursalSlug}).`);
+      console.log(
+        `- Relacion usuario-sucursal creada (${item.correo} -> ${item.sucursalSlug}).`,
+      );
     }
   },
 };

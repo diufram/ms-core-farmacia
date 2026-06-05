@@ -10,7 +10,11 @@ export class Cliente extends BaseEntity {
   @JoinColumn({ name: 'sucursal_id' })
   sucursal!: Sucursal;
 
-  @ManyToOne(() => Persona, { nullable: false, eager: true, onDelete: 'RESTRICT' })
+  @ManyToOne(() => Persona, {
+    nullable: false,
+    eager: true,
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'persona_id' })
   persona!: Persona;
 

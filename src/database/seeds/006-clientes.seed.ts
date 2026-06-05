@@ -31,7 +31,9 @@ export const clientesSeed: Seed = {
     const personaRepository = seedDataSource.getRepository(Persona);
     const clienteRepository = seedDataSource.getRepository(Cliente);
 
-    const sucursal = await sucursalRepository.findOne({ where: { slug: 'sucursal-central' } });
+    const sucursal = await sucursalRepository.findOne({
+      where: { slug: 'sucursal-central' },
+    });
     if (!sucursal) {
       console.log('- No existe sucursal-central, seed de clientes omitido.');
       return;

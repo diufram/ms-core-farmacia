@@ -1,5 +1,5 @@
 export interface Seed {
-    order: number;
-    name: string;
-    run: () => Promise<void>;
+  order: number;
+  name: string;
+  run: () => Promise<void>;
 }
