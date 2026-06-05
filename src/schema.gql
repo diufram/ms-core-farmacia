@@ -42,6 +42,14 @@ input CreateCategoriaDto {
   sucursalId: Int!
 }
 
+input CreateProductoDto {
+  categoriaId: Int!
+  codigo: String!
+  nombre: String!
+  precio_venta: Float!
+  stock_actual: Int! = 0
+}
+
 input CreateSucursalDto {
   apellido_admin: String!
   celular_admin: String
@@ -87,13 +95,31 @@ type MessageResultType {
 type Mutation {
   changePassword(input: ChangePasswordDto!): MessageResultType!
   createCategoria(input: CreateCategoriaDto!): CategoriaPayloadType!
+  createProducto(input: CreateProductoDto!): ProductoPayloadType!
   createSucursal(input: CreateSucursalDto!): CreateSucursalPayloadType!
   deleteCategoria(id: Int!): CategoriaPayloadType!
+  deleteProducto(id: Int!): ProductoPayloadType!
   login(input: LoginDto!): AuthPayloadType!
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
+  updateProducto(id: Int!, input: UpdateProductoDto!): ProductoType!
   updateUsername(input: UpdateUsernameDto!): ProfileType!
+}
+
+type ProductoPayloadType {
+  message: String!
+  producto: ProductoType!
+}
+
+type ProductoType {
+  categoria_id: Int!
+  codigo: String!
+  id: Int!
+  nombre: String!
+  precio_venta: Float!
+  stock_actual: Int!
+  sucursal_id: Int!
 }
 
 type ProfileType {
@@ -112,6 +138,8 @@ type Query {
   categorias(sucursalId: Int): [CategoriaType!]!
   checkUsername(input: CheckUsernameDto!): CheckUsernameResultType!
   me: MePayloadType!
+  producto(id: Int!): ProductoType!
+  productos(categoriaId: Int, sucursalId: Int): [ProductoType!]!
   profile: ProfileType!
   sucursal(id: Int!): SucursalType!
   sucursales: [SucursalType!]!
@@ -149,6 +177,13 @@ type SucursalType {
 input UpdateCategoriaDto {
   codigo: String
   nombre: String
+}
+
+input UpdateProductoDto {
+  categoriaId: Int
+  nombre: String
+  precio_venta: Float
+  stock_actual: Int
 }
 
 input UpdateUsernameDto {
