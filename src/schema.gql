@@ -36,9 +36,27 @@ type CheckUsernameResultType {
   message: String
 }
 
+type ClientePayloadType {
+  cliente: ClienteType!
+  message: String!
+}
+
+type ClienteType {
+  codigo_cliente: String!
+  id: Int!
+  persona: PersonaSimpleType!
+  sucursal_id: Int!
+}
+
 input CreateCategoriaDto {
   codigo: String!
   nombre: String!
+  sucursalId: Int!
+}
+
+input CreateClienteDto {
+  codigo_cliente: String!
+  persona: PersonaInput!
   sucursalId: Int!
 }
 
@@ -95,16 +113,32 @@ type MessageResultType {
 type Mutation {
   changePassword(input: ChangePasswordDto!): MessageResultType!
   createCategoria(input: CreateCategoriaDto!): CategoriaPayloadType!
+  createCliente(input: CreateClienteDto!): ClientePayloadType!
   createProducto(input: CreateProductoDto!): ProductoPayloadType!
   createSucursal(input: CreateSucursalDto!): CreateSucursalPayloadType!
   deleteCategoria(id: Int!): CategoriaPayloadType!
+  deleteCliente(id: Int!): ClientePayloadType!
   deleteProducto(id: Int!): ProductoPayloadType!
   login(input: LoginDto!): AuthPayloadType!
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
+  updateCliente(id: Int!, input: UpdateClienteDto!): ClienteType!
   updateProducto(id: Int!, input: UpdateProductoDto!): ProductoType!
   updateUsername(input: UpdateUsernameDto!): ProfileType!
+}
+
+input PersonaInput {
+  apellido: String
+  celular: String
+  nombre: String
+}
+
+type PersonaSimpleType {
+  apellido: String!
+  celular: String
+  id: Int!
+  nombre: String!
 }
 
 type ProductoPayloadType {
@@ -137,6 +171,8 @@ type Query {
   categoria(id: Int!): CategoriaType!
   categorias(sucursalId: Int): [CategoriaType!]!
   checkUsername(input: CheckUsernameDto!): CheckUsernameResultType!
+  cliente(id: Int!): ClienteType!
+  clientes(sucursalId: Int): [ClienteType!]!
   me: MePayloadType!
   producto(id: Int!): ProductoType!
   productos(categoriaId: Int, sucursalId: Int): [ProductoType!]!
@@ -177,6 +213,11 @@ type SucursalType {
 input UpdateCategoriaDto {
   codigo: String
   nombre: String
+}
+
+input UpdateClienteDto {
+  codigo_cliente: String
+  persona: PersonaInput
 }
 
 input UpdateProductoDto {

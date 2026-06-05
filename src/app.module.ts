@@ -7,6 +7,7 @@ import { join } from 'path';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './features/auth/auth.module';
 import { CategoriasModule } from './features/categorias/categorias.module';
+import { ClientesModule } from './features/clientes/clientes.module';
 import { ProductosModule } from './features/productos/productos.module';
 import { ProfileModule } from './features/profile/profile.module';
 import { SucursalesModule } from './features/sucursales/sucursales.module';
@@ -30,6 +31,7 @@ import { SucursalesModule } from './features/sucursales/sucursales.module';
     ProfileModule,
     CategoriasModule,
     ProductosModule,
+    ClientesModule,
   ],
 })
 export class AppModule {}
