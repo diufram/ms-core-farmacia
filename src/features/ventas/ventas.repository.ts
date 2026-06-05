@@ -67,17 +67,6 @@ export class VentasRepository {
     });
   }
 
-  async countByNumeroVentaPrefix(
-    sucursalId: number,
-    prefix: string,
-  ): Promise<number> {
-    return this.ventaRepository
-      .createQueryBuilder('v')
-      .where('v.sucursal_id = :sucursalId', { sucursalId })
-      .andWhere('v.numero_venta LIKE :prefix', { prefix: `${prefix}%` })
-      .getCount();
-  }
-
   create(data: Partial<Venta>): Venta {
     return this.ventaRepository.create(data);
   }

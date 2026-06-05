@@ -2,19 +2,16 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { DataSource, QueryFailedError } from 'typeorm';
+import { randomUUID } from 'crypto';
+import { DataSource } from 'typeorm';
 import { Producto } from '../../database/entities/producto.entity';
 import { RolGlobal } from '../../database/entities/usuario.entity';
 import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { VentasRepository } from './ventas.repository';
-
-const MAX_NUMERO_VENTA_ATTEMPTS = 10;
-const POSTGRES_UNIQUE_VIOLATION = '23505';
 
 @Injectable()
 export class VentasService {
@@ -83,8 +80,8 @@ export class VentasService {
     }
 
     const today = new Date();
-    const datePrefix = `V-${today.toISOString().slice(0, 10).replace(/-/g, '')}`;
     const fechaVenta = today.toISOString().slice(0, 10);
+    const numeroVenta = `V-${randomUUID()}`;
 
     let total = 0;
     for (const detalle of dto.detalles) {
@@ -95,82 +92,48 @@ export class VentasService {
       total += precioUnitario * detalle.cantidad;
     }
 
-    let ventaCreada: Venta | null = null;
-    let numeroVenta = '';
-    for (let attempt = 1; attempt <= MAX_NUMERO_VENTA_ATTEMPTS; attempt++) {
-      const count = await this.ventasRepository.countByNumeroVentaPrefix(
-        dto.sucursalId,
-        datePrefix,
-      );
-      const candidate = count + attempt;
-      numeroVenta = `${datePrefix}-${String(candidate).padStart(4, '0')}`;
+    const ventaCreada = await this.dataSource.transaction(async (manager) => {
+      const venta = manager.create(Venta, {
+        numero_venta: numeroVenta,
+        fecha_venta: fechaVenta,
+        total,
+        sucursal: { id: dto.sucursalId } as Venta['sucursal'],
+        usuario: { id: userId } as Venta['usuario'],
+        cliente: dto.clienteId
+          ? ({ id: dto.clienteId } as Venta['cliente'])
+          : null,
+      });
+      const ventaGuardada = await manager.save(venta);
 
-      try {
-        ventaCreada = await this.dataSource.transaction(async (manager) => {
-          const venta = manager.create(Venta, {
-            numero_venta: numeroVenta,
-            fecha_venta: fechaVenta,
-            total,
-            sucursal: { id: dto.sucursalId } as Venta['sucursal'],
-            usuario: { id: userId } as Venta['usuario'],
-            cliente: dto.clienteId
-              ? ({ id: dto.clienteId } as Venta['cliente'])
-              : null,
-          });
-          const ventaGuardada = await manager.save(venta);
-
-          for (const detalle of dto.detalles) {
-            const producto = productos.find((p) => p.id === detalle.productoId);
-            if (!producto) continue;
-            const precioUnitario =
-              detalle.precioUnitario ?? Number(producto.precio_venta);
-            const detalleEntity = manager.create(VentaDetalle, {
-              venta: ventaGuardada,
-              producto: { id: producto.id } as VentaDetalle['producto'],
-              cantidad: detalle.cantidad,
-              precio_unitario: precioUnitario,
-            });
-            await manager.save(detalleEntity);
-          }
-
-          for (const detalle of dto.detalles) {
-            const producto = productos.find((p) => p.id === detalle.productoId);
-            if (!producto) continue;
-            producto.stock_actual -= detalle.cantidad;
-            await manager.save(Producto, producto);
-          }
-
-          return ventaGuardada;
+      for (const detalle of dto.detalles) {
+        const producto = productos.find((p) => p.id === detalle.productoId);
+        if (!producto) continue;
+        const precioUnitario =
+          detalle.precioUnitario ?? Number(producto.precio_venta);
+        const detalleEntity = manager.create(VentaDetalle, {
+          venta: ventaGuardada,
+          producto: { id: producto.id } as VentaDetalle['producto'],
+          cantidad: detalle.cantidad,
+          precio_unitario: precioUnitario,
         });
-        break;
-      } catch (err) {
-        if (this.isUniqueViolation(err)) {
-          continue;
-        }
-        throw err;
+        await manager.save(detalleEntity);
       }
-    }
 
-    if (!ventaCreada) {
-      throw new InternalServerErrorException(
-        'No se pudo generar un numero de venta unico. Intente nuevamente.',
-      );
-    }
+      for (const detalle of dto.detalles) {
+        const producto = productos.find((p) => p.id === detalle.productoId);
+        if (!producto) continue;
+        producto.stock_actual -= detalle.cantidad;
+        await manager.save(Producto, producto);
+      }
+
+      return ventaGuardada;
+    });
 
     const reloaded = await this.ventasRepository.findById(ventaCreada.id);
     return {
       venta: this.serializeVenta(reloaded!),
       message: `Venta ${numeroVenta} creada correctamente.`,
     };
-  }
-
-  private isUniqueViolation(err: unknown): boolean {
-    if (err instanceof QueryFailedError) {
-      const driverError = (err as { driverError?: { code?: string } })
-        .driverError;
-      return driverError?.code === POSTGRES_UNIQUE_VIOLATION;
-    }
-    return false;
   }
 
   async delete(id: number, userRol: string, userSucursalId: number | null) {
