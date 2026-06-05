@@ -4,6 +4,7 @@ import { usuariosAdministradoresSeed } from './003-usuarios-administradores.seed
 import { categoriasProductoSeed } from './004-categorias-producto.seed';
 import { clientesSeed } from './006-clientes.seed';
 import { productosSeed } from './007-productos.seed';
+import { ventasSeed } from './008-ventas.seed';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
@@ -14,6 +15,7 @@ const seeds: Seed[] = [
   categoriasProductoSeed,
   clientesSeed,
   productosSeed,
+  ventasSeed,
 ];
 
 async function runSeeds() {
