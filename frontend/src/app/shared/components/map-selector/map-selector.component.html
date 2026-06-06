@@ -1,0 +1,41 @@
+<div class="map-selector-container">
+  
+  <div class="map-wrapper" [style.height]="height">
+    
+    <div [id]="mapId" class="map-container"></div>
+
+    <div class="map-controls-overlay" *ngIf="!readonly">
+      
+      <p-button 
+        icon="pi pi-compass" 
+        styleClass="glass-btn"
+        (click)="onGetCurrentLocation()"
+        pTooltip="Usar mi ubicación"
+        tooltipPosition="left"
+        [loading]="isLoadingLocation">
+      </p-button>
+
+      <p-button 
+        *ngIf="hasValidCoordinates()"
+        icon="pi pi-times" 
+        styleClass="glass-btn p-button-danger"
+        (click)="resetLocation()"
+        pTooltip="Borrar ubicación"
+        tooltipPosition="left">
+      </p-button>
+
+    </div>
+
+    <div class="map-info-pill" [class.visible]="hasValidCoordinates()">
+      <div class="map-info-content">
+        <i class="pi pi-map-marker text-primary"></i>
+        <span class="location-text" [pTooltip]="locationLabel" tooltipPosition="top">
+          {{ locationLabel || 'Buscando ubicación...' }}
+        </span>
+        <i *ngIf="isResolvingAddress" class="pi pi-spin pi-spinner text-color-secondary"></i>
+      </div>
+
+    </div>
+
+  </div>
+</div>

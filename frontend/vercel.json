@@ -1,0 +1,15 @@
+{
+    "rewrites": [
+        {
+            "source": "/:path*",
+            "destination": "/index.html"
+        }
+    ],
+    "trailingSlash": false,
+    "git": {
+        "deploymentEnabled": {
+            "main": true,
+            "*": false
+        }
+    }
+}

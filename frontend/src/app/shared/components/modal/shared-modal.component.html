@@ -1,0 +1,14 @@
+<p-dialog [(visible)]="visible" [header]="header" [modal]="true" [style]="{ width: width }"
+  [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" [closeOnEscape]="true"
+  [dismissableMask]="true" appendTo="body" [blockScroll]="true" (onHide)="close()" styleClass="custom-modal p-fluid"
+  [contentStyle]="{ 'overflow-y': 'auto', 'max-height': '80vh' }">
+
+  <div >
+    <ng-content select="[modal-body]"></ng-content>
+  </div>
+
+  <ng-template pTemplate="footer">
+      <ng-content select="[modal-footer]"></ng-content>
+  </ng-template>
+
+</p-dialog>

@@ -1,0 +1,62 @@
+/* 1. TODOS los @use al principio del archivo */
+@use './tailwind.css';
+@use './layout/layout.scss';
+@use 'primeicons/primeicons.css';
+@use './demo/demo.scss';
+@use '@angular/material' as mat;
+@use 'leaflet/dist/leaflet.css';
+
+/* 2. Estilos base */
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* 3. Angular Material tema que responde a app-dark */
+html {
+    @include mat.theme((
+        color: (
+            primary: mat.$azure-palette,
+            tertiary: mat.$blue-palette,
+        ),
+        typography: Roboto,
+        density: 0,
+    ));
+}
+
+/* 4. Sincronizar color-scheme con el tema de PrimeNG/Tailwind */
+:root {
+    color-scheme: light;
+}
+
+:root.app-dark,
+:root.dark {
+    color-scheme: dark;
+}
+
+/* 5. Asegurar que el body use las variables de PrimeNG para el fondo */
+body {
+    background-color: var(--surface-ground, var(--p-surface-100));
+    color: var(--text-color, var(--p-text-color));
+}
+
+:root.app-dark body,
+:root.dark body {
+    background-color: var(--surface-ground, var(--p-surface-950));
+    color: var(--text-color, var(--p-text-color));
+}
+
+/* 6. Variables CSS del layout */
+.logo-mask {
+    width: 54px;
+    height: 40px;
+    display: inline-block;
+    background-image: url('/icono_p.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}

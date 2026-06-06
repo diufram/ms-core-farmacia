@@ -1,0 +1,120 @@
+<div class="w-full">
+    <div class="mb-3 pl-1">
+        <h3 class="text-2xl font-bold text-color m-0">{{ title }}</h3>
+    </div>
+    <p-toolbar styleClass="mb-3 gap-2 w-full border-none p-0 bg-transparent">
+        <ng-template pTemplate="left">
+            <div class="actions-container flex flex-col md:flex-row w-full gap-2 items-stretch md:items-center">
+
+                <ng-content select="[table-actions]"></ng-content>
+
+                <p-button label="Exportar" icon="pi pi-upload" severity="secondary" [outlined]="true"
+                    styleClass="w-full md:w-auto" class="md:ml-auto w-full md:w-auto" (onClick)="dt.exportCSV()">
+                </p-button>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="right">
+            <p-iconfield iconPosition="left" class="w-full md:w-auto mt-2 md:mt-0">
+                <p-inputicon styleClass="pi pi-search text-gray-400" />
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..."
+                    class="w-full md:w-15rem pl-10" />
+            </p-iconfield>
+        </ng-template>
+    </p-toolbar>
+
+    <!-- Header de columnas (se muestra solo en desktop) -->
+    <div class="cards-desktop-header" [style.gridTemplateColumns]="desktopGridTemplate">
+        <div
+            class="cards-desktop-header-cell"
+            *ngFor="let col of columns"
+            [ngClass]="'cell-' + (col.type || 'text')"
+        >
+            {{ col.header }}
+        </div>
+    </div>
+
+    <!-- Skeleton Loading con template personalizado -->
+    @if (showSkeleton) {
+        @if (skeletonItemTemplate) {
+            <ng-container *ngTemplateOutlet="skeletonItemTemplate; context: { $implicit: rows, desktopGrid: desktopGridTemplate }"></ng-container>
+        } @else {
+            <!-- Skeleton por defecto -->
+            <div class="skeleton-cards-container" [style.gridTemplateColumns]="desktopGridTemplate">
+                <div *ngFor="let i of [].constructor(rows)" class="skeleton-card">
+                    <div class="skeleton-card-row" *ngFor="let col of columns">
+                        <span class="skeleton-card-label">{{ col.header }}</span>
+                        <p-skeleton width="60%" height="1.5rem"></p-skeleton>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <p-table #dt [value]="showSkeleton ? [] : data" [rows]="rows" [first]="first" [columns]="columns" [paginator]="paginator" [globalFilterFields]="searchFields"
+        [rowHover]="true" [dataKey]="dataKey" [loading]="loading" responsiveLayout="stack" breakpoint="0px"
+        styleClass="custom-table-cards" [tableStyle]="{'min-width': '100%'}"
+        [totalRecords]="totalRecords" [lazy]="lazyLoad" (onLazyLoad)="onPage($event)"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}" [showCurrentPageReport]="true"
+        [showLoader]="false"
+        (onPage)="handlePageChange($event)">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                    {{ col.header }} <p-sortIcon *ngIf="col.sortable" [field]="col.field" />
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+            <tr [style.gridTemplateColumns]="desktopGridTemplate">
+                <td *ngFor="let col of columns" [ngClass]="'cell-' + (col.type || 'text')">
+                    <span class="p-column-title">{{ col.header }}</span>
+                    <div class="cell-content">
+                        <ng-container [ngSwitch]="col.type || 'text'">
+                            <span *ngSwitchCase="'text'">{{ item[col.field] }}</span>
+                            <span *ngSwitchCase="'date'">{{ item[col.field] | date: 'dd/MM/yyyy' }}</span>
+                            <span *ngSwitchCase="'currency'">{{ item[col.field] | currency: (col.currencyCode || 'USD')
+                                }}</span>
+                            <div *ngSwitchCase="'image'" class="image-cell">
+                                @if (item[col.field]) {
+                                    <img [src]="item[col.field]" [alt]="item.full_name || item.name || 'Imagen'"
+                                        class="person-avatar-img" />
+                                } @else {
+                                    <div class="image-placeholder">
+                                        <i class="pi pi-user"></i>
+                                    </div>
+                                }
+                            </div>
+                            <div *ngSwitchCase="'rating'">
+                                <p-rating [ngModel]="item[col.field]" [readonly]="true"></p-rating>
+                            </div>
+                            <div *ngSwitchCase="'tag'">
+                                <p-tag [value]="item[col.field]" [severity]="getSeverity(item[col.field])"
+                                    [rounded]="true"></p-tag>
+                            </div>
+                            <div *ngSwitchCase="'actions'" class="flex gap-2 action-buttons">
+                                <ng-container *ngFor="let action of rowActions">
+                                    <p-button *ngIf="action.visible !== false" [icon]="action.icon"
+                                        [severity]="action.severity" [text]="true" [rounded]="true"
+                                        [pTooltip]="action.tooltip" tooltipPosition="top"
+                                        (onClick)="emitAction(action.key, item)">
+                                    </p-button>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td [attr.colspan]="columns.length" class="text-center p-5">
+                    <span class="font-medium text-color-secondary">No se encontraron registros</span>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

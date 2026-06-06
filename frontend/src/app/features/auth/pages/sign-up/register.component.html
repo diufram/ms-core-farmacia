@@ -1,0 +1,204 @@
+<my-floating-configurator />
+
+<div
+    class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden"
+>
+    <div class="flex flex-col items-center justify-center">
+        <div
+            style="
+                border-radius: 56px;
+                padding: 0.3rem;
+                background: linear-gradient(
+                    180deg,
+                    var(--primary-color) 10%,
+                    rgba(33, 150, 243, 0) 30%
+                );
+            "
+        >
+            <div
+                class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20"
+                style="border-radius: 53px"
+            >
+                <div class="text-center mb-8">
+                    <div
+                        class="logo-mask"
+                        style="width: 200px; height: 150px"
+                    ></div>
+
+                    <div
+                        class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4"
+                    >
+                        Crea tu cuenta
+                    </div>
+                    <span class="text-muted-color font-medium"
+                        >Registrate para continuar</span
+                    >
+                </div>
+
+                <form [formGroup]="form" (ngSubmit)="onRegister()">
+                    <div class="mb-4">
+                        <p-floatlabel variant="on">
+                            <input
+                                pInputText
+                                id="nombre"
+                                type="text"
+                                formControlName="nombre"
+                                class="w-full md:w-120"
+                                variant="filled"
+                                pSize="small"
+                            />
+                            <label for="nombre">Nombre</label>
+                        </p-floatlabel>
+                        @if (isInvalid("nombre")) {
+                            <small class="text-red-500 mt-1 block"
+                                >El nombre es requerido</small
+                            >
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <p-floatlabel variant="on">
+                            <input
+                                pInputText
+                                id="apellido"
+                                type="text"
+                                formControlName="apellido"
+                                class="w-full md:w-120"
+                                variant="filled"
+                                pSize="small"
+                            />
+                            <label for="apellido">Apellido</label>
+                        </p-floatlabel>
+                        @if (isInvalid("apellido")) {
+                            <small class="text-red-500 mt-1 block"
+                                >El apellido es requerido</small
+                            >
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <p-floatlabel variant="on">
+                            <input
+                                pInputText
+                                id="nombre_usuario"
+                                type="text"
+                                formControlName="nombre_usuario"
+                                class="w-full md:w-120"
+                                variant="filled"
+                                pSize="small"
+                            />
+                            <label for="nombre_usuario"
+                                >Nombre de usuario</label
+                            >
+                        </p-floatlabel>
+                        @if (isInvalid("nombre_usuario")) {
+                            <small class="text-red-500 mt-1 block"
+                                >Mínimo 3 caracteres requeridos</small
+                            >
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <p-floatlabel variant="on">
+                            <input
+                                pInputText
+                                id="celular"
+                                type="text"
+                                formControlName="celular"
+                                class="w-full md:w-120"
+                                variant="filled"
+                                pSize="small"
+                            />
+                            <label for="celular">Celular (opcional)</label>
+                        </p-floatlabel>
+                    </div>
+
+                    <div class="mb-4">
+                        <p-floatlabel variant="on">
+                            <input
+                                pInputText
+                                id="correo_electronico"
+                                type="email"
+                                formControlName="correo_electronico"
+                                class="w-full md:w-120"
+                                variant="filled"
+                                pSize="small"
+                            />
+                            <label for="correo_electronico"
+                                >Correo electrónico</label
+                            >
+                        </p-floatlabel>
+                        @if (isInvalid("correo_electronico")) {
+                            <small class="text-red-500 mt-1 block"
+                                >Correo electrónico inválido</small
+                            >
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <p-floatlabel variant="on">
+                            <input
+                                pInputText
+                                id="contrasena"
+                                type="password"
+                                formControlName="contrasena"
+                                class="w-full md:w-120"
+                                variant="filled"
+                                pSize="small"
+                            />
+                            <label for="contrasena">Contraseña</label>
+                        </p-floatlabel>
+                        @if (isInvalid("contrasena")) {
+                            <small class="text-red-500 mt-1 block"
+                                >Mínimo 8 caracteres requeridos</small
+                            >
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <p-floatlabel variant="on">
+                            <input
+                                pInputText
+                                id="confirmarContrasena"
+                                type="password"
+                                formControlName="confirmarContrasena"
+                                class="w-full md:w-120"
+                                variant="filled"
+                                pSize="small"
+                            />
+                            <label for="confirmarContrasena"
+                                >Confirmar contraseña</label
+                            >
+                        </p-floatlabel>
+                        @if (hasPasswordMismatch()) {
+                            <small class="text-red-500 mt-1 block"
+                                >Las contraseñas no coinciden</small
+                            >
+                        }
+                    </div>
+
+                    <p-button
+                        type="submit"
+                        label="Crear Cuenta"
+                        styleClass="w-full"
+                        [loading]="loading"
+                        [disabled]="form.invalid"
+                    >
+                    </p-button>
+
+                    <div class="mt-4 text-center">
+                        <span class="text-muted-color text-sm">
+                            Ya tienes cuenta?
+                        </span>
+                        <a
+                            routerLink="/auth/login"
+                            class="text-primary font-medium no-underline ml-1 cursor-pointer"
+                        >
+                            Inicia sesion
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

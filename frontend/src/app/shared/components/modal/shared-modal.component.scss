@@ -1,0 +1,20 @@
+:host ::ng-deep {
+    .custom-modal {
+        
+        /* 1. Ajustamos el Encabezado (Título) */
+        .p-dialog-header {
+            padding-bottom: 0.5rem !important; /* Reducimos el espacio debajo del título */
+        }
+
+        /* 2. Ajustamos el Contenido (Donde empiezan los inputs) */
+        .p-dialog-content {
+            padding-top: 0.5rem !important; /* Reducimos el espacio arriba del primer input */
+        }
+
+        /* 3. (Opcional) Si quieres el footer más pegado al contenido también */
+        .p-dialog-footer {
+            padding-top: 0 !important;
+            padding-bottom: 1rem !important;
+        }
+    }
+}

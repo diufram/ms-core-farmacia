@@ -1,0 +1,337 @@
+:host ::ng-deep {
+    /* --- AJUSTES DEL TOOLBAR (Móvil) --- */
+    @media screen and (max-width: 768px) {
+        /* 1. Forzar Toolbar a columna */
+        .p-toolbar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+        }
+        
+        /* 2. El grupo izquierdo ocupa todo el ancho */
+        .p-toolbar-group-left {
+            width: 100% !important;
+        }
+
+        /* 3. Contenedor de acciones (flex vertical) */
+        .actions-container {
+            flex-direction: column !important;
+            width: 100% !important;
+        }
+
+        /* 4. REGLA DE ORO: Forzar que TODOS los p-button hijos ocupen el 100% */
+        .actions-container > * {
+            width: 100% !important;
+            display: block !important;
+        }
+
+        /* 5. Asegurar que el botón interno de PrimeNG también se estire */
+        .actions-container p-button .p-button {
+            width: 100% !important;
+            justify-content: center !important;
+        }
+        
+        /* Ajuste para el buscador */
+        .p-toolbar-group-right {
+            width: 100% !important;
+            margin-top: 0.5rem;
+        }
+    }
+
+    .cards-desktop-header {
+        display: none;
+    }
+
+    /* --- ESTILOS DE TABLA EN CARD --- */
+    .custom-table-cards {
+        .p-datatable-thead {
+            display: none !important;
+        }
+
+        .p-datatable-wrapper {
+            overflow: visible;
+            padding: 0;
+
+            @media screen and (min-width: 960px) {
+                padding: 0;
+            }
+        }
+
+        .p-datatable {
+            padding: 0;
+        }
+
+        .p-datatable-tbody {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            background: transparent !important;
+            padding: 0;
+
+            @media screen and (min-width: 960px) {
+                gap: 0.5rem;
+                padding: 0;
+            }
+        }
+
+        .p-datatable-tbody > tr {
+            background: var(--surface-card) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--surface-border) !important;
+            border-radius: 14px;
+            padding: 0.95rem 1rem;
+            margin: 0 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex !important;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            }
+
+            @media screen and (min-width: 960px) {
+                display: grid !important;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.9rem 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        .p-datatable-tbody > tr > td {
+            display: flex !important;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            border: none !important;
+            padding: 0.45rem 0 !important;
+            width: 100% !important;
+            border-bottom: none !important;
+            gap: 0.35rem;
+
+            &:last-child {
+                padding-bottom: 0 !important;
+            }
+
+            &:first-child {
+                padding-top: 0 !important;
+            }
+
+            @media screen and (min-width: 960px) {
+                width: 100% !important;
+                min-width: 0;
+                padding: 0 !important;
+                border-bottom: none !important;
+                display: block !important;
+            }
+        }
+
+        /* Columna de acciones: sticky a la derecha para que siempre sea visible */
+        .p-datatable-tbody > tr > td.cell-actions,
+        .cards-desktop-header-cell:last-child {
+            @media screen and (min-width: 960px) {
+                position: sticky !important;
+                right: 0 !important;
+                background: var(--surface-card) !important;
+                z-index: 2;
+                box-shadow: -4px 0 6px -2px rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        .p-column-title {
+            display: block !important;
+            font-weight: 600;
+            font-size: 0.72rem;
+            color: var(--text-color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            flex-shrink: 0;
+
+            @media screen and (min-width: 960px) {
+                display: none !important;
+            }
+        }
+
+        .cell-content {
+            text-align: left;
+            width: 100%;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.35;
+
+            @media screen and (min-width: 960px) {
+                width: 100%;
+                min-width: 0;
+                text-align: left;
+            }
+        }
+
+        .cell-image .cell-content {
+            width: auto;
+        }
+
+        .cell-actions .cell-content {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .action-buttons {
+            justify-content: flex-start;
+            gap: 0.35rem;
+        }
+
+        img {
+            width: 48px !important;
+            height: 48px !important;
+            max-width: 48px !important;
+            max-height: 48px !important;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .person-avatar-img {
+            width: 48px;
+            height: 48px;
+            max-width: 48px;
+            max-height: 48px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-placeholder {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 8px;
+            background: #0D8ABC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .image-placeholder i {
+            font-size: 1.25rem;
+        }
+    }
+
+    @media screen and (min-width: 960px) {
+        .cards-desktop-header {
+            display: grid;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0 1rem 0.65rem;
+            margin-bottom: 0.35rem;
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        .cards-desktop-header-cell {
+            font-size: 0.84rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            color: var(--text-color-secondary);
+            text-transform: uppercase;
+        }
+
+        .cards-desktop-header-cell:last-child {
+            text-align: right;
+        }
+    }
+
+    .p-paginator {
+        background: transparent !important;
+        border: none !important;
+    }
+
+    /* --- SKELETON LOADING STYLES --- */
+    /* Para skeleton personalizado (pasado por template) */
+    .skeleton-person-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+
+        @media screen and (min-width: 960px) {
+            display: grid;
+            gap: 0.5rem;
+        }
+    }
+
+    .table-skeleton {
+        .skeleton-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+
+            @media screen and (min-width: 960px) {
+                display: grid;
+                gap: 0.5rem;
+            }
+        }
+
+        .skeleton-card {
+            background: var(--surface-card);
+            color: var(--text-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+            /* Desktop: Horizontal como cards - usar grid dinámico */
+            @media screen and (min-width: 960px) {
+                display: contents;
+            }
+        }
+
+        .skeleton-card-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            width: 100%;
+            border-bottom: 1px dashed var(--surface-border);
+            gap: 1rem;
+
+            &:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            &:first-child {
+                padding-top: 0;
+            }
+
+            /* Desktop */
+            @media screen and (min-width: 960px) {
+                display: block;
+                width: 100%;
+                border-bottom: none;
+                padding: 0;
+            }
+        }
+
+        .skeleton-card-label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-color-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+
+            @media screen and (min-width: 960px) {
+                display: none;
+            }
+        }
+    }
+}

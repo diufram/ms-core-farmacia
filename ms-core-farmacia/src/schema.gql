@@ -1,0 +1,424 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input AdminResetPasswordDto {
+  motivo: String
+  nueva_contrasena: String!
+}
+
+input AssignSucursalDto {
+  rol: String!
+  sucursalId: Int!
+}
+
+type AuthPayloadType {
+  access_token: String
+  message: String!
+  refresh_token: String
+  usuario: UsuarioAuthType!
+}
+
+type CategoriaPayloadType {
+  categoria: CategoriaType!
+  message: String!
+}
+
+type CategoriaType {
+  codigo: String!
+  id: Int!
+  nombre: String!
+  sucursal_id: Int
+}
+
+input ChangePasswordDto {
+  confirm_password: String!
+  current_password: String!
+  new_password: String!
+}
+
+input CheckUsernameDto {
+  username: String!
+}
+
+type CheckUsernameResultType {
+  available: Boolean!
+  message: String
+}
+
+type ClientePayloadType {
+  cliente: ClienteType!
+  message: String!
+}
+
+type ClienteType {
+  codigo_cliente: String!
+  id: Int!
+  persona: PersonaSimpleType!
+  sucursal_id: Int!
+}
+
+input CreateCategoriaDto {
+  codigo: String!
+  nombre: String!
+  sucursalId: Int!
+}
+
+input CreateClienteDto {
+  codigo_cliente: String!
+  persona: PersonaInput!
+  sucursalId: Int!
+}
+
+input CreateProductoDto {
+  categoriaId: Int!
+  codigo: String!
+  nombre: String!
+  precio_venta: Float!
+  stock_actual: Int! = 0
+}
+
+input CreateSucursalDto {
+  apellido_admin: String!
+  celular_admin: String
+  ciudad: String
+  contrasena_admin: String!
+  correo_admin: String!
+  direccion: String!
+  latitud: Float
+  longitud: Float
+  nombre: String!
+  nombre_admin: String!
+  nombre_usuario_admin: String!
+  telefono: String
+}
+
+type CreateSucursalPayloadType {
+  admin: SucursalAdminType!
+  message: String!
+  sucursal: SucursalType!
+}
+
+input CreateUsuarioDto {
+  contrasena: String!
+  correo_electronico: String!
+  nombre_usuario: String!
+  persona: UsuarioPersonaInput!
+  rol_global: String
+  sucursales: [SucursalAsignacionInput!]
+}
+
+input CreateVentaDto {
+  clienteId: Int
+  detalles: [VentaDetalleInput!]!
+  sucursalId: Int!
+}
+
+type DashboardKpisType {
+  cantidadVentas: Int!
+  productosStockBajo: Int!
+  productosStockBajoList: [ProductoStockBajoType!]!
+  topProductos: [TopProductoType!]!
+  totalClientes: Int!
+  totalProductos: Int!
+  totalSucursales: Int!
+  totalVentas: Float!
+  ventasPorDia: [VentasPorDiaType!]!
+  ventasPorSucursal: [VentasPorSucursalType!]!
+}
+
+input LoginDto {
+  contrasena: String!
+  correo_electronico: String!
+}
+
+input LogoutDto {
+  refresh_token: String!
+}
+
+type LogoutPayloadType {
+  message: String!
+}
+
+type MePayloadType {
+  usuario: UsuarioAuthType!
+}
+
+type MessageResultType {
+  message: String!
+}
+
+type Mutation {
+  adminResetUsuarioPassword(id: Int!, input: AdminResetPasswordDto!): UsuarioPayloadType!
+  assignUsuarioSucursal(input: AssignSucursalDto!, usuarioId: Int!): UsuarioPayloadType!
+  changePassword(input: ChangePasswordDto!): MessageResultType!
+  createCategoria(input: CreateCategoriaDto!): CategoriaPayloadType!
+  createCliente(input: CreateClienteDto!): ClientePayloadType!
+  createProducto(input: CreateProductoDto!): ProductoPayloadType!
+  createSucursal(input: CreateSucursalDto!): CreateSucursalPayloadType!
+  createUsuario(input: CreateUsuarioDto!): UsuarioPayloadType!
+  createVenta(input: CreateVentaDto!): VentaPayloadType!
+  deleteCategoria(id: Int!): CategoriaPayloadType!
+  deleteCliente(id: Int!): ClientePayloadType!
+  deleteProducto(id: Int!): ProductoPayloadType!
+  deleteSucursal(id: Int!): SucursalPayloadType!
+  deleteUsuario(id: Int!): UsuarioPayloadType!
+  deleteVenta(id: Int!): VentaPayloadType!
+  login(input: LoginDto!): AuthPayloadType!
+  logout(input: LogoutDto!): LogoutPayloadType!
+  refresh(input: RefreshTokenDto!): AuthPayloadType!
+  unassignUsuarioSucursal(sucursalId: Int!, usuarioId: Int!): UsuarioPayloadType!
+  updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
+  updateCliente(id: Int!, input: UpdateClienteDto!): ClienteType!
+  updateProducto(id: Int!, input: UpdateProductoDto!): ProductoType!
+  updateSucursal(id: Int!, input: UpdateSucursalDto!): SucursalPayloadType!
+  updateUsername(input: UpdateUsernameDto!): ProfileType!
+  updateUsuario(id: Int!, input: UpdateUsuarioDto!): UsuarioPayloadType!
+}
+
+input PersonaInput {
+  apellido: String
+  celular: String
+  nombre: String
+}
+
+type PersonaSimpleType {
+  apellido: String!
+  celular: String
+  id: Int!
+  nombre: String!
+}
+
+type PersonaType {
+  apellido: String!
+  celular: String
+  id: Int!
+  nombre: String!
+}
+
+type ProductoPayloadType {
+  message: String!
+  producto: ProductoType!
+}
+
+type ProductoStockBajoType {
+  codigo: String!
+  id: Int!
+  nombre: String!
+  stock_actual: Int!
+  sucursal_id: Int!
+  sucursal_nombre: String!
+}
+
+type ProductoType {
+  categoria_id: Int!
+  codigo: String!
+  id: Int!
+  nombre: String!
+  precio_venta: Float!
+  stock_actual: Int!
+  sucursal_id: Int!
+}
+
+type ProfileType {
+  branch_id: Int
+  branch_name: String
+  email: String!
+  first_name: String!
+  last_name: String!
+  person_id: Int!
+  user_id: Int!
+  username: String!
+}
+
+type Query {
+  categoria(id: Int!): CategoriaType!
+  categorias(sucursalId: Int): [CategoriaType!]!
+  checkUsername(input: CheckUsernameDto!): CheckUsernameResultType!
+  cliente(id: Int!): ClienteType!
+  clientes(sucursalId: Int): [ClienteType!]!
+  dashboardKpis(fechaDesde: String, fechaHasta: String, stockBajoUmbral: Int, sucursalId: Int): DashboardKpisType!
+  me: MePayloadType!
+  producto(id: Int!): ProductoType!
+  productos(categoriaId: Int, sucursalId: Int): [ProductoType!]!
+  profile: ProfileType!
+  sucursal(id: Int!): SucursalType!
+  sucursales: [SucursalType!]!
+  usuario(id: Int!): UsuarioType!
+  usuarios(rolGlobal: String, sucursalId: Int): [UsuarioType!]!
+  venta(id: Int!): VentaType!
+  ventas(fechaDesde: String, fechaHasta: String, sucursalId: Int): [VentaType!]!
+}
+
+input RefreshTokenDto {
+  refresh_token: String!
+}
+
+type SucursalAdminType {
+  correo_electronico: String!
+  id: Int!
+  nombre_usuario: String!
+  rol: String!
+}
+
+input SucursalAsignacionInput {
+  rol: String
+  sucursalId: Int!
+}
+
+type SucursalAuthType {
+  id: Int!
+  nombre: String!
+  slug: String!
+}
+
+type SucursalPayloadType {
+  message: String!
+  sucursal: SucursalType!
+}
+
+type SucursalSimpleType {
+  id: Int!
+  nombre: String!
+}
+
+type SucursalType {
+  ciudad: String
+  direccion: String!
+  id: Int!
+  latitud: Float
+  logo: String
+  longitud: Float
+  nombre: String!
+  slug: String!
+  telefono: String
+}
+
+type TopProductoType {
+  cantidad_vendida: Int!
+  codigo: String!
+  nombre: String!
+  producto_id: Int!
+  total_vendido: Float!
+}
+
+input UpdateCategoriaDto {
+  codigo: String
+  nombre: String
+}
+
+input UpdateClienteDto {
+  codigo_cliente: String
+  persona: PersonaInput
+}
+
+input UpdateProductoDto {
+  categoriaId: Int
+  nombre: String
+  precio_venta: Float
+  stock_actual: Int
+}
+
+input UpdateSucursalDto {
+  ciudad: String
+  direccion: String
+  latitud: Float
+  logo: String
+  longitud: Float
+  nombre: String
+  telefono: String
+}
+
+input UpdateUsernameDto {
+  current_password: String!
+  username: String!
+}
+
+input UpdateUsuarioDto {
+  activo: Boolean
+  correo_electronico: String
+  nombre_usuario: String
+  persona: UsuarioPersonaInput
+  rol_global: String
+}
+
+type UsuarioAuthType {
+  correo_electronico: String!
+  id: Int!
+  nombre_usuario: String!
+  rol: String!
+  rol_global: String!
+  sucursal: SucursalAuthType
+  sucursal_id: Int
+}
+
+type UsuarioPayloadType {
+  message: String!
+  usuario: UsuarioType!
+}
+
+input UsuarioPersonaInput {
+  apellido: String!
+  celular: String
+  nombre: String!
+}
+
+type UsuarioSucursalAsignacionType {
+  activo: Boolean!
+  id: Int!
+  rol: String!
+  sucursal: SucursalSimpleType!
+}
+
+type UsuarioType {
+  asignaciones: [UsuarioSucursalAsignacionType!]!
+  correo_electronico: String!
+  id: Int!
+  nombre_usuario: String!
+  persona: PersonaType!
+  rol_global: String!
+}
+
+input VentaDetalleInput {
+  cantidad: Int!
+  precioUnitario: Float
+  productoId: Int!
+}
+
+type VentaDetalleType {
+  cantidad: Int!
+  id: Int!
+  precio_unitario: Float!
+  producto_id: Int!
+  producto_nombre: String!
+  subtotal: Float!
+}
+
+type VentaPayloadType {
+  message: String!
+  venta: VentaType!
+}
+
+type VentaType {
+  cliente_id: Int
+  detalles: [VentaDetalleType!]!
+  fecha_venta: String!
+  id: Int!
+  numero_venta: String!
+  sucursal_id: Int!
+  total: Float!
+  usuario_id: Int!
+}
+
+type VentasPorDiaType {
+  cantidad: Int!
+  fecha: String!
+  total: Float!
+}
+
+type VentasPorSucursalType {
+  cantidad: Int!
+  sucursal_id: Int!
+  sucursal_nombre: String!
+  total: Float!
+}

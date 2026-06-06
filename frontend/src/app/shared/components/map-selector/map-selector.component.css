@@ -1,0 +1,176 @@
+/* --- CONTENEDOR PRINCIPAL --- */
+.map-selector-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 12px; /* Bordes modernos */
+  overflow: hidden;
+  /* El borde se adapta al color de tu tema (gris claro u oscuro) */
+  border: 1px solid var(--surface-border, #dfe7ef);
+  background: var(--surface-ground, #f8f9fa);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  /* Fondo base mientras carga */
+  background: var(--surface-ground, #f8f9fa);
+}
+
+/* --- MODO OSCURO AUTOMÁTICO PARA EL MAPA --- */
+
+/* IMPORTANTE: He eliminado el @media(prefers-color-scheme) 
+   para que el mapa NO se oscurezca solo porque tu Windows/Mac es oscuro.
+   
+   Ahora solo se activará si tu APP web tiene una de las siguientes clases:
+   .dark-mode, .layout-dark, .app-dark, .p-dark, o data-theme="dark"
+*/
+
+:host-context(.dark-mode) ::ng-deep .leaflet-tile-pane,
+:host-context(.layout-dark) ::ng-deep .leaflet-tile-pane,
+:host-context(.app-dark) ::ng-deep .leaflet-tile-pane,
+:host-context(.p-dark) ::ng-deep .leaflet-tile-pane,
+:host-context([data-theme="dark"]) ::ng-deep .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+
+/* --- CONTROLES FLOTANTES (Botones) --- */
+.map-controls-overlay {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 400; /* Encima del mapa */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Botones con efecto Glassmorphism */
+:host ::ng-deep .glass-btn {
+  background: var(--surface-card) !important; /* Color de tarjeta del tema */
+  color: var(--text-color) !important;
+  border: 1px solid var(--surface-border) !important;
+  
+  /* Efecto vidrio */
+  opacity: 0.95;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important; /* Circulares */
+  padding: 0 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, background 0.2s;
+}
+
+:host ::ng-deep .glass-btn:hover {
+  background: var(--surface-overlay) !important;
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  transform: translateY(-2px);
+}
+
+/* --- BARRA DE INFO INFERIOR (Cápsula) --- */
+.map-info-pill {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(150%); /* Oculto abajo inicialmente */
+  z-index: 400;
+  
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  color: var(--text-color);
+  
+  /* Vidrio */
+  opacity: 0.95;
+  backdrop-filter: blur(10px);
+  
+  padding: 0.55rem 0.9rem;
+  border-radius: 50px; /* Forma de píldora */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote */
+  width: min(92%, 560px);
+}
+
+.map-info-pill.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.map-info-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.location-text {
+  display: inline-block;
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* --- MARCADOR PERSONALIZADO --- */
+:host ::ng-deep .custom-marker-pin {
+  width: 20px;
+  height: 20px;
+  background: var(--primary-color); /* Usa el color primario de tu tema */
+  border: 3px solid #ffffff; 
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  position: relative;
+}
+
+/* Animación de pulso */
+:host ::ng-deep .custom-marker-pin::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: var(--primary-color);
+  opacity: 0.6;
+  animation: pulse-ring 2s infinite;
+  z-index: -1;
+}
+
+@keyframes pulse-ring {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+/* --- Ocultar atribución para minimalismo (Opcional) --- */
+:host ::ng-deep .leaflet-control-attribution {
+  display: none;
+}
+
+/* Móvil: Ajustar controles */
+@media (max-width: 640px) {
+  .map-info-pill { 
+    width: 90%; 
+    bottom: 1rem;
+  }
+}
