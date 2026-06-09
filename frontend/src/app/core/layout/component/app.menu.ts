@@ -176,6 +176,11 @@ export class MyMenu implements OnInit {
                         routerLink: ['/home/productos'],
                     },
                     {
+                        label: 'Ventas',
+                        icon: 'pi pi-fw pi-shopping-cart',
+                        routerLink: ['/home/ventas'],
+                    },
+                    {
                         label: 'Clientes',
                         icon: 'pi pi-fw pi-user',
                         routerLink: ['/home/clientes'],

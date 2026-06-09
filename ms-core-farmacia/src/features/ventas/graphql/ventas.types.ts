@@ -5,8 +5,8 @@ export class VentaDetalleType {
   @Field(() => Int)
   id!: number;
 
-  @Field(() => Int)
-  producto_id!: number;
+  @Field(() => Int, { nullable: true })
+  producto_id!: number | null;
 
   @Field()
   producto_nombre!: string;
@@ -38,11 +38,11 @@ export class VentaType {
   @Field()
   estado!: string;
 
-  @Field(() => Int)
-  sucursal_id!: number;
+  @Field(() => Int, { nullable: true })
+  sucursal_id!: number | null;
 
-  @Field(() => Int)
-  usuario_id!: number;
+  @Field(() => Int, { nullable: true })
+  usuario_id!: number | null;
 
   @Field(() => Int, { nullable: true })
   cliente_id!: number | null;

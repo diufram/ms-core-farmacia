@@ -399,7 +399,7 @@ type VentaDetalleType {
   cantidad: Int!
   id: Int!
   precio_unitario: Float!
-  producto_id: Int!
+  producto_id: Int
   producto_nombre: String!
   subtotal: Float!
 }
@@ -416,9 +416,9 @@ type VentaType {
   fecha_venta: String!
   id: Int!
   numero_venta: String!
-  sucursal_id: Int!
+  sucursal_id: Int
   total: Float!
-  usuario_id: Int!
+  usuario_id: Int
 }
 
 type VentasPorDiaType {

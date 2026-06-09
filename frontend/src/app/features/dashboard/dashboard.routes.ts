@@ -41,6 +41,13 @@ export const DASHBOARD_ROUTES: Routes = [
                     ),
             },
             {
+                path: 'ventas',
+                loadChildren: () =>
+                    import('@/features/ventas/ventas.routes').then(
+                        (m) => m.VENTAS_ROUTES,
+                    ),
+            },
+            {
                 path: 'clientes',
                 component: ComingSoonComponent,
                 data: { title: 'Clientes' },
