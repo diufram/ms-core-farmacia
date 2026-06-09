@@ -7,6 +7,7 @@ import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 
 export interface VentaFilters {
   sucursalId?: number;
+  usuarioId?: number;
   fechaDesde?: string;
   fechaHasta?: string;
 }
@@ -33,6 +34,9 @@ export class VentasRepository {
 
     if (filters.sucursalId) {
       qb.andWhere('v.sucursal_id = :sucursalId', { sucursalId: filters.sucursalId });
+    }
+    if (filters.usuarioId) {
+      qb.andWhere('v.usuario_id = :usuarioId', { usuarioId: filters.usuarioId });
     }
     if (filters.fechaDesde) {
       qb.andWhere('v.fecha_venta >= :fechaDesde', { fechaDesde: filters.fechaDesde });

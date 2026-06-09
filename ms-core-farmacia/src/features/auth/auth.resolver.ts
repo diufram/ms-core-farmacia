@@ -13,9 +13,16 @@ import {
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
+import { RegisterDto } from './dto/register.dto';
+
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
+
+  @Mutation(() => AuthPayloadType)
+  register(@Args('input') input: RegisterDto) {
+    return this.authService.register(input);
+  }
 
   @Mutation(() => AuthPayloadType)
   login(@Args('input') input: LoginDto) {

@@ -1,19 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { RefreshToken } from '../../database/entities/refresh-token.entity';
-import { Usuario } from '../../database/entities/usuario.entity';
+import { Usuario, RolGlobal } from '../../database/entities/usuario.entity';
 import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
+import { Persona } from '../../database/entities/persona.entity';
 
 @Injectable()
 export class AuthRepository {
   constructor(
+    private readonly dataSource: DataSource,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
     @InjectRepository(UsuarioSucursal)
     private readonly usuarioSucursalRepository: Repository<UsuarioSucursal>,
+    @InjectRepository(Persona)
+    private readonly personaRepository: Repository<Persona>,
   ) {}
 
   async buscarUsuarioPorCorreo(correo: string): Promise<Usuario | null> {
@@ -74,6 +78,33 @@ export class AuthRepository {
   async revocarRefreshToken(id: number): Promise<void> {
     await this.refreshTokenRepository.update(id, {
       revoked_at: new Date(),
+    });
+  }
+
+  async crearUsuarioConPersona(
+    nombre: string,
+    apellido: string,
+    celular: string | undefined,
+    correo: string,
+    nombre_usuario: string,
+    contrasenaHash: string,
+  ): Promise<Usuario> {
+    return await this.dataSource.transaction(async (manager) => {
+      const persona = manager.create(Persona, {
+        nombre,
+        apellido,
+        celular: celular || null,
+      });
+      await manager.save(persona);
+
+      const usuario = manager.create(Usuario, {
+        correo_electronico: correo.toLowerCase(),
+        nombre_usuario,
+        contrasena: contrasenaHash,
+        rol_global: RolGlobal.USER,
+        persona,
+      });
+      return await manager.save(usuario);
     });
   }
 }

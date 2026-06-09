@@ -21,6 +21,7 @@ export class VentasService {
   ) {}
 
   async findAll(
+    userId: number,
     userRol: string,
     userSucursalId: number | null,
     filters: { sucursalId?: number; fechaDesde?: string; fechaHasta?: string },
@@ -32,6 +33,7 @@ export class VentasService {
     );
     const ventas = await this.ventasRepository.findAll({
       sucursalId: targetSucursalId ?? undefined,
+      usuarioId: userRol === RolGlobal.USER ? userId : undefined,
       fechaDesde: filters.fechaDesde,
       fechaHasta: filters.fechaHasta,
     });
@@ -166,7 +168,7 @@ export class VentasService {
     userSucursalId: number | null,
     requestedSucursalId: number,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === RolGlobal.SUPER_ADMIN || userRol === RolGlobal.USER) {
       return;
     }
     if (requestedSucursalId !== userSucursalId) {

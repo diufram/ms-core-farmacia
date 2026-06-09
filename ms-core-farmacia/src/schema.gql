@@ -167,6 +167,7 @@ type Mutation {
   login(input: LoginDto!): AuthPayloadType!
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
+  register(input: RegisterDto!): AuthPayloadType!
   unassignUsuarioSucursal(sucursalId: Int!, usuarioId: Int!): UsuarioPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
   updateCliente(id: Int!, input: UpdateClienteDto!): ClienteType!
@@ -252,6 +253,15 @@ type Query {
 
 input RefreshTokenDto {
   refresh_token: String!
+}
+
+input RegisterDto {
+  apellido: String!
+  celular: String
+  contrasena: String!
+  correo_electronico: String!
+  nombre: String!
+  nombre_usuario: String!
 }
 
 type SucursalAdminType {

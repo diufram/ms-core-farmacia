@@ -19,13 +19,11 @@ export class SucursalesResolver {
   constructor(private readonly sucursalesService: SucursalesService) {}
 
   @Query(() => [SucursalType])
-  @Roles(RolGlobal.SUPER_ADMIN)
   sucursales() {
     return this.sucursalesService.findAll();
   }
 
   @Query(() => SucursalType)
-  @Roles(RolGlobal.SUPER_ADMIN)
   sucursal(@Args('id', { type: () => Int }) id: number) {
     return this.sucursalesService.findOne(id);
   }

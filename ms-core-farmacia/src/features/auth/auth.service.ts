@@ -6,13 +6,14 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'crypto';
-import { compare } from 'bcryptjs';
+import { compare, hash } from 'bcryptjs';
 import { RolGlobal, Usuario } from '../../database/entities/usuario.entity';
 import { AuthRepository } from './auth.repository';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { RegisterDto } from './dto/register.dto';
 
 type TokensResponse = {
   access_token: string;
@@ -26,6 +27,33 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+
+  async register(dto: RegisterDto) {
+    const usuarioExistente = await this.authRepository.buscarUsuarioPorCorreo(
+      dto.correo_electronico.toLowerCase(),
+    );
+    if (usuarioExistente) {
+      throw new BadRequestException('El correo electronico ya esta registrado.');
+    }
+
+    const contrasenaHash = await hash(dto.contrasena, 10);
+
+    const usuario = await this.authRepository.crearUsuarioConPersona(
+      dto.nombre,
+      dto.apellido,
+      dto.celular,
+      dto.correo_electronico,
+      dto.nombre_usuario,
+      contrasenaHash,
+    );
+
+    const tokens = await this.generarTokens(usuario);
+    return {
+      usuario: this.serializarUsuario(usuario),
+      ...tokens,
+      message: 'Registro exitoso.',
+    };
+  }
 
   async login(dto: LoginDto) {
     const usuario = await this.authRepository.buscarUsuarioPorCorreo(

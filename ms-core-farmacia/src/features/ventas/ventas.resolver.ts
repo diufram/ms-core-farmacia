@@ -25,7 +25,7 @@ export class VentasResolver {
     @Args('fechaHasta', { type: () => String, nullable: true })
     fechaHasta: string | null,
   ) {
-    return this.ventasService.findAll(user.rol, user.sucursal_id, {
+    return this.ventasService.findAll(user.sub, user.rol, user.sucursal_id, {
       sucursalId: sucursalId ?? undefined,
       fechaDesde: fechaDesde ?? undefined,
       fechaHasta: fechaHasta ?? undefined,

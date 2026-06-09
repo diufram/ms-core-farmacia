@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Field, InputType } from '@nestjs/graphql';
 
@@ -12,6 +12,6 @@ export class LoginDto {
   @ApiProperty({ example: 'Password123' })
   @Field()
   @IsString()
-  @MinLength(8)
+  @IsNotEmpty()
   contrasena!: string;
 }
