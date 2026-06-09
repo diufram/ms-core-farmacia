@@ -53,6 +53,41 @@ interface DetalleLinea {
         DividerModule,
         TagModule,
     ],
+    styles: [`
+        .venta-linea {
+            background: var(--surface-card);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: box-shadow 0.2s;
+        }
+        .venta-linea:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .field-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-color-secondary);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .field-label .req {
+            color: var(--red-500);
+        }
+        .venta-linea ::ng-deep p-inputnumber .p-inputnumber-input {
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+        .venta-linea ::ng-deep p-select .p-select {
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+        .venta-linea ::ng-deep .p-button {
+            min-width: auto;
+        }
+    `],
     template: `
         <div class="max-w-4xl mx-auto">
             <div class="flex items-center gap-3 mb-4">
@@ -83,26 +118,23 @@ interface DetalleLinea {
                             <p-tag
                                 [value]="'Total: Bs ' + total()"
                                 severity="success"
-                                styleClass="text-lg"
+                                styleClass="text-lg font-bold"
                             />
                         </div>
                     </ng-template>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <div *ngIf="esSuperAdmin()">
-                            <p-floatlabel variant="on">
-                                <p-select
-                                    inputId="sucursalId"
-                                    formControlName="sucursalId"
-                                    [options]="sucursales()"
-                                    optionLabel="nombre"
-                                    optionValue="id"
-                                    placeholder="Seleccionar sucursal"
-                                    styleClass="w-full"
-                                    (onChange)="onCambioSucursal()"
-                                />
-                                <label for="sucursalId">Sucursal *</label>
-                            </p-floatlabel>
+                            <label class="field-label">Sucursal <span class="req">*</span></label>
+                            <p-select
+                                formControlName="sucursalId"
+                                [options]="sucursales()"
+                                optionLabel="nombre"
+                                optionValue="id"
+                                placeholder="Seleccionar sucursal"
+                                styleClass="w-full"
+                                (onChange)="onCambioSucursal()"
+                            />
                             <small
                                 *ngIf="invalid('sucursalId')"
                                 class="text-red-500 mt-1 block"
@@ -112,17 +144,14 @@ interface DetalleLinea {
                         </div>
 
                         <div *ngIf="!esSuperAdmin()">
-                            <p-floatlabel variant="on">
-                                <input
-                                    pInputText
-                                    id="sucursalDisplay"
-                                    type="text"
-                                    [value]="sucursalNombre()"
-                                    disabled
-                                    class="w-full"
-                                />
-                                <label for="sucursalDisplay">Sucursal</label>
-                            </p-floatlabel>
+                            <label class="field-label">Sucursal</label>
+                            <input
+                                pInputText
+                                type="text"
+                                [value]="sucursalNombre()"
+                                disabled
+                                class="w-full"
+                            />
                         </div>
                     </div>
                 </p-card>
@@ -145,12 +174,11 @@ interface DetalleLinea {
 
                     <div
                         *ngIf="detalles.length === 0"
-                        class="text-center py-8 text-muted-color"
+                        class="text-center py-10 text-muted-color"
                     >
-                        <i class="pi pi-shopping-cart text-4xl mb-3 block"></i>
-                        <p>
-                            Agrega al menos un producto para registrar la
-                            venta.
+                        <i class="pi pi-shopping-cart text-5xl mb-4 block opacity-60"></i>
+                        <p class="text-base">
+                            Agrega al menos un producto para registrar la venta.
                         </p>
                     </div>
 
@@ -161,44 +189,36 @@ interface DetalleLinea {
                         <div
                             *ngFor="let linea of detalles.controls; let i = index"
                             [formGroupName]="i"
-                            class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end p-4 border border-surface-border rounded-lg bg-surface-50"
+                            class="venta-linea"
                         >
-                            <div class="md:col-span-5">
-                                <p-floatlabel variant="on">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-start">
+                                <div class="sm:col-span-2 lg:col-span-5 min-w-0">
+                                    <label class="field-label">Producto <span class="req">*</span></label>
                                     <p-select
-                                        inputId="producto-{{ i }}"
                                         formControlName="productoId"
                                         [options]="productos()"
                                         optionLabel="nombre"
                                         optionValue="id"
-                                        placeholder="Seleccionar producto"
+                                        placeholder="Buscar producto..."
                                         styleClass="w-full"
                                         [filter]="true"
                                         filterBy="nombre,codigo"
                                         (onChange)="onProductoChange(i)"
                                     />
-                                    <label [for]="'producto-' + i"
-                                    >Producto *</label>
-                                </p-floatlabel>
-                            </div>
+                                </div>
 
-                            <div class="md:col-span-2">
-                                <p-floatlabel variant="on">
+                                <div class="sm:col-span-1 lg:col-span-2 min-w-0">
+                                    <label class="field-label">Cantidad <span class="req">*</span></label>
                                     <p-inputNumber
-                                        [inputId]="'cantidad-' + i"
                                         formControlName="cantidad"
                                         [min]="1"
                                         styleClass="w-full"
                                     />
-                                    <label [for]="'cantidad-' + i"
-                                    >Cantidad *</label>
-                                </p-floatlabel>
-                            </div>
+                                </div>
 
-                            <div class="md:col-span-3">
-                                <p-floatlabel variant="on">
+                                <div class="sm:col-span-1 lg:col-span-3 min-w-0">
+                                    <label class="field-label">Precio unitario</label>
                                     <p-inputNumber
-                                        [inputId]="'precio-' + i"
                                         formControlName="precioUnitario"
                                         mode="decimal"
                                         [minFractionDigits]="2"
@@ -206,37 +226,31 @@ interface DetalleLinea {
                                         [min]="0"
                                         styleClass="w-full"
                                     />
-                                    <label [for]="'precio-' + i"
-                                    >Precio unit.</label>
-                                </p-floatlabel>
-                                <small class="text-muted-color block mt-1"
-                                >
-                                    Default: Bs
-                                    {{ getPrecioProducto(i) }}
-                                </small>
+                                    <small class="text-muted-color block mt-1">
+                                        Default: Bs {{ getPrecioProducto(i) | number:'1.2-2' }}
+                                    </small>
+                                </div>
+
+                                <div class="sm:col-span-2 lg:col-span-2 flex items-start justify-end lg:pt-6">
+                                    <p-button
+                                        icon="pi pi-trash"
+                                        severity="danger"
+                                        [outlined]="true"
+                                        (onClick)="eliminarLinea(i)"
+                                        [disabled]="saving()"
+                                        pTooltip="Eliminar línea"
+                                    />
+                                </div>
                             </div>
 
-                            <div class="md:col-span-2 flex justify-end">
-                                <p-button
-                                    icon="pi pi-trash"
-                                    severity="danger"
-                                    [text]="true"
-                                    (onClick)="eliminarLinea(i)"
-                                    [disabled]="saving()"
-                                />
-                            </div>
-
-                            <div class="md:col-span-12">
-                                <p-divider />
-                                <div class="flex justify-between text-sm">
+                            <div class="mt-4 pt-3 border-t border-surface-border">
+                                <div class="flex justify-between items-center text-sm">
                                     <span class="text-muted-color">
-                                        Stock disponible: {{
-                                            getStockProducto(i)
-                                        }}
+                                        <i class="pi pi-box mr-1"></i>
+                                        Stock disponible: <strong>{{ getStockProducto(i) }}</strong>
                                     </span>
-                                    <span class="font-semibold">
-                                        Subtotal: Bs
-                                        {{ subtotalLinea(i) }}
+                                    <span class="font-bold text-color">
+                                        Subtotal: Bs {{ subtotalLinea(i) | number:'1.2-2' }}
                                     </span>
                                 </div>
                             </div>
@@ -244,7 +258,7 @@ interface DetalleLinea {
                     </div>
                 </p-card>
 
-                <div class="flex justify-end gap-2 pt-2">
+                <div class="flex justify-end gap-3 pt-2">
                     <p-button
                         type="button"
                         label="Cancelar"
