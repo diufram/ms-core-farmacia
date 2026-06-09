@@ -99,6 +99,7 @@ export class VentasService {
         numero_venta: numeroVenta,
         fecha_venta: fechaVenta,
         total,
+        estado: 'PENDIENTE',
         sucursal: { id: dto.sucursalId } as Venta['sucursal'],
         usuario: { id: userId } as Venta['usuario'],
         cliente: dto.clienteId
@@ -199,6 +200,7 @@ export class VentasService {
       numero_venta: venta.numero_venta,
       fecha_venta: venta.fecha_venta,
       total: Number(venta.total),
+      estado: venta.estado ?? 'PENDIENTE',
       sucursal_id: venta.sucursal?.id ?? null,
       usuario_id: venta.usuario?.id ?? null,
       cliente_id: venta.cliente?.id ?? null,

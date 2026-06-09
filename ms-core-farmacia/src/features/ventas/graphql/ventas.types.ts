@@ -35,6 +35,9 @@ export class VentaType {
   @Field(() => Float)
   total!: number;
 
+  @Field()
+  estado!: string;
+
   @Field(() => Int)
   sucursal_id!: number;
 

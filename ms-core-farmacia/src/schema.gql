@@ -412,6 +412,7 @@ type VentaPayloadType {
 type VentaType {
   cliente_id: Int
   detalles: [VentaDetalleType!]!
+  estado: String!
   fecha_venta: String!
   id: Int!
   numero_venta: String!

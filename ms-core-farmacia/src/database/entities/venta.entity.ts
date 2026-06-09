@@ -44,6 +44,9 @@ export class Venta extends BaseEntity {
   @Column({ type: 'numeric', precision: 12, scale: 2, default: 0 })
   total!: number;
 
+  @Column({ type: 'varchar', length: 20, default: 'PENDIENTE' })
+  estado!: string;
+
   @OneToMany(() => VentaDetalle, (detalle) => detalle.venta)
   detalles!: VentaDetalle[];
 }

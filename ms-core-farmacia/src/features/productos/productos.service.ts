@@ -145,7 +145,7 @@ export class ProductosService {
     userSucursalId: number | null,
     requestedSucursalId: number | null,
   ): number | null {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === RolGlobal.SUPER_ADMIN || userRol === RolGlobal.USER) {
       return requestedSucursalId;
     }
     return userSucursalId;
@@ -156,7 +156,7 @@ export class ProductosService {
     userRol: string,
     userSucursalId: number | null,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === RolGlobal.SUPER_ADMIN || userRol === RolGlobal.USER) {
       return;
     }
     if (producto.sucursal.id !== userSucursalId) {
