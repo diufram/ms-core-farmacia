@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -64,7 +64,8 @@ const STOCK_BAJO_UMBRAL = 10;
                     <input
                         pInputText
                         type="text"
-                        [(ngModel)]="searchTerm"
+                        [ngModel]="searchTerm()"
+                        (ngModelChange)="searchTerm.set($event)"
                         placeholder="Buscar por código, nombre..."
                         class="w-full"
                     />
@@ -137,7 +138,7 @@ export class ProductosListComponent implements OnInit {
     categorias = signal<Categoria[]>([]);
     sucursales = signal<Sucursal[]>([]);
     loading = signal<boolean>(true);
-    searchTerm = '';
+    searchTerm = signal('');
     filtroSucursalId: number | null = null;
     filtroCategoriaId: number | null = null;
 
@@ -238,8 +239,8 @@ export class ProductosListComponent implements OnInit {
         });
     }
 
-    productosFiltrados(): (Producto & { stock_estado: string })[] {
-        const term = this.searchTerm.trim().toLowerCase();
+    productosFiltrados = computed<(Producto & { stock_estado: string })[]>(() => {
+        const term = this.searchTerm().trim().toLowerCase();
         const decorated = this.productos().map((p) => ({
             ...p,
             stock_estado:
@@ -255,7 +256,7 @@ export class ProductosListComponent implements OnInit {
                 p.codigo.toLowerCase().includes(term) ||
                 p.nombre.toLowerCase().includes(term),
         );
-    }
+    });
 
     nuevo(): void {
         this.router.navigate(['/home/productos/nuevo']);
