@@ -44,8 +44,8 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Build Angular app
-        # Replace '/ms-core-farmacia/' with the exact repository name.
-        run: npm run build -- --configuration production --base-href /ms-core-farmacia/
+        # Since it's hosted on a custom domain (pharmacy.lonk.dev), base-href should be /
+        run: npm run build -- --configuration production --base-href /
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
