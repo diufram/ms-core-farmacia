@@ -4,6 +4,7 @@ import { Producto } from '../../database/entities/producto.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
+import { CategoriaProducto } from '../../database/entities/categoria-producto.entity';
 import { DashboardRepository } from './dashboard.repository';
 import { DashboardResolver } from './dashboard.resolver';
 import { DashboardService } from './dashboard.service';
@@ -15,6 +16,7 @@ import { DashboardService } from './dashboard.service';
       VentaDetalle,
       Producto,
       Sucursal,
+      CategoriaProducto,
     ]),
   ],
   providers: [DashboardService, DashboardRepository, DashboardResolver],

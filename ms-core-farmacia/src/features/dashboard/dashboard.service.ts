@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Rol } from '../../database/entities/usuario.entity';
 import {
   DashboardKpisType,
+  ProductoSinMovimientoType,
   ProductoStockBajoType,
+  RiesgoCategoriaType,
+  TopClienteType,
   TopProductoType,
   VentasPorDiaType,
   VentasPorSucursalType,
@@ -13,6 +16,8 @@ const DEFAULT_STOCK_BAJO_UMBRAL = 10;
 const DEFAULT_TOP_PRODUCTOS_LIMITE = 5;
 const DEFAULT_STOCK_BAJO_LISTA_LIMITE = 10;
 const DEFAULT_VENTAS_POR_DIA = 30;
+const DEFAULT_TOP_CLIENTES_LIMITE = 5;
+const DEFAULT_PRODUCTOS_SIN_MOV_LIMITE = 5;
 
 @Injectable()
 export class DashboardService {
@@ -49,12 +54,18 @@ export class DashboardService {
       totalStockBajo,
       totalProductos,
       totalSucursales,
+      topClientes,
+      productosSinMovimiento,
+      riesgoPorCategoria,
     ] = await Promise.all([
       this.dashboardRepository.ventasTotales({
         ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
         ...dateFilters,
       }),
-      this.dashboardRepository.ventasPorSucursal(dateFilters),
+      this.dashboardRepository.ventasPorSucursal({
+        ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
+        ...dateFilters,
+      }),
       this.dashboardRepository.topProductos(DEFAULT_TOP_PRODUCTOS_LIMITE, {
         ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
         ...dateFilters,
@@ -76,6 +87,23 @@ export class DashboardService {
         ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
       }),
       this.dashboardRepository.countSucursales(userRol, userSucursalId),
+      this.dashboardRepository.topClientes(DEFAULT_TOP_CLIENTES_LIMITE, {
+        ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
+        ...dateFilters,
+      }),
+      this.dashboardRepository.productosSinMovimiento(
+        DEFAULT_PRODUCTOS_SIN_MOV_LIMITE,
+        DEFAULT_VENTAS_POR_DIA,
+        {
+          ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
+          stockBajoUmbral: umbral,
+        },
+      ),
+      this.dashboardRepository.riesgoPorCategoria({
+        ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
+        stockBajoUmbral: umbral,
+        ...dateFilters,
+      }),
     ]);
 
     return {
@@ -110,6 +138,32 @@ export class DashboardService {
         sucursal_id: p.sucursal_id,
         sucursal_nombre: p.sucursal_nombre,
       })),
+      topClientes: topClientes.map<TopClienteType>((c) => ({
+        cliente_nombre: c.cliente_nombre,
+        cliente_codigo: c.cliente_codigo,
+        cantidad_ventas: c.cantidad_ventas,
+        total_comprado: c.total_comprado,
+      })),
+      productosSinMovimiento: productosSinMovimiento.map<ProductoSinMovimientoType>(
+        (p) => ({
+          id: p.id,
+          codigo: p.codigo,
+          nombre: p.nombre,
+          stock_actual: p.stock_actual,
+          categoria_nombre: p.categoria_nombre,
+          dias_sin_venta: p.dias_sin_venta,
+        }),
+      ),
+      riesgoPorCategoria: riesgoPorCategoria
+        .map<RiesgoCategoriaType>((r) => ({
+          categoria_id: r.categoria_id,
+          categoria_nombre: r.categoria_nombre,
+          total_productos: r.total_productos,
+          productos_stock_bajo: r.productos_stock_bajo,
+          ventas_periodo: r.ventas_periodo,
+          score_riesgo: r.score_riesgo,
+        }))
+        .sort((a, b) => b.score_riesgo - a.score_riesgo),
     };
   }
 

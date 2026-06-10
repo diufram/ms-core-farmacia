@@ -17,7 +17,6 @@ export const DASHBOARD_KPIS_QUERY = gql`
             cantidadVentas
             totalProductos
             productosStockBajo
-            totalClientes
             totalSucursales
             ventasPorSucursal {
                 sucursal_id
@@ -44,6 +43,28 @@ export const DASHBOARD_KPIS_QUERY = gql`
                 stock_actual
                 sucursal_id
                 sucursal_nombre
+            }
+            topClientes {
+                cliente_nombre
+                cliente_codigo
+                cantidad_ventas
+                total_comprado
+            }
+            productosSinMovimiento {
+                id
+                codigo
+                nombre
+                stock_actual
+                categoria_nombre
+                dias_sin_venta
+            }
+            riesgoPorCategoria {
+                categoria_id
+                categoria_nombre
+                total_productos
+                productos_stock_bajo
+                ventas_periodo
+                score_riesgo
             }
         }
     }

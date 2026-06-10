@@ -5,6 +5,7 @@ import { Producto } from '../../database/entities/producto.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
+import { CategoriaProducto } from '../../database/entities/categoria-producto.entity';
 import { Rol } from '../../database/entities/usuario.entity';
 
 export interface DashboardFilters {
@@ -25,6 +26,8 @@ export class DashboardRepository {
     private readonly productoRepository: Repository<Producto>,
     @InjectRepository(Sucursal)
     private readonly sucursalRepository: Repository<Sucursal>,
+    @InjectRepository(CategoriaProducto)
+    private readonly categoriaRepository: Repository<CategoriaProducto>,
   ) {}
 
   async ventasTotales(filters: {
@@ -61,6 +64,7 @@ export class DashboardRepository {
   }
 
   async ventasPorSucursal(filters: {
+    sucursalId?: number;
     fechaDesde?: string;
     fechaHasta?: string;
   }): Promise<
@@ -82,6 +86,11 @@ export class DashboardRepository {
       .addGroupBy('s.nombre')
       .orderBy('total', 'DESC');
 
+    if (filters.sucursalId) {
+      qb.andWhere('v.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+    }
     if (filters.fechaDesde) {
       qb.andWhere('v.fecha_venta >= :fechaDesde', {
         fechaDesde: filters.fechaDesde,
@@ -289,6 +298,240 @@ export class DashboardRepository {
     }
     return this.sucursalRepository.count({
       where: userSucursalId ? { id: userSucursalId } : {},
+    });
+  }
+
+  async topClientes(
+    limite: number,
+    filters: { sucursalId?: number; fechaDesde?: string; fechaHasta?: string },
+  ): Promise<
+    {
+      cliente_nombre: string | null;
+      cliente_codigo: string | null;
+      cantidad_ventas: number;
+      total_comprado: number;
+    }[]
+  > {
+    const qb = this.ventaRepository
+      .createQueryBuilder('v')
+      .select('v.cliente_nombre', 'cliente_nombre')
+      .addSelect('v.cliente_codigo', 'cliente_codigo')
+      .addSelect('COUNT(v.id)', 'cantidad_ventas')
+      .addSelect('COALESCE(SUM(v.total), 0)', 'total_comprado')
+      .where('v.estado = :estado', { estado: 'CONFIRMADA' })
+      .groupBy('v.cliente_nombre')
+      .addGroupBy('v.cliente_codigo')
+      .orderBy('total_comprado', 'DESC')
+      .limit(limite);
+
+    if (filters.sucursalId) {
+      qb.andWhere('v.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+    }
+    if (filters.fechaDesde) {
+      qb.andWhere('v.fecha_venta >= :fechaDesde', {
+        fechaDesde: filters.fechaDesde,
+      });
+    }
+    if (filters.fechaHasta) {
+      qb.andWhere('v.fecha_venta <= :fechaHasta', {
+        fechaHasta: filters.fechaHasta,
+      });
+    }
+
+    const rows = await qb.getRawMany<{
+      cliente_nombre: string | null;
+      cliente_codigo: string | null;
+      cantidad_ventas: string;
+      total_comprado: string;
+    }>();
+    return rows.map((r) => ({
+      cliente_nombre: r.cliente_nombre,
+      cliente_codigo: r.cliente_codigo,
+      cantidad_ventas: Number(r.cantidad_ventas),
+      total_comprado: Number(r.total_comprado),
+    }));
+  }
+
+  async productosSinMovimiento(
+    limite: number,
+    rangoDias: number,
+    filters: { sucursalId?: number; stockBajoUmbral?: number },
+  ): Promise<
+    {
+      id: number;
+      codigo: string;
+      nombre: string;
+      stock_actual: number;
+      categoria_nombre: string;
+      dias_sin_venta: number;
+    }[]
+  > {
+    const fechaDesdeLimite = new Date();
+    fechaDesdeLimite.setDate(fechaDesdeLimite.getDate() - rangoDias);
+    const fechaLimiteStr = fechaDesdeLimite.toISOString().slice(0, 10);
+
+    const qb = this.productoRepository
+      .createQueryBuilder('p')
+      .innerJoin('p.categoria', 'c')
+      .leftJoin(
+        (sub) =>
+          sub
+            .select('d.producto_id', 'producto_id')
+            .addSelect('MAX(v.fecha_venta)', 'ultima_venta')
+            .from(VentaDetalle, 'd')
+            .innerJoin('d.venta', 'v')
+            .where('v.estado = :estado', { estado: 'CONFIRMADA' })
+            .groupBy('d.producto_id'),
+        'uv',
+        'uv.producto_id = p.id',
+      )
+      .select('p.id', 'id')
+      .addSelect('p.codigo', 'codigo')
+      .addSelect('p.nombre', 'nombre')
+      .addSelect('p.stock_actual', 'stock_actual')
+      .addSelect('c.nombre', 'categoria_nombre')
+      .addSelect(
+        `COALESCE(DATE_PART('day', NOW() - uv.ultima_venta::timestamp), ${rangoDias})`,
+        'dias_sin_venta',
+      )
+      .where(
+        '(uv.ultima_venta IS NULL OR uv.ultima_venta < :fechaLimite)',
+        { fechaLimite: fechaLimiteStr },
+      )
+      .orderBy('p.stock_actual', 'DESC')
+      .limit(limite);
+
+    if (filters.sucursalId) {
+      qb.andWhere('p.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+    }
+    if (filters.stockBajoUmbral != null) {
+      qb.andWhere('p.stock_actual >= :umbral', {
+        umbral: filters.stockBajoUmbral,
+      });
+    }
+
+    const rows = await qb.getRawMany<{
+      id: string;
+      codigo: string;
+      nombre: string;
+      stock_actual: string;
+      categoria_nombre: string;
+      dias_sin_venta: string;
+    }>();
+    return rows.map((r) => ({
+      id: Number(r.id),
+      codigo: r.codigo,
+      nombre: r.nombre,
+      stock_actual: Number(r.stock_actual),
+      categoria_nombre: r.categoria_nombre,
+      dias_sin_venta: Number(r.dias_sin_venta),
+    }));
+  }
+
+  async riesgoPorCategoria(filters: {
+    sucursalId?: number;
+    stockBajoUmbral?: number;
+    fechaDesde?: string;
+    fechaHasta?: string;
+  }): Promise<
+    {
+      categoria_id: number;
+      categoria_nombre: string;
+      total_productos: number;
+      productos_stock_bajo: number;
+      ventas_periodo: number;
+      score_riesgo: number;
+    }[]
+  > {
+    const umbral = filters.stockBajoUmbral ?? 10;
+
+    const qbProductos = this.productoRepository
+      .createQueryBuilder('p')
+      .innerJoin('p.categoria', 'c')
+      .select('c.id', 'categoria_id')
+      .addSelect('c.nombre', 'categoria_nombre')
+      .addSelect('COUNT(p.id)', 'total_productos')
+      .addSelect(
+        `SUM(CASE WHEN p.stock_actual < ${umbral} THEN 1 ELSE 0 END)`,
+        'productos_stock_bajo',
+      )
+      .groupBy('c.id')
+      .addGroupBy('c.nombre');
+
+    if (filters.sucursalId) {
+      qbProductos.andWhere('p.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+    }
+
+    const productos = await qbProductos.getRawMany<{
+      categoria_id: string;
+      categoria_nombre: string;
+      total_productos: string;
+      productos_stock_bajo: string;
+    }>();
+
+    const qbVentas = this.ventaDetalleRepository
+      .createQueryBuilder('d')
+      .innerJoin('d.venta', 'v')
+      .innerJoin('d.producto', 'p')
+      .innerJoin('p.categoria', 'c')
+      .select('c.id', 'categoria_id')
+      .addSelect('COALESCE(SUM(d.cantidad), 0)', 'ventas_periodo')
+      .where('v.estado = :estado', { estado: 'CONFIRMADA' })
+      .groupBy('c.id');
+
+    if (filters.sucursalId) {
+      qbVentas.andWhere('v.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+    }
+    if (filters.fechaDesde) {
+      qbVentas.andWhere('v.fecha_venta >= :fechaDesde', {
+        fechaDesde: filters.fechaDesde,
+      });
+    }
+    if (filters.fechaHasta) {
+      qbVentas.andWhere('v.fecha_venta <= :fechaHasta', {
+        fechaHasta: filters.fechaHasta,
+      });
+    }
+
+    const ventas = await qbVentas.getRawMany<{
+      categoria_id: string;
+      ventas_periodo: string;
+    }>();
+    const ventasMap = new Map<number, number>();
+    for (const v of ventas) {
+      ventasMap.set(Number(v.categoria_id), Number(v.ventas_periodo));
+    }
+
+    const maxVentas = Math.max(
+      1,
+      ...Array.from(ventasMap.values()),
+    );
+
+    return productos.map((p) => {
+      const totalProductos = Number(p.total_productos);
+      const stockBajo = Number(p.productos_stock_bajo);
+      const ventasCategoria = ventasMap.get(Number(p.categoria_id)) ?? 0;
+      const ratioStockBajo = totalProductos
+        ? stockBajo / totalProductos
+        : 0;
+      const ratioSinVenta = 1 - ventasCategoria / maxVentas;
+      const score = ratioStockBajo * 0.5 + ratioSinVenta * 0.5;
+      return {
+        categoria_id: Number(p.categoria_id),
+        categoria_nombre: p.categoria_nombre,
+        total_productos: totalProductos,
+        productos_stock_bajo: stockBajo,
+        ventas_periodo: ventasCategoria,
+        score_riesgo: score,
+      };
     });
   }
 }

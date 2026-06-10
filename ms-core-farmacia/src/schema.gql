@@ -100,8 +100,11 @@ input CreateVentaDto {
 
 type DashboardKpisType {
   cantidadVentas: Int!
+  productosSinMovimiento: [ProductoSinMovimientoType!]!
   productosStockBajo: Int!
   productosStockBajoList: [ProductoStockBajoType!]!
+  riesgoPorCategoria: [RiesgoCategoriaType!]!
+  topClientes: [TopClienteType!]!
   topProductos: [TopProductoType!]!
   totalProductos: Int!
   totalSucursales: Int!
@@ -169,6 +172,15 @@ type PersonaType {
 type ProductoPayloadType {
   message: String!
   producto: ProductoType!
+}
+
+type ProductoSinMovimientoType {
+  categoria_nombre: String!
+  codigo: String!
+  dias_sin_venta: Int!
+  id: Int!
+  nombre: String!
+  stock_actual: Int!
 }
 
 type ProductoStockBajoType {
@@ -240,6 +252,15 @@ input RegisterDto {
   nombre_usuario: String!
 }
 
+type RiesgoCategoriaType {
+  categoria_id: Int!
+  categoria_nombre: String!
+  productos_stock_bajo: Int!
+  score_riesgo: Float!
+  total_productos: Int!
+  ventas_periodo: Int!
+}
+
 type SucursalAdminType {
   correo_electronico: String!
   id: Int!
@@ -276,6 +297,13 @@ type SucursalType {
   nombre: String!
   slug: String!
   telefono: String
+}
+
+type TopClienteType {
+  cantidad_ventas: Int!
+  cliente_codigo: String
+  cliente_nombre: String
+  total_comprado: Float!
 }
 
 type TopProductoType {

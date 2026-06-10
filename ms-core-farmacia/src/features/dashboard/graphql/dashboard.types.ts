@@ -67,6 +67,63 @@ export class ProductoStockBajoType {
 }
 
 @ObjectType()
+export class TopClienteType {
+  @Field(() => String, { nullable: true })
+  cliente_nombre!: string | null;
+
+  @Field(() => String, { nullable: true })
+  cliente_codigo!: string | null;
+
+  @Field(() => Int)
+  cantidad_ventas!: number;
+
+  @Field(() => Float)
+  total_comprado!: number;
+}
+
+@ObjectType()
+export class ProductoSinMovimientoType {
+  @Field(() => Int)
+  id!: number;
+
+  @Field()
+  codigo!: string;
+
+  @Field()
+  nombre!: string;
+
+  @Field(() => Int)
+  stock_actual!: number;
+
+  @Field()
+  categoria_nombre!: string;
+
+  @Field(() => Int)
+  dias_sin_venta!: number;
+}
+
+@ObjectType()
+export class RiesgoCategoriaType {
+  @Field(() => Int)
+  categoria_id!: number;
+
+  @Field()
+  categoria_nombre!: string;
+
+  @Field(() => Int)
+  total_productos!: number;
+
+  @Field(() => Int)
+  productos_stock_bajo!: number;
+
+  @Field(() => Float)
+  score_riesgo!: number;
+
+  @Field(() => Int)
+  ventas_periodo!: number;
+}
+
+@ObjectType()
 export class DashboardKpisType {
   @Field(() => Float)
   totalVentas!: number;
@@ -94,4 +151,13 @@ export class DashboardKpisType {
 
   @Field(() => [ProductoStockBajoType])
   productosStockBajoList!: ProductoStockBajoType[];
+
+  @Field(() => [TopClienteType])
+  topClientes!: TopClienteType[];
+
+  @Field(() => [ProductoSinMovimientoType])
+  productosSinMovimiento!: ProductoSinMovimientoType[];
+
+  @Field(() => [RiesgoCategoriaType])
+  riesgoPorCategoria!: RiesgoCategoriaType[];
 }
