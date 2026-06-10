@@ -206,7 +206,7 @@ export class DashboardRepository {
 
     const map = new Map<string, { cantidad: number; total: number }>();
     for (const r of rows) {
-      const fechaStr = String(r.fecha);
+      const fechaStr = this.toDateString(r.fecha);
       map.set(fechaStr, {
         cantidad: Number(r.cantidad),
         total: Number(r.total),
@@ -533,5 +533,17 @@ export class DashboardRepository {
         score_riesgo: score,
       };
     });
+  }
+
+  private toDateString(value: unknown): string {
+    if (value == null) return '';
+    if (value instanceof Date) {
+      const y = value.getUTCFullYear();
+      const m = String(value.getUTCMonth() + 1).padStart(2, '0');
+      const d = String(value.getUTCDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    const s = String(value);
+    return s.length >= 10 ? s.slice(0, 10) : s;
   }
 }

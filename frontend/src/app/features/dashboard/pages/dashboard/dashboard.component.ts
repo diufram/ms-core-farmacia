@@ -396,12 +396,10 @@ interface Tendencia {
                                                             pred.score
                                                         )
                                                     "
-                                                    [class]="
-                                                        'bg-' +
-                                                        prediccionColor(
+                                                    [ngClass]="
+                                                        barraFillClasses(
                                                             pred.nivel_riesgo
-                                                        ) +
-                                                        '-500'
+                                                        )
                                                     "
                                                 ></div>
                                             </div>
@@ -472,10 +470,10 @@ interface Tendencia {
                             >
                                 <span
                                     class="text-3xl font-bold"
-                                    [class]="
-                                        'text-' +
-                                        tendenciaColor(t.crecimiento_pct) +
-                                        '-500'
+                                    [ngClass]="
+                                        tendenciaTextClasses(
+                                            t.crecimiento_pct
+                                        )
                                     "
                                 >
                                     {{
@@ -486,7 +484,7 @@ interface Tendencia {
                                 </span>
                                 <i
                                     class="pi text-xl"
-                                    [class]="
+                                    [ngClass]="
                                         t.crecimiento_pct >= 0
                                             ? 'pi-arrow-up text-green-500'
                                             : 'pi-arrow-down text-red-500'
@@ -736,12 +734,10 @@ interface Tendencia {
                                                     [style.width.%]="
                                                         cat.score_riesgo * 100
                                                     "
-                                                    [class]="
-                                                        'bg-' +
-                                                        riesgoColor(
+                                                    [ngClass]="
+                                                        barraFillClassesRiesgo(
                                                             cat.score_riesgo
-                                                        ) +
-                                                        '-500'
+                                                        )
                                                     "
                                                 ></div>
                                             </div>
@@ -1336,5 +1332,36 @@ export class DashboardComponent implements OnInit {
         if (score >= 0.4) return 'warn';
         if (score > 0) return 'success';
         return 'secondary';
+    }
+
+    barraFillClasses(
+        nivel: PrediccionDemanda['nivel_riesgo'],
+    ): { [key: string]: boolean } {
+        return {
+            'bg-red-500': nivel === 'CRITICO',
+            'bg-orange-500': nivel === 'ALTO',
+            'bg-blue-500': nivel === 'MEDIO',
+            'bg-green-500': nivel === 'BAJO',
+        };
+    }
+
+    barraFillClassesRiesgo(score: number): { [key: string]: boolean } {
+        const nivel = this.riesgoColor(score);
+        return {
+            'bg-red-500': nivel === 'danger',
+            'bg-orange-500': nivel === 'warn',
+            'bg-green-500': nivel === 'success',
+            'bg-surface-400': nivel === 'secondary',
+        };
+    }
+
+    tendenciaTextClasses(pct: number): { [key: string]: boolean } {
+        const nivel = this.tendenciaColor(pct);
+        return {
+            'text-green-500': nivel === 'success',
+            'text-red-500': nivel === 'danger',
+            'text-surface-500 dark:text-surface-400':
+                nivel === 'secondary',
+        };
     }
 }
