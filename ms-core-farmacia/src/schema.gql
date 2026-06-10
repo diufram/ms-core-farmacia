@@ -167,6 +167,7 @@ type Mutation {
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
   register(input: RegisterDto!): AuthPayloadType!
+  testPushNotification(body: String!, title: String!, token: String!): Boolean!
   unassignUsuarioSucursal(sucursalId: Int!, usuarioId: Int!): UsuarioPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
   updateCliente(id: Int!, input: UpdateClienteDto!): ClienteType!
