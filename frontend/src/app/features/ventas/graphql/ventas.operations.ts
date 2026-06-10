@@ -18,6 +18,10 @@ const VENTA_FIELDS = `
     sucursal_id
     usuario_id
     cliente_id
+    cliente_walk_in
+    cliente_nombre
+    cliente_celular
+    cliente_codigo
     detalles {
         ${VENTA_DETALLE_FIELDS}
     }
@@ -42,6 +46,17 @@ export const VENTA_QUERY = gql`
 export const CREATE_VENTA_MUTATION = gql`
     mutation CreateVenta($input: CreateVentaDto!) {
         createVenta(input: $input) {
+            message
+            venta {
+                ${VENTA_FIELDS}
+            }
+        }
+    }
+`;
+
+export const CAMBIAR_ESTADO_VENTA_MUTATION = gql`
+    mutation CambiarEstadoVenta($id: Int!, $nuevoEstado: String!) {
+        cambiarEstadoVenta(id: $id, nuevoEstado: $nuevoEstado) {
             message
             venta {
                 ${VENTA_FIELDS}

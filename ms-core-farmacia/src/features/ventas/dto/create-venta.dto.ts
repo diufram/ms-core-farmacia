@@ -4,8 +4,11 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsInt,
   IsOptional,
+  IsString,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -25,6 +28,35 @@ export class CreateVentaDto {
   @IsInt()
   @Min(1)
   clienteId?: number;
+
+  @ApiPropertyOptional({
+    description: 'Si es true, el admin está asociando un cliente walk-in (consumidor final)',
+  })
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  cliente_walk_in?: boolean;
+
+  @ApiPropertyOptional({ description: 'Snapshot: nombre del cliente walk-in' })
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  cliente_nombre?: string;
+
+  @ApiPropertyOptional({ description: 'Snapshot: celular del cliente walk-in' })
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  cliente_celular?: string;
+
+  @ApiPropertyOptional({ description: 'Snapshot: código del cliente walk-in' })
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  cliente_codigo?: string;
 
   @ApiProperty({ type: [VentaDetalleInput] })
   @Field(() => [VentaDetalleInput])

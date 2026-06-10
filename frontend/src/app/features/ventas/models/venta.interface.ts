@@ -7,15 +7,21 @@ export interface VentaDetalle {
     subtotal: number;
 }
 
+export type EstadoVenta = 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA' | 'ENTREGADA';
+
 export interface Venta {
     id: number;
     numero_venta: string;
     fecha_venta: string;
     total: number;
-    estado: string;
+    estado: EstadoVenta;
     sucursal_id: number | null;
     usuario_id: number | null;
     cliente_id: number | null;
+    cliente_walk_in: boolean;
+    cliente_nombre: string | null;
+    cliente_celular: string | null;
+    cliente_codigo: string | null;
     detalles: VentaDetalle[];
 }
 
@@ -33,6 +39,10 @@ export interface VentaDetalleInput {
 export interface CreateVentaInput {
     sucursalId: number;
     clienteId?: number | null;
+    cliente_walk_in?: boolean;
+    cliente_nombre?: string;
+    cliente_celular?: string;
+    cliente_codigo?: string;
     detalles: VentaDetalleInput[];
 }
 

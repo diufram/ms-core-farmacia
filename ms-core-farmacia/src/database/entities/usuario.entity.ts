@@ -7,6 +7,7 @@ import { UsuarioSucursal } from './usuario-sucursal.entity';
 export enum Rol {
   SUPER_ADMIN = 'super_admin',
   ADMIN = 'admin',
+  CLIENTE = 'cliente',
 }
 
 @Entity('usuarios')

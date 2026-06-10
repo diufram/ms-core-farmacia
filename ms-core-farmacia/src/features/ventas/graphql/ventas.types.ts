@@ -47,6 +47,18 @@ export class VentaType {
   @Field(() => Int, { nullable: true })
   cliente_id!: number | null;
 
+  @Field()
+  cliente_walk_in!: boolean;
+
+  @Field(() => String, { nullable: true })
+  cliente_nombre?: string | null;
+
+  @Field(() => String, { nullable: true })
+  cliente_celular?: string | null;
+
+  @Field(() => String, { nullable: true })
+  cliente_codigo?: string | null;
+
   @Field(() => [VentaDetalleType])
   detalles!: VentaDetalleType[];
 }

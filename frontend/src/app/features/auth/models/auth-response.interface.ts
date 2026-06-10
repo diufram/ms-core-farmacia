@@ -8,7 +8,7 @@ export interface Usuario {
     id: number;
     nombre_usuario: string;
     correo_electronico: string;
-    rol: 'super_admin' | 'admin';
+    rol: 'super_admin' | 'admin' | 'cliente';
     sucursal?: Sucursal | null;
     sucursal_id?: number | null;
 }

@@ -141,6 +141,8 @@ export class MyMenu implements OnInit {
     }
 
     private buildModel(): MenuItem[] {
+        const esCliente = this.authService.isCliente();
+
         const model: MenuItem[] = [
             {
                 label: 'Principal',
@@ -160,6 +162,7 @@ export class MyMenu implements OnInit {
             },
             {
                 label: 'Administración',
+                visible: !esCliente,
                 items: [
                     {
                         label: 'Sucursales',
@@ -194,7 +197,19 @@ export class MyMenu implements OnInit {
                 ],
             },
             {
+                label: 'Mis Pedidos',
+                visible: esCliente,
+                items: [
+                    {
+                        label: 'Historial',
+                        icon: 'pi pi-fw pi-shopping-cart',
+                        routerLink: ['/home/ventas'],
+                    },
+                ],
+            },
+            {
                 label: 'Documentos',
+                visible: !esCliente,
                 items: [
                     {
                         label: 'Gestor de Archivos',
@@ -218,7 +233,7 @@ export class MyMenu implements OnInit {
         return model.filter(
             (section) =>
                 !section.label ||
-                section.items?.some((item) => item.visible !== false),
+                section.visible !== false,
         );
     }
 }

@@ -169,6 +169,11 @@ export class ClientesService {
     userSucursalId: number | null,
     requestedSucursalId: number,
   ) {
+    if (userRol === Rol.CLIENTE) {
+      throw new ForbiddenException(
+        'Los clientes no pueden realizar esta operacion.',
+      );
+    }
     if (userRol === Rol.SUPER_ADMIN) {
       return;
     }
@@ -184,6 +189,11 @@ export class ClientesService {
     userRol: string,
     userSucursalId: number | null,
   ) {
+    if (userRol === Rol.CLIENTE) {
+      throw new ForbiddenException(
+        'Los clientes no pueden realizar esta operacion.',
+      );
+    }
     if (userRol === Rol.SUPER_ADMIN) {
       return;
     }

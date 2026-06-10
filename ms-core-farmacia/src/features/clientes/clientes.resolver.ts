@@ -1,7 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Rol } from '../../database/entities/usuario.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
@@ -12,11 +15,12 @@ import {
 import { ClientesService } from './clientes.service';
 
 @Resolver()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class ClientesResolver {
   constructor(private readonly clientesService: ClientesService) {}
 
   @Query(() => [ClienteType])
+  @Roles(Rol.SUPER_ADMIN, Rol.ADMIN)
   clientes(
     @CurrentUser() user: JwtPayload,
     @Args('sucursalId', { type: () => Int, nullable: true })
@@ -26,6 +30,7 @@ export class ClientesResolver {
   }
 
   @Query(() => ClienteType)
+  @Roles(Rol.SUPER_ADMIN, Rol.ADMIN)
   cliente(
     @CurrentUser() user: JwtPayload,
     @Args('id', { type: () => Int }) id: number,
@@ -34,6 +39,7 @@ export class ClientesResolver {
   }
 
   @Mutation(() => ClientePayloadType)
+  @Roles(Rol.SUPER_ADMIN, Rol.ADMIN)
   createCliente(
     @CurrentUser() user: JwtPayload,
     @Args('input') input: CreateClienteDto,
@@ -42,6 +48,7 @@ export class ClientesResolver {
   }
 
   @Mutation(() => ClienteType)
+  @Roles(Rol.SUPER_ADMIN, Rol.ADMIN)
   updateCliente(
     @CurrentUser() user: JwtPayload,
     @Args('id', { type: () => Int }) id: number,
@@ -51,6 +58,7 @@ export class ClientesResolver {
   }
 
   @Mutation(() => ClientePayloadType)
+  @Roles(Rol.SUPER_ADMIN, Rol.ADMIN)
   deleteCliente(
     @CurrentUser() user: JwtPayload,
     @Args('id', { type: () => Int }) id: number,

@@ -138,6 +138,7 @@ export class UsuariosListComponent implements OnInit {
     rolOptions = [
         { label: 'Super Administrador', value: 'super_admin' as Rol },
         { label: 'Administrador', value: 'admin' as Rol },
+        { label: 'Cliente', value: 'cliente' as Rol },
     ];
 
     columns: TableColumn[] = [

@@ -109,6 +109,10 @@ input CreateUsuarioDto {
 
 input CreateVentaDto {
   clienteId: Int
+  cliente_celular: String
+  cliente_codigo: String
+  cliente_nombre: String
+  cliente_walk_in: Boolean
   detalles: [VentaDetalleInput!]!
   sucursalId: Int!
 }
@@ -150,6 +154,7 @@ type MessageResultType {
 type Mutation {
   adminResetUsuarioPassword(id: Int!, input: AdminResetPasswordDto!): UsuarioPayloadType!
   assignUsuarioSucursal(input: AssignSucursalDto!, usuarioId: Int!): UsuarioPayloadType!
+  cambiarEstadoVenta(id: Int!, nuevoEstado: String!): VentaPayloadType!
   changePassword(input: ChangePasswordDto!): MessageResultType!
   createCategoria(input: CreateCategoriaDto!): CategoriaPayloadType!
   createCliente(input: CreateClienteDto!): ClientePayloadType!
@@ -167,7 +172,7 @@ type Mutation {
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
   register(input: RegisterDto!): AuthPayloadType!
-  testPushNotification(body: String!, title: String!, token: String!): Boolean!
+  registerCliente(input: RegisterClienteDto!): AuthPayloadType!
   unassignUsuarioSucursal(sucursalId: Int!, usuarioId: Int!): UsuarioPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
   updateCliente(id: Int!, input: UpdateClienteDto!): ClienteType!
@@ -253,6 +258,15 @@ type Query {
 
 input RefreshTokenDto {
   refresh_token: String!
+}
+
+input RegisterClienteDto {
+  apellido: String!
+  celular: String
+  contrasena: String!
+  correo_electronico: String!
+  nombre: String!
+  nombre_usuario: String!
 }
 
 input RegisterDto {
@@ -406,7 +420,11 @@ type VentaPayloadType {
 }
 
 type VentaType {
+  cliente_celular: String
+  cliente_codigo: String
   cliente_id: Int
+  cliente_nombre: String
+  cliente_walk_in: Boolean!
   detalles: [VentaDetalleType!]!
   estado: String!
   fecha_venta: String!

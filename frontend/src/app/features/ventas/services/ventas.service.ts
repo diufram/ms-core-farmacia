@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
 import {
+    CAMBIAR_ESTADO_VENTA_MUTATION,
     CREATE_VENTA_MUTATION,
     DELETE_VENTA_MUTATION,
     VENTA_QUERY,
@@ -9,6 +10,7 @@ import {
 } from '../graphql/ventas.operations';
 import {
     CreateVentaInput,
+    EstadoVenta,
     Venta,
     VentaPayload,
     VentasFilters,
@@ -82,6 +84,30 @@ export class VentasService {
                         throw new Error('Respuesta inválida del servidor');
                     }
                     return res.data.createVenta;
+                }),
+            );
+    }
+
+    cambiarEstado(
+        id: number,
+        nuevoEstado: EstadoVenta,
+    ): Observable<VentaPayload> {
+        return this.apollo
+            .mutate<
+                { cambiarEstadoVenta: VentaPayload },
+                { id: number; nuevoEstado: string }
+            >({
+                mutation: CAMBIAR_ESTADO_VENTA_MUTATION,
+                variables: { id, nuevoEstado },
+            })
+            .pipe(
+                map((res) => {
+                    const err = res.errors?.[0]?.message;
+                    if (err) throw new Error(err);
+                    if (!res.data?.cambiarEstadoVenta) {
+                        throw new Error('Respuesta inválida del servidor');
+                    }
+                    return res.data.cambiarEstadoVenta;
                 }),
             );
     }

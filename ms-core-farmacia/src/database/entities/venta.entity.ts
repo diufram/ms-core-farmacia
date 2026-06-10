@@ -47,6 +47,18 @@ export class Venta extends BaseEntity {
   @Column({ type: 'varchar', length: 20, default: 'PENDIENTE' })
   estado!: string;
 
+  @Column({ type: 'boolean', default: false })
+  cliente_walk_in!: boolean;
+
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  cliente_nombre?: string | null;
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  cliente_celular?: string | null;
+
+  @Column({ type: 'varchar', length: 60, nullable: true })
+  cliente_codigo?: string | null;
+
   @OneToMany(() => VentaDetalle, (detalle) => detalle.venta)
   detalles!: VentaDetalle[];
 }

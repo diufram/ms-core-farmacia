@@ -19,6 +19,8 @@ import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
+import { CheckboxModule } from 'primeng/checkbox';
+import { MessageModule } from 'primeng/message';
 
 import { ToastService } from '@/core/services/toast.service';
 import { AuthService } from '@/features/auth/services/auth.service';
@@ -27,7 +29,7 @@ import { Sucursal } from '@/features/sucursales/models/sucursal.interface';
 import { ProductosService } from '@/features/productos/services/productos.service';
 import { Producto } from '@/features/productos/models/producto.interface';
 import { VentasService } from '../../services/ventas.service';
-import { VentaDetalleInput } from '../../models/venta.interface';
+import { CreateVentaInput, VentaDetalleInput } from '../../models/venta.interface';
 
 interface DetalleLinea {
     productoId: number | null;
@@ -52,6 +54,8 @@ interface DetalleLinea {
         InputNumberModule,
         DividerModule,
         TagModule,
+        CheckboxModule,
+        MessageModule,
     ],
     styles: [`
         .venta-linea {
@@ -143,7 +147,7 @@ interface DetalleLinea {
                             </small>
                         </div>
 
-                        <div *ngIf="!esSuperAdmin()">
+                        <div *ngIf="!esSuperAdmin() && !esCliente()">
                             <label class="field-label">Sucursal</label>
                             <input
                                 pInputText
@@ -153,8 +157,99 @@ interface DetalleLinea {
                                 class="w-full"
                             />
                         </div>
+
+                        <div *ngIf="esCliente()">
+                            <label class="field-label">Sucursal de retiro <span class="req">*</span></label>
+                            <p-select
+                                formControlName="sucursalId"
+                                [options]="sucursales()"
+                                optionLabel="nombre"
+                                optionValue="id"
+                                placeholder="Selecciona la sucursal"
+                                styleClass="w-full"
+                                (onChange)="onCambioSucursal()"
+                            />
+                            <small class="text-muted-color mt-1 block">
+                                Elegí la sucursal donde retirarás tu pedido.
+                            </small>
+                            <small
+                                *ngIf="invalid('sucursalId')"
+                                class="text-red-500 mt-1 block"
+                            >
+                                La sucursal es requerida
+                            </small>
+                        </div>
                     </div>
                 </p-card>
+
+                <p-card *ngIf="esEmpleado()">
+                    <ng-template pTemplate="header">
+                        <div class="px-6 pt-5">
+                            <h3 class="text-lg font-semibold text-color m-0">
+                                Cliente walk-in (opcional)
+                            </h3>
+                            <p class="text-muted-color text-sm m-0 mt-1">
+                                Activa para asociar un cliente consumidor final a esta venta.
+                            </p>
+                        </div>
+                    </ng-template>
+
+                    <div class="flex items-center gap-3 pb-3">
+                        <p-checkbox
+                            formControlName="cliente_walk_in"
+                            [binary]="true"
+                            inputId="cliente_walk_in"
+                        />
+                        <label for="cliente_walk_in" class="font-medium">
+                            Esta venta es para un cliente walk-in (consumidor final)
+                        </label>
+                    </div>
+
+                    <div *ngIf="form.get('cliente_walk_in')?.value" class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                        <div>
+                            <label class="field-label">Nombre <span class="req">*</span></label>
+                            <input
+                                pInputText
+                                type="text"
+                                formControlName="cliente_nombre"
+                                class="w-full"
+                                placeholder="Consumidor final"
+                            />
+                            <small
+                                *ngIf="invalid('cliente_nombre')"
+                                class="text-red-500 mt-1 block"
+                            >
+                                El nombre es obligatorio para walk-in
+                            </small>
+                        </div>
+                        <div>
+                            <label class="field-label">Celular</label>
+                            <input
+                                pInputText
+                                type="text"
+                                formControlName="cliente_celular"
+                                class="w-full"
+                            />
+                        </div>
+                        <div>
+                            <label class="field-label">Código</label>
+                            <input
+                                pInputText
+                                type="text"
+                                formControlName="cliente_codigo"
+                                class="w-full"
+                                placeholder="Opcional"
+                            />
+                        </div>
+                    </div>
+                </p-card>
+
+                <p-message
+                    *ngIf="esCliente()"
+                    severity="info"
+                    text="Tu pedido quedará en estado PENDIENTE. Será confirmado por un administrador de la sucursal."
+                    styleClass="w-full"
+                />
 
                 <p-card>
                     <ng-template pTemplate="header">
@@ -307,17 +402,31 @@ export class VentaFormComponent implements OnInit {
 
         this.form = this.fb.group({
             sucursalId: [
-                this.esSuperAdmin() ? null : sucursalId,
+                this.esSuperAdmin() || this.esCliente() ? null : sucursalId,
                 Validators.required,
             ],
+            cliente_walk_in: [false],
+            cliente_nombre: [''],
+            cliente_celular: [''],
+            cliente_codigo: [''],
             detalles: this.fb.array<FormGroup>([], [
                 (arr) => ((arr as FormArray).length > 0 ? null : { minLength: true }),
             ]),
         });
 
-        if (!this.esSuperAdmin() && user?.sucursal_id) {
+        if (!this.esSuperAdmin() && !this.esCliente() && user?.sucursal_id) {
             this.sucursalNombre.set(user.sucursal?.nombre ?? `Sucursal #${user.sucursal_id}`);
         }
+
+        this.form.get('cliente_walk_in')?.valueChanges.subscribe((walkIn) => {
+            const nombreCtrl = this.form.get('cliente_nombre');
+            if (walkIn) {
+                nombreCtrl?.setValidators([Validators.required, Validators.maxLength(120)]);
+            } else {
+                nombreCtrl?.clearValidators();
+            }
+            nombreCtrl?.updateValueAndValidity();
+        });
     }
 
     get detalles(): FormArray<FormGroup> {
@@ -328,8 +437,20 @@ export class VentaFormComponent implements OnInit {
         return this.auth.currentUser()?.rol === 'super_admin';
     }
 
+    esAdmin(): boolean {
+        return this.auth.currentUser()?.rol === 'admin';
+    }
+
+    esCliente(): boolean {
+        return this.auth.currentUser()?.rol === 'cliente';
+    }
+
+    esEmpleado(): boolean {
+        return this.esSuperAdmin() || this.esAdmin();
+    }
+
     cargarSucursales(): void {
-        if (!this.esSuperAdmin()) return;
+        if (!this.esSuperAdmin() && !this.esCliente()) return;
         this.sucursalesService.list().subscribe({
             next: (data) => this.sucursales.set(data),
             error: () => undefined,
@@ -433,22 +554,29 @@ export class VentaFormComponent implements OnInit {
                 : undefined,
         }));
 
-        this.ventasService
-            .create({
-                sucursalId: Number(v.sucursalId),
-                detalles,
-            })
-            .subscribe({
-                next: (res) => {
-                    this.saving.set(false);
-                    this.toast.success(res.message);
-                    this.router.navigate(['/home/ventas']);
-                },
-                error: (err) => {
-                    this.saving.set(false);
-                    this.toast.error(err);
-                },
-            });
+        const input: CreateVentaInput = {
+            sucursalId: Number(v.sucursalId),
+            detalles,
+        };
+
+        if (this.esEmpleado() && v.cliente_walk_in) {
+            input.cliente_walk_in = true;
+            input.cliente_nombre = v.cliente_nombre;
+            input.cliente_celular = v.cliente_celular || undefined;
+            input.cliente_codigo = v.cliente_codigo || undefined;
+        }
+
+        this.ventasService.create(input).subscribe({
+            next: (res) => {
+                this.saving.set(false);
+                this.toast.success(res.message);
+                this.router.navigate(['/home/ventas']);
+            },
+            error: (err) => {
+                this.saving.set(false);
+                this.toast.error(err);
+            },
+        });
     }
 
     cancelar(): void {

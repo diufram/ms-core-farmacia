@@ -1,4 +1,4 @@
-export type Rol = 'super_admin' | 'admin';
+export type Rol = 'super_admin' | 'admin' | 'cliente';
 
 export interface Persona {
     id: number;

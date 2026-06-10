@@ -2,8 +2,12 @@ import { Routes } from '@angular/router';
 import { ComingSoonComponent } from '@/shared/components/coming-soon/coming-soon.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { authGuard } from '@/core/guards/auth.guard';
+import { roleGuard } from '@/core/guards/role.guard';
 import { MainLayout } from '@/core/layout/component/app.layout';
 import { Notfound } from '@/pages/notfound/notfound';
+
+const EMPLEADO_ROLES = ['super_admin', 'admin'];
+const SOLO_SUPER_ADMIN = ['super_admin'];
 
 export const DASHBOARD_ROUTES: Routes = [
     {
@@ -14,6 +18,8 @@ export const DASHBOARD_ROUTES: Routes = [
             { path: '', component: DashboardComponent, title: 'Dashboard' },
             {
                 path: 'sucursales',
+                canActivate: [roleGuard],
+                data: { roles: SOLO_SUPER_ADMIN },
                 loadChildren: () =>
                     import('@/features/sucursales/sucursales.routes').then(
                         (m) => m.SUCURSALES_ROUTES,
@@ -21,6 +27,8 @@ export const DASHBOARD_ROUTES: Routes = [
             },
             {
                 path: 'usuarios',
+                canActivate: [roleGuard],
+                data: { roles: SOLO_SUPER_ADMIN },
                 loadChildren: () =>
                     import('@/features/usuarios/usuarios.routes').then(
                         (m) => m.USUARIOS_ROUTES,
@@ -28,6 +36,8 @@ export const DASHBOARD_ROUTES: Routes = [
             },
             {
                 path: 'categorias',
+                canActivate: [roleGuard],
+                data: { roles: EMPLEADO_ROLES },
                 loadChildren: () =>
                     import('@/features/categorias/categorias.routes').then(
                         (m) => m.CATEGORIAS_ROUTES,
@@ -35,6 +45,8 @@ export const DASHBOARD_ROUTES: Routes = [
             },
             {
                 path: 'productos',
+                canActivate: [roleGuard],
+                data: { roles: EMPLEADO_ROLES },
                 loadChildren: () =>
                     import('@/features/productos/productos.routes').then(
                         (m) => m.PRODUCTOS_ROUTES,
@@ -49,6 +61,8 @@ export const DASHBOARD_ROUTES: Routes = [
             },
             {
                 path: 'clientes',
+                canActivate: [roleGuard],
+                data: { roles: SOLO_SUPER_ADMIN },
                 loadChildren: () =>
                     import('@/features/clientes/clientes.routes').then(
                         (m) => m.CLIENTES_ROUTES,
@@ -56,22 +70,12 @@ export const DASHBOARD_ROUTES: Routes = [
             },
             {
                 path: 'documentos',
+                canActivate: [roleGuard],
+                data: { roles: EMPLEADO_ROLES },
                 loadChildren: () =>
                     import('@/features/documentos/documentos.routes').then(
                         (m) => m.DOCUMENTOS_ROUTES,
                     ),
-            },
-            {
-                path: 'reportes/ventas',
-                component: ComingSoonComponent,
-                data: { title: 'Reporte de Ventas' },
-                title: 'Reporte de Ventas',
-            },
-            {
-                path: 'reportes/inventario',
-                component: ComingSoonComponent,
-                data: { title: 'Reporte de Inventario' },
-                title: 'Reporte de Inventario',
             },
         ],
     },

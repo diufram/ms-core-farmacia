@@ -14,6 +14,7 @@ import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterDto } from './dto/register.dto';
+import { RegisterClienteDto } from './dto/register-cliente.dto';
 
 type TokensResponse = {
   access_token: string;
@@ -52,6 +53,42 @@ export class AuthService {
       usuario: this.serializarUsuario(usuario),
       ...tokens,
       message: 'Registro exitoso.',
+    };
+  }
+
+  async registerCliente(dto: RegisterClienteDto) {
+    const usuarioExistente = await this.authRepository.buscarUsuarioPorCorreo(
+      dto.correo_electronico.toLowerCase(),
+    );
+    if (usuarioExistente) {
+      throw new BadRequestException('El correo electronico ya esta registrado.');
+    }
+
+    const contrasenaHash = await hash(dto.contrasena, 10);
+
+    const usuario = await this.authRepository.crearUsuarioConPersona(
+      dto.nombre,
+      dto.apellido,
+      dto.celular,
+      dto.correo_electronico,
+      dto.nombre_usuario,
+      contrasenaHash,
+    );
+
+    await this.authRepository.actualizarRolUsuario(usuario.id, Rol.CLIENTE);
+
+    const usuarioActualizado = await this.authRepository.buscarUsuarioPorId(
+      usuario.id,
+    );
+    if (!usuarioActualizado) {
+      throw new BadRequestException('Error al registrar el cliente.');
+    }
+
+    const tokens = await this.generarTokens(usuarioActualizado);
+    return {
+      usuario: this.serializarUsuario(usuarioActualizado),
+      ...tokens,
+      message: 'Registro de cliente exitoso.',
     };
   }
 
@@ -268,7 +305,7 @@ export class AuthService {
   private async obtenerSucursalActiva(
     usuario: Usuario,
   ): Promise<number | null> {
-    if (usuario.rol === Rol.SUPER_ADMIN) {
+    if (usuario.rol === Rol.SUPER_ADMIN || usuario.rol === Rol.CLIENTE) {
       return null;
     }
 

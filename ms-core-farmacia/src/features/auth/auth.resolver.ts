@@ -14,6 +14,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 import { RegisterDto } from './dto/register.dto';
+import { RegisterClienteDto } from './dto/register-cliente.dto';
 
 @Resolver()
 export class AuthResolver {
@@ -22,6 +23,11 @@ export class AuthResolver {
   @Mutation(() => AuthPayloadType)
   register(@Args('input') input: RegisterDto) {
     return this.authService.register(input);
+  }
+
+  @Mutation(() => AuthPayloadType)
+  registerCliente(@Args('input') input: RegisterClienteDto) {
+    return this.authService.registerCliente(input);
   }
 
   @Mutation(() => AuthPayloadType)

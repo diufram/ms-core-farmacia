@@ -60,6 +60,11 @@ export class UsuariosService {
         'Un administrador debe estar asignado a al menos una sucursal.',
       );
     }
+    if (targetRol === Rol.CLIENTE && dto.sucursales && dto.sucursales.length > 0) {
+      throw new ConflictException(
+        'Un cliente no debe estar asignado a sucursales.',
+      );
+    }
 
     if (dto.sucursales?.length) {
       const sucursalIds = dto.sucursales.map((s) => s.sucursalId);

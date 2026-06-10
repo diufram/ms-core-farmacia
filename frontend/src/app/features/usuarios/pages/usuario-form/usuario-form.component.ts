@@ -457,6 +457,7 @@ export class UsuarioFormComponent implements OnInit {
     rolOptions = [
         { label: 'Administrador', value: 'admin' as Rol },
         { label: 'Super Administrador', value: 'super_admin' as Rol },
+        { label: 'Cliente', value: 'cliente' as Rol },
     ];
 
     get sucursalesControls(): FormArray<FormGroup> {

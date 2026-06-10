@@ -107,4 +107,8 @@ export class AuthRepository {
       return await manager.save(usuario);
     });
   }
+
+  async actualizarRolUsuario(usuarioId: number, nuevoRol: Rol): Promise<void> {
+    await this.usuarioRepository.update(usuarioId, { rol: nuevoRol });
+  }
 }

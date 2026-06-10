@@ -141,6 +141,10 @@ export class AuthService {
         return this.currentUser()?.rol === 'super_admin';
     }
 
+    isCliente(): boolean {
+        return this.currentUser()?.rol === 'cliente';
+    }
+
     loadSession(): Promise<void> {
         return new Promise((resolve) => {
             const token = localStorage.getItem('token');
