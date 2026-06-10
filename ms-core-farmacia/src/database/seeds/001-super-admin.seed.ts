@@ -12,10 +12,10 @@ export const superAdminSeed: Seed = {
     const personaRepository = seedDataSource.getRepository(Persona);
 
     const correo = (
-      process.env.SEED_SUPER_ADMIN_EMAIL || 'admin@multifarmacia.local'
+      process.env.SEED_SUPER_ADMIN_EMAIL || 'admin@gmail.com'
     ).toLowerCase();
-    const username = process.env.SEED_SUPER_ADMIN_USERNAME || 'superadmin';
-    const password = process.env.SEED_SUPER_ADMIN_PASSWORD || 'Admin12345';
+    const username = process.env.SEED_SUPER_ADMIN_USERNAME || 'admin';
+    const password = process.env.SEED_SUPER_ADMIN_PASSWORD || '123123';
 
     const existing = await usuarioRepository.findOne({
       where: [{ correo_electronico: correo }, { nombre_usuario: username }],
@@ -27,8 +27,8 @@ export const superAdminSeed: Seed = {
     }
 
     const persona = personaRepository.create({
-      nombre: process.env.SEED_SUPER_ADMIN_NOMBRE || 'Super',
-      apellido: process.env.SEED_SUPER_ADMIN_APELLIDO || 'Admin',
+      nombre: process.env.SEED_SUPER_ADMIN_NOMBRE || 'Admin',
+      apellido: process.env.SEED_SUPER_ADMIN_APELLIDO || 'General',
       celular: process.env.SEED_SUPER_ADMIN_CELULAR || null,
     });
     const personaGuardada = await personaRepository.save(persona);

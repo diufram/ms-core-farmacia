@@ -19,9 +19,10 @@ type VentaSeed = {
 };
 
 const VENTAS: VentaSeed[] = [
+  // === Sucursal Central ===
   {
     sucursalSlug: 'sucursal-central',
-    diasAtras: 5,
+    diasAtras: 10,
     walkIn: { nombre: 'Cliente Walk-in A', celular: '70000001', codigo: 'WI-A' },
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 2 },
@@ -30,12 +31,12 @@ const VENTAS: VentaSeed[] = [
   },
   {
     sucursalSlug: 'sucursal-central',
-    diasAtras: 4,
+    diasAtras: 7,
     detalles: [{ productoCodigo: 'PROD-002', cantidad: 1 }],
   },
   {
     sucursalSlug: 'sucursal-central',
-    diasAtras: 3,
+    diasAtras: 5,
     walkIn: { nombre: 'Cliente Walk-in B' },
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 3 },
@@ -47,9 +48,10 @@ const VENTAS: VentaSeed[] = [
     diasAtras: 1,
     detalles: [{ productoCodigo: 'PROD-003', cantidad: 2 }],
   },
+  // === Sucursal Norte ===
   {
     sucursalSlug: 'sucursal-norte',
-    diasAtras: 4,
+    diasAtras: 8,
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 5 },
       { productoCodigo: 'PROD-003', cantidad: 3 },
@@ -57,23 +59,42 @@ const VENTAS: VentaSeed[] = [
   },
   {
     sucursalSlug: 'sucursal-norte',
-    diasAtras: 2,
+    diasAtras: 4,
     walkIn: { nombre: 'Cliente Walk-in C', codigo: 'WI-C' },
     detalles: [{ productoCodigo: 'PROD-002', cantidad: 4 }],
   },
   {
     sucursalSlug: 'sucursal-norte',
-    diasAtras: 0,
+    diasAtras: 2,
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 1 },
       { productoCodigo: 'PROD-002', cantidad: 1 },
       { productoCodigo: 'PROD-003', cantidad: 1 },
     ],
   },
+  // === Sucursal Sur ===
   {
-    sucursalSlug: 'sucursal-norte',
+    sucursalSlug: 'sucursal-sur',
+    diasAtras: 6,
+    walkIn: { nombre: 'Cliente Walk-in D', celular: '70000004', codigo: 'WI-D' },
+    detalles: [
+      { productoCodigo: 'PROD-001', cantidad: 4 },
+      { productoCodigo: 'PROD-002', cantidad: 1 },
+    ],
+  },
+  {
+    sucursalSlug: 'sucursal-sur',
+    diasAtras: 3,
+    walkIn: { nombre: 'Cliente Walk-in E' },
+    detalles: [{ productoCodigo: 'PROD-003', cantidad: 6 }],
+  },
+  {
+    sucursalSlug: 'sucursal-sur',
     diasAtras: 0,
-    detalles: [{ productoCodigo: 'PROD-003', cantidad: 1, precioUnitario: 11.5 }],
+    detalles: [
+      { productoCodigo: 'PROD-001', cantidad: 2 },
+      { productoCodigo: 'PROD-003', cantidad: 2 },
+    ],
   },
 ];
 
@@ -86,7 +107,7 @@ export const ventasSeed: Seed = {
     const productoRepository = seedDataSource.getRepository(Producto);
 
     const superAdmin = await usuarioRepository.findOne({
-      where: { nombre_usuario: 'superadmin' },
+      where: { nombre_usuario: 'admin' },
     });
     if (!superAdmin) {
       console.log('- Super admin no existe, seed de ventas omitido.');

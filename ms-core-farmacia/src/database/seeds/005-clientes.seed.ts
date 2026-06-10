@@ -4,49 +4,28 @@ import { Rol, Usuario } from '../entities/usuario.entity';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
-const CLIENTES: Array<{
-  nombre: string;
-  apellido: string;
-  username: string;
-  correo: string;
-  celular: string;
-}> = [
-  {
-    nombre: 'Carlos',
-    apellido: 'Rojas',
-    username: 'carlos.rojas',
-    correo: 'carlos.rojas@clientes.local',
-    celular: '76000001',
-  },
-  {
-    nombre: 'Maria',
-    apellido: 'Luna',
-    username: 'maria.luna',
-    correo: 'maria.luna@clientes.local',
-    celular: '76000002',
-  },
-  {
-    nombre: 'Luis',
-    apellido: 'Mendoza',
-    username: 'luis.mendoza',
-    correo: 'luis.mendoza@clientes.local',
-    celular: '76001001',
-  },
-  {
-    nombre: 'Sofia',
-    apellido: 'Castro',
-    username: 'sofia.castro',
-    correo: 'sofia.castro@clientes.local',
-    celular: '76001002',
-  },
-  {
-    nombre: 'Diego',
-    apellido: 'Vargas',
-    username: 'diego.vargas',
-    correo: 'diego.vargas@clientes.local',
-    celular: '76001003',
-  },
+const PRIMER_NOMBRE = [
+  'Carlos', 'Maria', 'Luis', 'Sofia', 'Diego',
+  'Ana', 'Jose', 'Laura', 'Pedro', 'Marta',
+  'Jorge', 'Elena',
 ];
+
+const PRIMER_APELLIDO = [
+  'Rojas', 'Luna', 'Mendoza', 'Castro', 'Vargas',
+  'Suarez', 'Perez', 'Gomez', 'Diaz', 'Torres',
+  'Romero', 'Alvarez',
+];
+
+const CLIENTES = Array.from({ length: 12 }, (_, i) => {
+  const n = i + 1;
+  return {
+    nombre: PRIMER_NOMBRE[i] ?? 'Cliente',
+    apellido: PRIMER_APELLIDO[i] ?? 'Generico',
+    username: `cliente${n}`,
+    correo: `cliente${n}@gmail.com`,
+    celular: `7600${String(n).padStart(4, '0')}`,
+  };
+});
 
 export const clientesSeed: Seed = {
   order: 5,
@@ -54,7 +33,7 @@ export const clientesSeed: Seed = {
   run: async () => {
     const usuarioRepository = seedDataSource.getRepository(Usuario);
     const personaRepository = seedDataSource.getRepository(Persona);
-    const password = process.env.SEED_CLIENTE_PASSWORD || 'Cliente123';
+    const password = process.env.SEED_CLIENTE_PASSWORD || '123123';
 
     for (const item of CLIENTES) {
       const existing = await usuarioRepository.findOne({

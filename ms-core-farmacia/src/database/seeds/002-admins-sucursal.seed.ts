@@ -17,18 +17,26 @@ const ADMIN_POR_SUCURSAL: Array<{
   {
     sucursalSlug: 'sucursal-central',
     nombre: 'Admin',
-    apellido: 'Central',
-    username: 'admin.central',
-    correo: 'admin.central@multifarmacia.local',
+    apellido: 'Sucursal 1',
+    username: 'admin.suc.1',
+    correo: 'admin.suc.1@gmail.com',
     celular: '71111111',
   },
   {
     sucursalSlug: 'sucursal-norte',
     nombre: 'Admin',
-    apellido: 'Norte',
-    username: 'admin.norte',
-    correo: 'admin.norte@multifarmacia.local',
+    apellido: 'Sucursal 2',
+    username: 'admin.suc.2',
+    correo: 'admin.suc.2@gmail.com',
     celular: '72222222',
+  },
+  {
+    sucursalSlug: 'sucursal-sur',
+    nombre: 'Admin',
+    apellido: 'Sucursal 3',
+    username: 'admin.suc.3',
+    correo: 'admin.suc.3@gmail.com',
+    celular: '73333333',
   },
 ];
 
@@ -41,7 +49,7 @@ export const adminsSucursalSeed: Seed = {
     const sucursalRepository = seedDataSource.getRepository(Sucursal);
     const usuarioSucursalRepository =
       seedDataSource.getRepository(UsuarioSucursal);
-    const password = process.env.SEED_ADMIN_SUCURSAL_PASSWORD || 'Admin12345';
+    const password = process.env.SEED_ADMIN_SUCURSAL_PASSWORD || '123123';
 
     for (const item of ADMIN_POR_SUCURSAL) {
       const sucursal = await sucursalRepository.findOne({

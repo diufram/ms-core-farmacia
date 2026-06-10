@@ -17,6 +17,13 @@ const SUCURSALES = [
     direccion: 'Av. Norte #250',
     ciudad: 'Santa Cruz',
   },
+  {
+    nombre: 'Sucursal Sur',
+    slug: 'sucursal-sur',
+    telefono: '70000003',
+    direccion: 'Av. Sur #350',
+    ciudad: 'Santa Cruz',
+  },
 ];
 
 export const sucursalesSeed: Seed = {
