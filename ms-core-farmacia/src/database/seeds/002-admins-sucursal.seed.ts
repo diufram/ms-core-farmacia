@@ -6,7 +6,14 @@ import { UsuarioSucursal } from '../entities/usuario-sucursal.entity';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
-const ADMINISTRADORES = [
+const ADMIN_POR_SUCURSAL: Array<{
+  sucursalSlug: string;
+  nombre: string;
+  apellido: string;
+  username: string;
+  correo: string;
+  celular: string;
+}> = [
   {
     sucursalSlug: 'sucursal-central',
     nombre: 'Admin',
@@ -25,9 +32,9 @@ const ADMINISTRADORES = [
   },
 ];
 
-export const usuariosAdministradoresSeed: Seed = {
-  order: 3,
-  name: '003-usuarios-administradores',
+export const adminsSucursalSeed: Seed = {
+  order: 2,
+  name: '002-admins-sucursal',
   run: async () => {
     const usuarioRepository = seedDataSource.getRepository(Usuario);
     const personaRepository = seedDataSource.getRepository(Persona);
@@ -36,7 +43,7 @@ export const usuariosAdministradoresSeed: Seed = {
       seedDataSource.getRepository(UsuarioSucursal);
     const password = process.env.SEED_ADMIN_SUCURSAL_PASSWORD || 'Admin12345';
 
-    for (const item of ADMINISTRADORES) {
+    for (const item of ADMIN_POR_SUCURSAL) {
       const sucursal = await sucursalRepository.findOne({
         where: { slug: item.sucursalSlug },
       });
@@ -68,7 +75,7 @@ export const usuariosAdministradoresSeed: Seed = {
           persona: personaGuardada,
         });
         usuario = await usuarioRepository.save(usuario);
-        console.log(`- Usuario administrador creado (${item.correo}).`);
+        console.log(`- Admin de sucursal creado: ${item.correo} -> ${item.sucursalSlug}.`);
       }
 
       const relacion = await usuarioSucursalRepository.findOne({
@@ -77,7 +84,7 @@ export const usuariosAdministradoresSeed: Seed = {
 
       if (relacion) {
         console.log(
-          `- Relacion usuario-sucursal ya existe (${item.correo} -> ${item.sucursalSlug}).`,
+          `- Relacion admin-sucursal ya existe (${item.correo} -> ${item.sucursalSlug}).`,
         );
         continue;
       }
@@ -91,7 +98,7 @@ export const usuariosAdministradoresSeed: Seed = {
       );
 
       console.log(
-        `- Relacion usuario-sucursal creada (${item.correo} -> ${item.sucursalSlug}).`,
+        `- Relacion admin-sucursal creada (${item.correo} -> ${item.sucursalSlug}).`,
       );
     }
   },

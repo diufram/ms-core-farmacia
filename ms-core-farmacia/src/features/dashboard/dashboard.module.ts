@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Cliente } from '../../database/entities/cliente.entity';
 import { Producto } from '../../database/entities/producto.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Venta } from '../../database/entities/venta.entity';
@@ -15,7 +14,6 @@ import { DashboardService } from './dashboard.service';
       Venta,
       VentaDetalle,
       Producto,
-      Cliente,
       Sucursal,
     ]),
   ],

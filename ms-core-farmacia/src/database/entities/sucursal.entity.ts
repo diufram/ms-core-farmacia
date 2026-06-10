@@ -1,6 +1,5 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
-import { Cliente } from './cliente.entity';
 import { UsuarioSucursal } from './usuario-sucursal.entity';
 
 @Entity('sucursales')
@@ -34,7 +33,4 @@ export class Sucursal extends BaseEntity {
     (usuarioSucursal) => usuarioSucursal.sucursal,
   )
   usuarios_sucursal!: UsuarioSucursal[];
-
-  @OneToMany(() => Cliente, (cliente) => cliente.sucursal)
-  clientes!: Cliente[];
 }

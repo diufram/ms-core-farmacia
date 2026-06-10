@@ -22,13 +22,6 @@ export class CreateVentaDto {
   @Min(1)
   sucursalId!: number;
 
-  @ApiPropertyOptional({ example: 1 })
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  clienteId?: number;
-
   @ApiPropertyOptional({
     description: 'Si es true, el admin está asociando un cliente walk-in (consumidor final)',
   })

@@ -123,9 +123,6 @@ export class VentasService {
         estado: 'PENDIENTE',
         sucursal: { id: dto.sucursalId } as Venta['sucursal'],
         usuario: { id: userId } as Venta['usuario'],
-        cliente: dto.clienteId
-          ? ({ id: dto.clienteId } as Venta['cliente'])
-          : null,
         cliente_walk_in: dto.cliente_walk_in ?? false,
         cliente_nombre: dto.cliente_walk_in ? (dto.cliente_nombre ?? null) : null,
         cliente_celular: dto.cliente_walk_in ? (dto.cliente_celular ?? null) : null,
@@ -318,7 +315,6 @@ export class VentasService {
       estado: venta.estado ?? 'PENDIENTE',
       sucursal_id: venta.sucursal?.id ?? null,
       usuario_id: venta.usuario?.id ?? null,
-      cliente_id: venta.cliente?.id ?? null,
       cliente_walk_in: venta.cliente_walk_in ?? false,
       cliente_nombre: venta.cliente_nombre ?? null,
       cliente_celular: venta.cliente_celular ?? null,

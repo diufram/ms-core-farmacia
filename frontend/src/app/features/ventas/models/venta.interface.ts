@@ -17,7 +17,7 @@ export interface Venta {
     estado: EstadoVenta;
     sucursal_id: number | null;
     usuario_id: number | null;
-    cliente_id: number | null;
+    cliente_id?: never;
     cliente_walk_in: boolean;
     cliente_nombre: string | null;
     cliente_celular: string | null;

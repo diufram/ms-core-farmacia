@@ -1,6 +1,5 @@
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
-import { Cliente } from './cliente.entity';
 import { Usuario } from './usuario.entity';
 
 @Entity('personas')
@@ -16,7 +15,4 @@ export class Persona extends BaseEntity {
 
   @OneToOne(() => Usuario, (usuario) => usuario.persona)
   usuario?: Usuario;
-
-  @OneToMany(() => Cliente, (cliente) => cliente.persona)
-  clientes!: Cliente[];
 }

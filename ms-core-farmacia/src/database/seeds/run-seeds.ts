@@ -1,8 +1,8 @@
 import { superAdminSeed } from './001-super-admin.seed';
+import { adminsSucursalSeed } from './002-admins-sucursal.seed';
 import { sucursalesSeed } from './002-sucursales.seed';
-import { usuariosAdministradoresSeed } from './003-usuarios-administradores.seed';
 import { categoriasProductoSeed } from './004-categorias-producto.seed';
-import { clientesSeed } from './006-clientes.seed';
+import { clientesSeed } from './005-clientes.seed';
 import { productosSeed } from './007-productos.seed';
 import { ventasSeed } from './008-ventas.seed';
 import { Seed } from './base.seed';
@@ -11,7 +11,7 @@ import { seedDataSource } from './seed-data-source';
 const seeds: Seed[] = [
   superAdminSeed,
   sucursalesSeed,
-  usuariosAdministradoresSeed,
+  adminsSucursalSeed,
   categoriasProductoSeed,
   clientesSeed,
   productosSeed,

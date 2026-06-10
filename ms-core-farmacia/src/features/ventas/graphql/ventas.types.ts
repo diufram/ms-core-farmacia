@@ -44,9 +44,6 @@ export class VentaType {
   @Field(() => Int, { nullable: true })
   usuario_id!: number | null;
 
-  @Field(() => Int, { nullable: true })
-  cliente_id!: number | null;
-
   @Field()
   cliente_walk_in!: boolean;
 

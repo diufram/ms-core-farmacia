@@ -48,7 +48,6 @@ export class DashboardService {
       stockBajoList,
       totalStockBajo,
       totalProductos,
-      totalClientes,
       totalSucursales,
     ] = await Promise.all([
       this.dashboardRepository.ventasTotales({
@@ -76,9 +75,6 @@ export class DashboardService {
       this.dashboardRepository.countProductos({
         ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
       }),
-      this.dashboardRepository.countClientes({
-        ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
-      }),
       this.dashboardRepository.countSucursales(userRol, userSucursalId),
     ]);
 
@@ -87,7 +83,6 @@ export class DashboardService {
       cantidadVentas: ventasTotales.cantidad,
       totalProductos,
       productosStockBajo: totalStockBajo,
-      totalClientes,
       totalSucursales,
       ventasPorSucursal: ventasPorSucursal.map<VentasPorSucursalType>((v) => ({
         sucursal_id: v.sucursal_id,

@@ -7,7 +7,6 @@ import {
   Unique,
 } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
-import { Cliente } from './cliente.entity';
 import { Sucursal } from './sucursal.entity';
 import { Usuario } from './usuario.entity';
 import { VentaDetalle } from './venta-detalle.entity';
@@ -26,14 +25,6 @@ export class Venta extends BaseEntity {
   })
   @JoinColumn({ name: 'usuario_id' })
   usuario!: Usuario;
-
-  @ManyToOne(() => Cliente, {
-    nullable: true,
-    eager: true,
-    onDelete: 'SET NULL',
-  })
-  @JoinColumn({ name: 'cliente_id' })
-  cliente?: Cliente | null;
 
   @Column({ type: 'varchar', length: 40 })
   numero_venta!: string;

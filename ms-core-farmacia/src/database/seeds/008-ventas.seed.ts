@@ -1,5 +1,4 @@
 import { randomUUID } from 'crypto';
-import { Cliente } from '../entities/cliente.entity';
 import { Producto } from '../entities/producto.entity';
 import { Sucursal } from '../entities/sucursal.entity';
 import { Usuario } from '../entities/usuario.entity';
@@ -10,16 +9,20 @@ import { seedDataSource } from './seed-data-source';
 
 type VentaSeed = {
   sucursalSlug: string;
-  clienteCodigo?: string;
   diasAtras: number;
+  walkIn?: {
+    nombre: string;
+    celular?: string;
+    codigo?: string;
+  };
   detalles: { productoCodigo: string; cantidad: number; precioUnitario?: number }[];
 };
 
 const VENTAS: VentaSeed[] = [
   {
     sucursalSlug: 'sucursal-central',
-    clienteCodigo: 'CLI-0001',
     diasAtras: 5,
+    walkIn: { nombre: 'Cliente Walk-in A', celular: '70000001', codigo: 'WI-A' },
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 2 },
       { productoCodigo: 'PROD-003', cantidad: 1 },
@@ -32,8 +35,8 @@ const VENTAS: VentaSeed[] = [
   },
   {
     sucursalSlug: 'sucursal-central',
-    clienteCodigo: 'CLI-0002',
     diasAtras: 3,
+    walkIn: { nombre: 'Cliente Walk-in B' },
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 3 },
       { productoCodigo: 'PROD-002', cantidad: 2 },
@@ -54,8 +57,8 @@ const VENTAS: VentaSeed[] = [
   },
   {
     sucursalSlug: 'sucursal-norte',
-    clienteCodigo: 'CLI-1001',
     diasAtras: 2,
+    walkIn: { nombre: 'Cliente Walk-in C', codigo: 'WI-C' },
     detalles: [{ productoCodigo: 'PROD-002', cantidad: 4 }],
   },
   {
@@ -80,7 +83,6 @@ export const ventasSeed: Seed = {
   run: async () => {
     const sucursalRepository = seedDataSource.getRepository(Sucursal);
     const usuarioRepository = seedDataSource.getRepository(Usuario);
-    const clienteRepository = seedDataSource.getRepository(Cliente);
     const productoRepository = seedDataSource.getRepository(Producto);
 
     const superAdmin = await usuarioRepository.findOne({
@@ -100,20 +102,6 @@ export const ventasSeed: Seed = {
       if (!sucursal) {
         console.log(`- Sucursal ${item.sucursalSlug} no existe, omitida.`);
         continue;
-      }
-
-      let cliente: Cliente | null = null;
-      if (item.clienteCodigo) {
-        cliente = await clienteRepository.findOne({
-          where: { codigo_cliente: item.clienteCodigo, sucursal: { id: sucursal.id } },
-          relations: ['sucursal'],
-        });
-        if (!cliente) {
-          console.log(
-            `- Cliente ${item.clienteCodigo} no existe en ${item.sucursalSlug}, omitido.`,
-          );
-          continue;
-        }
       }
 
       const productos: Producto[] = [];
@@ -154,14 +142,20 @@ export const ventasSeed: Seed = {
 
       const numeroVenta = `V-${randomUUID()}`;
 
+      const esWalkIn = !!item.walkIn;
+
       await seedDataSource.transaction(async (manager) => {
         const venta = manager.create(Venta, {
           numero_venta: numeroVenta,
           fecha_venta: fechaVentaStr,
           total,
+          estado: 'CONFIRMADA',
           sucursal,
           usuario: superAdmin,
-          cliente,
+          cliente_walk_in: esWalkIn,
+          cliente_nombre: esWalkIn ? (item.walkIn?.nombre ?? null) : null,
+          cliente_celular: esWalkIn ? (item.walkIn?.celular ?? null) : null,
+          cliente_codigo: esWalkIn ? (item.walkIn?.codigo ?? null) : null,
         });
         const ventaGuardada = await manager.save(venta);
 

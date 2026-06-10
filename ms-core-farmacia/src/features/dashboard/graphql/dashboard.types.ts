@@ -81,9 +81,6 @@ export class DashboardKpisType {
   productosStockBajo!: number;
 
   @Field(() => Int)
-  totalClientes!: number;
-
-  @Field(() => Int)
   totalSucursales!: number;
 
   @Field(() => [VentasPorSucursalType])

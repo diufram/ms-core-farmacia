@@ -28,8 +28,6 @@ export class VentasRepository {
       .leftJoinAndSelect('v.usuario', 'u')
       .leftJoinAndSelect('v.detalles', 'd')
       .leftJoinAndSelect('d.producto', 'p')
-      .leftJoinAndSelect('v.cliente', 'c')
-      .leftJoinAndSelect('c.persona', 'cp')
       .orderBy('v.created_at', 'DESC');
 
     if (filters.sucursalId) {
@@ -51,13 +49,7 @@ export class VentasRepository {
   findById(id: number): Promise<Venta | null> {
     return this.ventaRepository.findOne({
       where: { id },
-      relations: [
-        'sucursal',
-        'usuario',
-        'cliente',
-        'detalles',
-        'detalles.producto',
-      ],
+      relations: ['sucursal', 'usuario', 'detalles', 'detalles.producto'],
     });
   }
 

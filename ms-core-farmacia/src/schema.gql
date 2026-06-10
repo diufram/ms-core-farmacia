@@ -45,27 +45,9 @@ type CheckUsernameResultType {
   message: String
 }
 
-type ClientePayloadType {
-  cliente: ClienteType!
-  message: String!
-}
-
-type ClienteType {
-  codigo_cliente: String!
-  id: Int!
-  persona: PersonaSimpleType!
-  sucursal_id: Int!
-}
-
 input CreateCategoriaDto {
   codigo: String!
   nombre: String!
-  sucursalId: Int!
-}
-
-input CreateClienteDto {
-  codigo_cliente: String!
-  persona: PersonaInput!
   sucursalId: Int!
 }
 
@@ -108,7 +90,6 @@ input CreateUsuarioDto {
 }
 
 input CreateVentaDto {
-  clienteId: Int
   cliente_celular: String
   cliente_codigo: String
   cliente_nombre: String
@@ -122,7 +103,6 @@ type DashboardKpisType {
   productosStockBajo: Int!
   productosStockBajoList: [ProductoStockBajoType!]!
   topProductos: [TopProductoType!]!
-  totalClientes: Int!
   totalProductos: Int!
   totalSucursales: Int!
   totalVentas: Float!
@@ -157,13 +137,11 @@ type Mutation {
   cambiarEstadoVenta(id: Int!, nuevoEstado: String!): VentaPayloadType!
   changePassword(input: ChangePasswordDto!): MessageResultType!
   createCategoria(input: CreateCategoriaDto!): CategoriaPayloadType!
-  createCliente(input: CreateClienteDto!): ClientePayloadType!
   createProducto(input: CreateProductoDto!): ProductoPayloadType!
   createSucursal(input: CreateSucursalDto!): CreateSucursalPayloadType!
   createUsuario(input: CreateUsuarioDto!): UsuarioPayloadType!
   createVenta(input: CreateVentaDto!): VentaPayloadType!
   deleteCategoria(id: Int!): CategoriaPayloadType!
-  deleteCliente(id: Int!): ClientePayloadType!
   deleteProducto(id: Int!): ProductoPayloadType!
   deleteSucursal(id: Int!): SucursalPayloadType!
   deleteUsuario(id: Int!): UsuarioPayloadType!
@@ -175,24 +153,10 @@ type Mutation {
   registerCliente(input: RegisterClienteDto!): AuthPayloadType!
   unassignUsuarioSucursal(sucursalId: Int!, usuarioId: Int!): UsuarioPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
-  updateCliente(id: Int!, input: UpdateClienteDto!): ClienteType!
   updateProducto(id: Int!, input: UpdateProductoDto!): ProductoType!
   updateSucursal(id: Int!, input: UpdateSucursalDto!): SucursalPayloadType!
   updateUsername(input: UpdateUsernameDto!): ProfileType!
   updateUsuario(id: Int!, input: UpdateUsuarioDto!): UsuarioPayloadType!
-}
-
-input PersonaInput {
-  apellido: String
-  celular: String
-  nombre: String
-}
-
-type PersonaSimpleType {
-  apellido: String!
-  celular: String
-  id: Int!
-  nombre: String!
 }
 
 type PersonaType {
@@ -241,8 +205,6 @@ type Query {
   categoria(id: Int!): CategoriaType!
   categorias(sucursalId: Int): [CategoriaType!]!
   checkUsername(input: CheckUsernameDto!): CheckUsernameResultType!
-  cliente(id: Int!): ClienteType!
-  clientes(sucursalId: Int): [ClienteType!]!
   dashboardKpis(fechaDesde: String, fechaHasta: String, stockBajoUmbral: Int, sucursalId: Int): DashboardKpisType!
   me: MePayloadType!
   producto(id: Int!): ProductoType!
@@ -327,11 +289,6 @@ type TopProductoType {
 input UpdateCategoriaDto {
   codigo: String
   nombre: String
-}
-
-input UpdateClienteDto {
-  codigo_cliente: String
-  persona: PersonaInput
 }
 
 input UpdateProductoDto {
@@ -422,7 +379,6 @@ type VentaPayloadType {
 type VentaType {
   cliente_celular: String
   cliente_codigo: String
-  cliente_id: Int
   cliente_nombre: String
   cliente_walk_in: Boolean!
   detalles: [VentaDetalleType!]!

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Cliente } from '../../database/entities/cliente.entity';
 import { Producto } from '../../database/entities/producto.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Venta } from '../../database/entities/venta.entity';
@@ -24,8 +23,6 @@ export class DashboardRepository {
     private readonly ventaDetalleRepository: Repository<VentaDetalle>,
     @InjectRepository(Producto)
     private readonly productoRepository: Repository<Producto>,
-    @InjectRepository(Cliente)
-    private readonly clienteRepository: Repository<Cliente>,
     @InjectRepository(Sucursal)
     private readonly sucursalRepository: Repository<Sucursal>,
   ) {}
@@ -277,16 +274,6 @@ export class DashboardRepository {
     const qb = this.productoRepository.createQueryBuilder('p');
     if (filters.sucursalId) {
       qb.where('p.sucursal_id = :sucursalId', {
-        sucursalId: filters.sucursalId,
-      });
-    }
-    return qb.getCount();
-  }
-
-  countClientes(filters: { sucursalId?: number }): Promise<number> {
-    const qb = this.clienteRepository.createQueryBuilder('c');
-    if (filters.sucursalId) {
-      qb.where('c.sucursal_id = :sucursalId', {
         sucursalId: filters.sucursalId,
       });
     }

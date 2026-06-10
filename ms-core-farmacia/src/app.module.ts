@@ -7,7 +7,6 @@ import { join } from 'path';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './features/auth/auth.module';
 import { CategoriasModule } from './features/categorias/categorias.module';
-import { ClientesModule } from './features/clientes/clientes.module';
 import { DashboardModule } from './features/dashboard/dashboard.module';
 import { ProductosModule } from './features/productos/productos.module';
 import { ProfileModule } from './features/profile/profile.module';
@@ -36,7 +35,6 @@ import { NotificationsModule } from './features/notifications/notifications.modu
     ProfileModule,
     CategoriasModule,
     ProductosModule,
-    ClientesModule,
     VentasModule,
     DashboardModule,
     NotificationsModule,
