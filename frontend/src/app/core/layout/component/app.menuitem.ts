@@ -187,12 +187,14 @@ export class MyMenuitem {
 
         if (!link) return;
 
-        const activeRoute = this.router.isActive(link, {
+        const options = this.item.routerLinkActiveOptions ?? {
             paths: 'subset',
             queryParams: 'ignored',
             matrixParams: 'ignored',
             fragment: 'ignored',
-        });
+        };
+
+        const activeRoute = this.router.isActive(link, options);
 
         if (activeRoute) {
             // ✅ informa al layout (y en mobile cierra el menú)

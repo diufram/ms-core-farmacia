@@ -149,6 +149,12 @@ export class MyMenu implements OnInit {
                         label: 'Inicio',
                         icon: 'pi pi-fw pi-home',
                         routerLink: ['/home'],
+                        routerLinkActiveOptions: {
+                            paths: 'exact',
+                            queryParams: 'ignored',
+                            matrixParams: 'ignored',
+                            fragment: 'ignored',
+                        },
                     },
                 ],
             },
@@ -184,21 +190,6 @@ export class MyMenu implements OnInit {
                         label: 'Clientes',
                         icon: 'pi pi-fw pi-user',
                         routerLink: ['/home/clientes'],
-                    },
-                ],
-            },
-            {
-                label: 'Reportes',
-                items: [
-                    {
-                        label: 'Ventas',
-                        icon: 'pi pi-fw pi-chart-line',
-                        routerLink: ['/home/reportes/ventas'],
-                    },
-                    {
-                        label: 'Inventario',
-                        icon: 'pi pi-fw pi-warehouse',
-                        routerLink: ['/home/reportes/inventario'],
                     },
                 ],
             },
