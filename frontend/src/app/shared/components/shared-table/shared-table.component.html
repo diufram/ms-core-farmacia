@@ -9,17 +9,22 @@
                 <ng-content select="[table-actions]"></ng-content>
 
                 <p-button label="Exportar" icon="pi pi-upload" severity="secondary" [outlined]="true"
-                    styleClass="w-full md:w-auto" class="md:ml-auto w-full md:w-auto" (onClick)="dt.exportCSV()">
+                    styleClass="w-full md:w-auto" (onClick)="dt.exportCSV()">
                 </p-button>
             </div>
         </ng-template>
 
         <ng-template pTemplate="right">
-            <p-iconfield iconPosition="left" class="w-full md:w-auto mt-2 md:mt-0">
-                <p-inputicon styleClass="pi pi-search text-gray-400" />
-                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..."
-                    class="w-full md:w-15rem pl-10" />
-            </p-iconfield>
+            <div class="flex flex-col md:flex-row w-full md:w-auto gap-2 items-stretch md:items-center mt-2 md:mt-0">
+
+                <ng-content select="[table-filters]"></ng-content>
+
+                <p-iconfield iconPosition="left" class="w-full md:w-auto">
+                    <p-inputicon styleClass="pi pi-search text-gray-400" />
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..."
+                        class="w-full md:w-15rem pl-10" />
+                </p-iconfield>
+            </div>
         </ng-template>
     </p-toolbar>
 

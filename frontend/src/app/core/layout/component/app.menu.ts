@@ -149,7 +149,7 @@ export class MyMenu implements OnInit {
         // ================================================================
         // SUPER ADMIN
         // Ve: Inicio (Dashboard con KPIs), Sucursales, Usuarios,
-        //     Gestor Documental, Categorías, Productos, Ventas
+        //     Gestor Documental, Categorías, Productos
         // ================================================================
         if (esSuperAdmin) {
             return [
@@ -196,16 +196,6 @@ export class MyMenu implements OnInit {
                             label: 'Productos',
                             icon: 'pi pi-fw pi-box',
                             routerLink: ['/home/productos'],
-                        },
-                    ],
-                },
-                {
-                    label: 'Operaciones',
-                    items: [
-                        {
-                            label: 'Ventas',
-                            icon: 'pi pi-fw pi-shopping-cart',
-                            routerLink: ['/home/ventas'],
                         },
                     ],
                 },

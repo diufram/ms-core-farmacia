@@ -33,19 +33,18 @@ import { Categoria } from '../../models/categoria.interface';
     providers: [ConfirmationService],
     template: `
         <div class="card">
-            <div class="flex flex-wrap items-end gap-3 mb-4">
-                <div>
-                    <h1 class="text-2xl font-semibold text-color m-0">
-                        Categorías
-                    </h1>
-                    <p class="text-muted-color m-0 mt-1">
-                        Agrupa los productos por tipo
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-3 mb-3">
+            <app-shared-table
+                [data]="categorias()"
+                [columns]="columns"
+                [rowActions]="rowActions"
+                [loading]="loading()"
+                [searchFields]="['nombre', 'codigo']"
+                title="Categorías"
+                dataKey="id"
+                (actionClicked)="onAction($event)"
+            >
                 <p-select
+                    table-filters
                     *ngIf="esSuperAdmin()"
                     [options]="sucursales()"
                     [(ngModel)]="filtroSucursalId"
@@ -59,6 +58,7 @@ import { Categoria } from '../../models/categoria.interface';
                 />
 
                 <p-button
+                    table-filters
                     icon="pi pi-refresh"
                     severity="secondary"
                     [outlined]="true"
@@ -67,22 +67,12 @@ import { Categoria } from '../../models/categoria.interface';
                 />
 
                 <p-button
+                    table-actions
                     icon="pi pi-plus"
                     label="Nueva Categoría"
                     (onClick)="nueva()"
                 />
-            </div>
-
-            <app-shared-table
-                [data]="categorias()"
-                [columns]="columns"
-                [rowActions]="rowActions"
-                [loading]="loading()"
-                [searchFields]="['nombre', 'codigo']"
-                title=""
-                dataKey="id"
-                (actionClicked)="onAction($event)"
-            />
+            </app-shared-table>
             <p-confirmDialog />
         </div>
     `,

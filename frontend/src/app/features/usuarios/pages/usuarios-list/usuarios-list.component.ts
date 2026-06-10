@@ -7,9 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
-import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
 
 import { SharedTableComponent } from '@/shared/components/shared-table/shared-table.component';
 import {
@@ -35,38 +32,23 @@ import {
         ConfirmDialogModule,
         SelectModule,
         TagModule,
-        InputTextModule,
-        IconFieldModule,
-        InputIconModule,
         SharedTableComponent,
     ],
     providers: [ConfirmationService],
     template: `
         <div class="card">
-            <div class="flex flex-wrap items-end gap-3 mb-4">
-                <div>
-                    <h1 class="text-2xl font-semibold text-color m-0">
-                        Usuarios
-                    </h1>
-                    <p class="text-muted-color m-0 mt-1">
-                        Gestiona los usuarios del sistema
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-3 mb-3">
-                <p-iconfield iconPosition="left" class="flex-1 min-w-[220px]">
-                    <p-inputicon styleClass="pi pi-search" />
-                    <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="searchTerm"
-                        placeholder="Buscar por nombre, usuario, correo..."
-                        class="w-full"
-                    />
-                </p-iconfield>
-
+            <app-shared-table
+                [data]="usuarios()"
+                [columns]="columns"
+                [rowActions]="rowActions"
+                [loading]="loading()"
+                [searchFields]="['persona.nombre', 'persona.apellido', 'nombre_usuario', 'correo_electronico']"
+                title="Usuarios"
+                dataKey="id"
+                (actionClicked)="onAction($event)"
+            >
                 <p-select
+                    table-filters
                     [options]="sucursalOptions()"
                     [(ngModel)]="filtroSucursalId"
                     optionLabel="nombre"
@@ -79,6 +61,7 @@ import {
                 />
 
                 <p-select
+                    table-filters
                     [options]="rolOptions"
                     [(ngModel)]="filtroRol"
                     optionLabel="label"
@@ -91,6 +74,7 @@ import {
                 />
 
                 <p-button
+                    table-filters
                     icon="pi pi-refresh"
                     severity="secondary"
                     [outlined]="true"
@@ -99,22 +83,12 @@ import {
                 />
 
                 <p-button
+                    table-actions
                     icon="pi pi-plus"
                     label="Nuevo Usuario"
                     (onClick)="nuevo()"
                 />
-            </div>
-
-            <app-shared-table
-                [data]="usuariosFiltrados()"
-                [columns]="columns"
-                [rowActions]="rowActions"
-                [loading]="loading()"
-                [searchFields]="[]"
-                title=""
-                dataKey="id"
-                (actionClicked)="onAction($event)"
-            />
+            </app-shared-table>
             <p-confirmDialog />
         </div>
     `,
@@ -129,7 +103,6 @@ export class UsuariosListComponent implements OnInit {
     usuarios = signal<Usuario[]>([]);
     sucursales = signal<Sucursal[]>([]);
     loading = signal<boolean>(true);
-    searchTerm = '';
     filtroSucursalId: number | null = null;
     filtroRol: Rol | null = null;
 
@@ -230,19 +203,6 @@ export class UsuariosListComponent implements OnInit {
         this.sucursalesService.list().subscribe({
             next: (data) => this.sucursales.set(data),
             error: () => undefined,
-        });
-    }
-
-    usuariosFiltrados(): Usuario[] {
-        const term = this.searchTerm.trim().toLowerCase();
-        if (!term) return this.usuarios();
-        return this.usuarios().filter((u) => {
-            const nombreCompleto = `${u.persona.nombre} ${u.persona.apellido}`.toLowerCase();
-            return (
-                nombreCompleto.includes(term) ||
-                u.nombre_usuario.toLowerCase().includes(term) ||
-                u.correo_electronico.toLowerCase().includes(term)
-            );
         });
     }
 

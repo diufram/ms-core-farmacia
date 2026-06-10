@@ -7,10 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
-import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { SharedTableComponent } from '@/shared/components/shared-table/shared-table.component';
 import {
@@ -38,40 +34,23 @@ const STOCK_BAJO_UMBRAL = 10;
         ConfirmDialogModule,
         SelectModule,
         TagModule,
-        InputTextModule,
-        IconFieldModule,
-        InputIconModule,
-        ProgressSpinnerModule,
         SharedTableComponent,
     ],
     providers: [ConfirmationService],
     template: `
         <div class="card">
-            <div class="flex flex-wrap items-end gap-3 mb-4">
-                <div>
-                    <h1 class="text-2xl font-semibold text-color m-0">
-                        Productos
-                    </h1>
-                    <p class="text-muted-color m-0 mt-1">
-                        Inventario y precios
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-3 mb-3">
-                <p-iconfield iconPosition="left" class="flex-1 min-w-[220px]">
-                    <p-inputicon styleClass="pi pi-search" />
-                    <input
-                        pInputText
-                        type="text"
-                        [ngModel]="searchTerm()"
-                        (ngModelChange)="searchTerm.set($event)"
-                        placeholder="Buscar por código, nombre..."
-                        class="w-full"
-                    />
-                </p-iconfield>
-
+            <app-shared-table
+                [data]="productosDecorados()"
+                [columns]="columns"
+                [rowActions]="rowActions"
+                [loading]="loading()"
+                [searchFields]="['codigo', 'nombre']"
+                title="Productos"
+                dataKey="id"
+                (actionClicked)="onAction($event)"
+            >
                 <p-select
+                    table-filters
                     *ngIf="esSuperAdmin()"
                     [options]="sucursales()"
                     [(ngModel)]="filtroSucursalId"
@@ -85,6 +64,7 @@ const STOCK_BAJO_UMBRAL = 10;
                 />
 
                 <p-select
+                    table-filters
                     [options]="categorias()"
                     [(ngModel)]="filtroCategoriaId"
                     optionLabel="nombre"
@@ -97,6 +77,7 @@ const STOCK_BAJO_UMBRAL = 10;
                 />
 
                 <p-button
+                    table-filters
                     icon="pi pi-refresh"
                     severity="secondary"
                     [outlined]="true"
@@ -105,22 +86,12 @@ const STOCK_BAJO_UMBRAL = 10;
                 />
 
                 <p-button
+                    table-actions
                     icon="pi pi-plus"
                     label="Nuevo Producto"
                     (onClick)="nuevo()"
                 />
-            </div>
-
-            <app-shared-table
-                [data]="productosFiltrados()"
-                [columns]="columns"
-                [rowActions]="rowActions"
-                [loading]="loading()"
-                [searchFields]="[]"
-                title=""
-                dataKey="id"
-                (actionClicked)="onAction($event)"
-            />
+            </app-shared-table>
             <p-confirmDialog />
         </div>
     `,
@@ -138,7 +109,6 @@ export class ProductosListComponent implements OnInit {
     categorias = signal<Categoria[]>([]);
     sucursales = signal<Sucursal[]>([]);
     loading = signal<boolean>(true);
-    searchTerm = signal('');
     filtroSucursalId: number | null = null;
     filtroCategoriaId: number | null = null;
 
@@ -239,9 +209,8 @@ export class ProductosListComponent implements OnInit {
         });
     }
 
-    productosFiltrados = computed<(Producto & { stock_estado: string })[]>(() => {
-        const term = this.searchTerm().trim().toLowerCase();
-        const decorated = this.productos().map((p) => ({
+    productosDecorados = computed<(Producto & { stock_estado: string })[]>(() =>
+        this.productos().map((p) => ({
             ...p,
             stock_estado:
                 p.stock_actual <= 0
@@ -249,14 +218,8 @@ export class ProductosListComponent implements OnInit {
                     : p.stock_actual < STOCK_BAJO_UMBRAL
                       ? 'LOWSTOCK'
                       : 'INSTOCK',
-        }));
-        if (!term) return decorated;
-        return decorated.filter(
-            (p) =>
-                p.codigo.toLowerCase().includes(term) ||
-                p.nombre.toLowerCase().includes(term),
-        );
-    });
+        })),
+    );
 
     nuevo(): void {
         this.router.navigate(['/home/productos/nuevo']);
