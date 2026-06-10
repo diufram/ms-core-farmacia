@@ -39,7 +39,7 @@ import { Sucursal } from '../../models/sucursal.interface';
                 <p-button
                     table-actions
                     icon="pi pi-plus"
-                    label="Nueva Sucursal"
+                    label="Nuevo"
                     (onClick)="nueva()"
                 />
             </app-shared-table>

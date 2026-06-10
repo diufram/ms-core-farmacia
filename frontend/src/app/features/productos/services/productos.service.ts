@@ -27,15 +27,22 @@ export class ProductosService {
     private apollo = inject(Apollo);
 
     list(filters: ProductosFilters = {}): Observable<Producto[]> {
+        const sucursalId =
+            filters.sucursalId != null ? Number(filters.sucursalId) : null;
+        const categoriaId =
+            filters.categoriaId != null ? Number(filters.categoriaId) : null;
         return this.apollo
             .watchQuery<
                 { productos: Producto[] },
-                { sucursalId?: number | null; categoriaId?: number | null }
+                {
+                    sucursalId?: number | null;
+                    categoriaId?: number | null;
+                }
             >({
                 query: PRODUCTOS_QUERY,
                 variables: {
-                    sucursalId: filters.sucursalId ?? null,
-                    categoriaId: filters.categoriaId ?? null,
+                    sucursalId,
+                    categoriaId,
                 },
                 fetchPolicy: 'network-only',
             })

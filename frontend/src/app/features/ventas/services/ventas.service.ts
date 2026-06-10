@@ -23,6 +23,8 @@ export class VentasService {
     private apollo = inject(Apollo);
 
     list(filters: VentasFilters = {}): Observable<Venta[]> {
+        const sucursalId =
+            filters.sucursalId != null ? Number(filters.sucursalId) : null;
         return this.apollo
             .watchQuery<
                 { ventas: Venta[] },
@@ -34,7 +36,7 @@ export class VentasService {
             >({
                 query: VENTAS_QUERY,
                 variables: {
-                    sucursalId: filters.sucursalId ?? null,
+                    sucursalId,
                     fechaDesde: filters.fechaDesde ?? null,
                     fechaHasta: filters.fechaHasta ?? null,
                 },

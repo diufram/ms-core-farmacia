@@ -18,7 +18,6 @@ const VENTA_FIELDS = `
     sucursal_id
     usuario_id
     cliente_walk_in
-    cliente_walk_in
     cliente_nombre
     cliente_celular
     cliente_codigo

@@ -69,7 +69,7 @@ import { Categoria } from '../../models/categoria.interface';
                 <p-button
                     table-actions
                     icon="pi pi-plus"
-                    label="Nueva Categoría"
+                    label="Nuevo"
                     (onClick)="nueva()"
                 />
             </app-shared-table>
@@ -115,7 +115,7 @@ export class CategoriasListComponent implements OnInit {
     ngOnInit(): void {
         const user = this.auth.currentUser();
         if (user?.sucursal_id) {
-            this.filtroSucursalId = user.sucursal_id;
+            this.filtroSucursalId = Number(user.sucursal_id);
         }
         if (this.esSuperAdmin()) {
             this.cargarSucursales();

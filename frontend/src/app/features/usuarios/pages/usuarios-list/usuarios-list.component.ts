@@ -85,7 +85,7 @@ import {
                 <p-button
                     table-actions
                     icon="pi pi-plus"
-                    label="Nuevo Usuario"
+                    label="Nuevo"
                     (onClick)="nuevo()"
                 />
             </app-shared-table>
@@ -180,7 +180,10 @@ export class UsuariosListComponent implements OnInit {
         this.loading.set(true);
         this.usuariosService
             .list({
-                sucursalId: this.filtroSucursalId,
+                sucursalId:
+                    this.filtroSucursalId != null
+                        ? Number(this.filtroSucursalId)
+                        : null,
                 rol: this.filtroRol,
             })
             .subscribe({

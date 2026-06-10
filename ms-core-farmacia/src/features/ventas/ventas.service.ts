@@ -252,7 +252,7 @@ export class VentasService {
       return { targetSucursalId: requestedSucursalId, targetUsuarioId: undefined };
     }
     if (userRol === Rol.ADMIN) {
-      return { targetSucursalId: userSucursalId, targetUsuarioId: userId };
+      return { targetSucursalId: userSucursalId, targetUsuarioId: undefined };
     }
     if (userRol === Rol.CLIENTE) {
       return { targetSucursalId: null, targetUsuarioId: userId };

@@ -32,6 +32,8 @@ export class UsuariosService {
     private apollo = inject(Apollo);
 
     list(filters: UsuariosFilters = {}): Observable<Usuario[]> {
+        const sucursalId =
+            filters.sucursalId != null ? Number(filters.sucursalId) : null;
         return this.apollo
             .watchQuery<
                 { usuarios: Usuario[] },
@@ -39,7 +41,7 @@ export class UsuariosService {
             >({
                 query: USUARIOS_QUERY,
                 variables: {
-                    sucursalId: filters.sucursalId ?? null,
+                    sucursalId,
                     rol: filters.rol ?? null,
                 },
                 fetchPolicy: 'network-only',

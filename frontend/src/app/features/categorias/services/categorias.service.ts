@@ -22,13 +22,14 @@ export class CategoriasService {
     private apollo = inject(Apollo);
 
     list(sucursalId?: number | null): Observable<Categoria[]> {
+        const id = sucursalId != null ? Number(sucursalId) : null;
         return this.apollo
             .watchQuery<
                 { categorias: Categoria[] },
                 { sucursalId?: number | null }
             >({
                 query: CATEGORIAS_QUERY,
-                variables: { sucursalId: sucursalId ?? null },
+                variables: { sucursalId: id },
                 fetchPolicy: 'network-only',
             })
             .valueChanges.pipe(

@@ -88,7 +88,7 @@ const STOCK_BAJO_UMBRAL = 10;
                 <p-button
                     table-actions
                     icon="pi pi-plus"
-                    label="Nuevo Producto"
+                    label="Nuevo"
                     (onClick)="nuevo()"
                 />
             </app-shared-table>
@@ -161,7 +161,7 @@ export class ProductosListComponent implements OnInit {
     ngOnInit(): void {
         const user = this.auth.currentUser();
         if (user?.sucursal_id) {
-            this.filtroSucursalId = user.sucursal_id;
+            this.filtroSucursalId = Number(user.sucursal_id);
         }
         this.cargarCategorias();
         if (this.esSuperAdmin()) {

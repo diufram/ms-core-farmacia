@@ -7,9 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
-import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
 import { DatePickerModule } from 'primeng/datepicker';
 
 import { SharedTableComponent } from '@/shared/components/shared-table/shared-table.component';
@@ -34,44 +31,24 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
         ConfirmDialogModule,
         SelectModule,
         TagModule,
-        InputTextModule,
-        IconFieldModule,
-        InputIconModule,
         DatePickerModule,
         SharedTableComponent,
     ],
     providers: [ConfirmationService],
     template: `
         <div class="card">
-            <div class="flex flex-wrap items-end gap-3 mb-4">
-                <div>
-                    <h1 class="text-2xl font-semibold text-color m-0">
-                        {{ esCliente() ? 'Mis Pedidos' : 'Ventas' }}
-                    </h1>
-                    <p class="text-muted-color m-0 mt-1">
-                        {{
-                            esCliente()
-                                ? 'Historial de tus pedidos'
-                                : 'Historial de transacciones'
-                        }}
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-3 mb-3">
-                <p-iconfield iconPosition="left" class="flex-1 min-w-[220px]">
-                    <p-inputicon styleClass="pi pi-search" />
-                    <input
-                        pInputText
-                        type="text"
-                        [ngModel]="searchTerm()"
-                        (ngModelChange)="searchTerm.set($event)"
-                        placeholder="Buscar por número, estado..."
-                        class="w-full"
-                    />
-                </p-iconfield>
-
+            <app-shared-table
+                [data]="ventasDecoradas()"
+                [columns]="columns"
+                [rowActions]="rowActions"
+                [loading]="loading()"
+                [searchFields]="['numero_venta', 'estado', 'cliente_nombre']"
+                [title]="esCliente() ? 'Mis Pedidos' : 'Ventas'"
+                dataKey="id"
+                (actionClicked)="onAction($event)"
+            >
                 <p-select
+                    table-filters
                     *ngIf="esSuperAdmin()"
                     [options]="sucursales()"
                     [(ngModel)]="filtroSucursalId"
@@ -85,6 +62,7 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
                 />
 
                 <p-date-picker
+                    table-filters
                     *ngIf="!esCliente()"
                     [(ngModel)]="filtroFechaDesde"
                     (onSelect)="cargar()"
@@ -95,6 +73,7 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
                 />
 
                 <p-date-picker
+                    table-filters
                     *ngIf="!esCliente()"
                     [(ngModel)]="filtroFechaHasta"
                     (onSelect)="cargar()"
@@ -105,6 +84,7 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
                 />
 
                 <p-button
+                    table-filters
                     icon="pi pi-refresh"
                     severity="secondary"
                     [outlined]="true"
@@ -113,23 +93,13 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
                 />
 
                 <p-button
+                    table-actions
                     *ngIf="!esCliente()"
                     icon="pi pi-plus"
-                    label="Nueva Venta"
+                    label="Nuevo"
                     (onClick)="nueva()"
                 />
-            </div>
-
-            <app-shared-table
-                [data]="ventasFiltradas()"
-                [columns]="columns"
-                [rowActions]="rowActions"
-                [loading]="loading()"
-                [searchFields]="[]"
-                title=""
-                dataKey="id"
-                (actionClicked)="onAction($event)"
-            />
+            </app-shared-table>
             <p-confirmDialog />
         </div>
     `,
@@ -145,7 +115,6 @@ export class VentasListComponent implements OnInit {
     ventas = signal<Venta[]>([]);
     sucursales = signal<Sucursal[]>([]);
     loading = signal<boolean>(true);
-    searchTerm = signal('');
     filtroSucursalId: number | null = null;
     filtroFechaDesde: Date | null = null;
     filtroFechaHasta: Date | null = null;
@@ -196,7 +165,7 @@ export class VentasListComponent implements OnInit {
     ngOnInit(): void {
         const user = this.auth.currentUser();
         if (!this.esCliente() && user?.sucursal_id) {
-            this.filtroSucursalId = user.sucursal_id;
+            this.filtroSucursalId = Number(user.sucursal_id);
         }
         if (this.esSuperAdmin()) {
             this.cargarSucursales();
@@ -248,21 +217,14 @@ export class VentasListComponent implements OnInit {
         });
     }
 
-    ventasFiltradas = computed<
+    ventasDecoradas = computed<
         (Venta & { cantidad_items: number })[]
-    >(() => {
-        const term = this.searchTerm().trim().toLowerCase();
-        const decorated = this.ventas().map((v) => ({
+    >(() =>
+        this.ventas().map((v) => ({
             ...v,
             cantidad_items: v.detalles?.length ?? 0,
-        }));
-        if (!term) return decorated;
-        return decorated.filter(
-            (v) =>
-                v.numero_venta.toLowerCase().includes(term) ||
-                v.estado.toLowerCase().includes(term),
-        );
-    });
+        })),
+    );
 
     nueva(): void {
         this.router.navigate(['/home/ventas/nueva']);
