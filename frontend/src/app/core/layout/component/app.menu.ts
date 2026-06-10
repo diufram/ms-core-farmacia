@@ -141,94 +141,220 @@ export class MyMenu implements OnInit {
     }
 
     private buildModel(): MenuItem[] {
+        const esSuperAdmin = this.authService.isSuperAdmin();
+        const esAdmin = this.authService.isAdmin();
         const esCliente = this.authService.isCliente();
+        const esEmpleado = esSuperAdmin || esAdmin;
 
-        const model: MenuItem[] = [
-            {
-                label: 'Principal',
-                items: [
-                    {
-                        label: 'Inicio',
-                        icon: 'pi pi-fw pi-home',
-                        routerLink: ['/home'],
-                        routerLinkActiveOptions: {
-                            paths: 'exact',
-                            queryParams: 'ignored',
-                            matrixParams: 'ignored',
-                            fragment: 'ignored',
+        // ================================================================
+        // SUPER ADMIN
+        // Ve: Inicio (Dashboard con KPIs), Sucursales, Usuarios,
+        //     Gestor Documental, Categorías, Productos, Ventas
+        // ================================================================
+        if (esSuperAdmin) {
+            return [
+                {
+                    label: 'Principal',
+                    items: [
+                        {
+                            label: 'Dashboard',
+                            icon: 'pi pi-fw pi-home',
+                            routerLink: ['/home'],
+                            routerLinkActiveOptions: {
+                                paths: 'exact',
+                                queryParams: 'ignored',
+                                matrixParams: 'ignored',
+                                fragment: 'ignored',
+                            },
                         },
-                    },
-                ],
-            },
-            {
-                label: 'Administración',
-                visible: !esCliente,
-                items: [
-                    {
-                        label: 'Sucursales',
-                        icon: 'pi pi-fw pi-building',
-                        routerLink: ['/home/sucursales'],
-                    },
-                    {
-                        label: 'Usuarios',
-                        icon: 'pi pi-fw pi-users',
-                        routerLink: ['/home/usuarios'],
-                    },
-                    {
-                        label: 'Categorías',
-                        icon: 'pi pi-fw pi-tags',
-                        routerLink: ['/home/categorias'],
-                    },
-                    {
-                        label: 'Productos',
-                        icon: 'pi pi-fw pi-box',
-                        routerLink: ['/home/productos'],
-                    },
-                    {
-                        label: 'Ventas',
-                        icon: 'pi pi-fw pi-shopping-cart',
-                        routerLink: ['/home/ventas'],
-                    },
-                ],
-            },
-            {
-                label: 'Mis Pedidos',
-                visible: esCliente,
-                items: [
-                    {
-                        label: 'Historial',
-                        icon: 'pi pi-fw pi-shopping-cart',
-                        routerLink: ['/home/ventas'],
-                    },
-                ],
-            },
-            {
-                label: 'Documentos',
-                visible: !esCliente,
-                items: [
-                    {
-                        label: 'Gestor de Archivos',
-                        icon: 'pi pi-fw pi-folder',
-                        routerLink: ['/home/documentos'],
-                    },
-                ],
-            },
-            {
-                label: 'Cuenta',
-                items: [
-                    {
-                        label: 'Cerrar Sesion',
-                        icon: 'pi pi-fw pi-sign-out',
-                        command: () => this.authService.logout(),
-                    },
-                ],
-            },
-        ];
+                    ],
+                },
+                {
+                    label: 'Administración',
+                    items: [
+                        {
+                            label: 'Sucursales',
+                            icon: 'pi pi-fw pi-building',
+                            routerLink: ['/home/sucursales'],
+                        },
+                        {
+                            label: 'Usuarios',
+                            icon: 'pi pi-fw pi-users',
+                            routerLink: ['/home/usuarios'],
+                        },
+                    ],
+                },
+                {
+                    label: 'Catálogo',
+                    items: [
+                        {
+                            label: 'Categorías',
+                            icon: 'pi pi-fw pi-tags',
+                            routerLink: ['/home/categorias'],
+                        },
+                        {
+                            label: 'Productos',
+                            icon: 'pi pi-fw pi-box',
+                            routerLink: ['/home/productos'],
+                        },
+                    ],
+                },
+                {
+                    label: 'Operaciones',
+                    items: [
+                        {
+                            label: 'Ventas',
+                            icon: 'pi pi-fw pi-shopping-cart',
+                            routerLink: ['/home/ventas'],
+                        },
+                    ],
+                },
+                {
+                    label: 'Documentos',
+                    items: [
+                        {
+                            label: 'Gestor Documental',
+                            icon: 'pi pi-fw pi-folder',
+                            routerLink: ['/home/documentos'],
+                        },
+                    ],
+                },
+                {
+                    label: 'Cuenta',
+                    items: [
+                        {
+                            label: 'Cerrar Sesion',
+                            icon: 'pi pi-fw pi-sign-out',
+                            command: () => this.authService.logout(),
+                        },
+                    ],
+                },
+            ];
+        }
 
-        return model.filter(
-            (section) =>
-                !section.label ||
-                section.visible !== false,
-        );
+        // ================================================================
+        // ADMIN DE SUCURSAL
+        // Ve: Inicio (Dashboard de su sucursal), Categorías, Productos,
+        //     Ventas, Gestor Documental (limitado a su sucursal)
+        // NO ve: Sucursales, Usuarios
+        // ================================================================
+        if (esAdmin) {
+            return [
+                {
+                    label: 'Principal',
+                    items: [
+                        {
+                            label: 'Mi Sucursal',
+                            icon: 'pi pi-fw pi-home',
+                            routerLink: ['/home'],
+                            routerLinkActiveOptions: {
+                                paths: 'exact',
+                                queryParams: 'ignored',
+                                matrixParams: 'ignored',
+                                fragment: 'ignored',
+                            },
+                        },
+                    ],
+                },
+                {
+                    label: 'Catálogo',
+                    items: [
+                        {
+                            label: 'Categorías',
+                            icon: 'pi pi-fw pi-tags',
+                            routerLink: ['/home/categorias'],
+                        },
+                        {
+                            label: 'Productos',
+                            icon: 'pi pi-fw pi-box',
+                            routerLink: ['/home/productos'],
+                        },
+                    ],
+                },
+                {
+                    label: 'Operaciones',
+                    items: [
+                        {
+                            label: 'Ventas',
+                            icon: 'pi pi-fw pi-shopping-cart',
+                            routerLink: ['/home/ventas'],
+                        },
+                    ],
+                },
+                {
+                    label: 'Documentos',
+                    items: [
+                        {
+                            label: 'Gestor Documental',
+                            icon: 'pi pi-fw pi-folder',
+                            routerLink: ['/home/documentos'],
+                        },
+                    ],
+                },
+                {
+                    label: 'Cuenta',
+                    items: [
+                        {
+                            label: 'Cerrar Sesion',
+                            icon: 'pi pi-fw pi-sign-out',
+                            command: () => this.authService.logout(),
+                        },
+                    ],
+                },
+            ];
+        }
+
+        // ================================================================
+        // CLIENTE
+        // Ve: Inicio (Mis Pedidos), su historial de pedidos
+        // ================================================================
+        if (esCliente) {
+            return [
+                {
+                    label: 'Principal',
+                    items: [
+                        {
+                            label: 'Mis Pedidos',
+                            icon: 'pi pi-fw pi-home',
+                            routerLink: ['/home/ventas'],
+                            routerLinkActiveOptions: {
+                                paths: 'exact',
+                                queryParams: 'ignored',
+                                matrixParams: 'ignored',
+                                fragment: 'ignored',
+                            },
+                        },
+                    ],
+                },
+                {
+                    label: 'Cuenta',
+                    items: [
+                        {
+                            label: 'Cerrar Sesion',
+                            icon: 'pi pi-fw pi-sign-out',
+                            command: () => this.authService.logout(),
+                        },
+                    ],
+                },
+            ];
+        }
+
+        // Fallback: empleado sin rol claro
+        if (esEmpleado) {
+            return [
+                {
+                    label: 'Principal',
+                    items: [
+                        {
+                            label: 'Inicio',
+                            icon: 'pi pi-fw pi-home',
+                            routerLink: ['/home'],
+                        },
+                    ],
+                },
+            ];
+        }
+
+        return [];
     }
 }

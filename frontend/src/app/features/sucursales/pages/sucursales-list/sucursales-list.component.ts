@@ -37,6 +37,7 @@ import { Sucursal } from '../../models/sucursal.interface';
                 (actionClicked)="onAction($event)"
             >
                 <p-button
+                    table-actions
                     icon="pi pi-plus"
                     label="Nueva Sucursal"
                     (onClick)="nueva()"
