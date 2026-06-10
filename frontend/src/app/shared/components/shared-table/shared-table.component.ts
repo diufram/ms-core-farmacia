@@ -16,6 +16,7 @@ import { TagModule } from 'primeng/tag';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import {
     TableColumn,
     RowAction,
@@ -40,6 +41,7 @@ import { SkeletonModule } from 'primeng/skeleton';
         TooltipModule,
         RatingModule,
         SkeletonModule,
+        SelectButtonModule,
     ],
     templateUrl: './shared-table.component.html',
     styleUrl: './shared-table.component.scss',
@@ -100,6 +102,11 @@ export class SharedTableComponent {
     // --- Eventos ---
     @Output() actionClicked = new EventEmitter<ActionEvent>();
     @Output() deleteSelected = new EventEmitter<void>(); // Evento para borrar lote
+    @Output() cellChange = new EventEmitter<{
+        field: string;
+        value: any;
+        data: any;
+    }>();
 
     private searchTimeout: any;
 
@@ -145,6 +152,19 @@ export class SharedTableComponent {
     // Emisor de acciones
     emitAction(action: string, item: any) {
         this.actionClicked.emit({ action, data: item });
+    }
+
+    // Resolver opciones de selectbutton (estático o función por fila)
+    resolveSelectOptions(col: TableColumn, row: any) {
+        if (!col.selectOptions) return [];
+        return typeof col.selectOptions === 'function'
+            ? col.selectOptions(row)
+            : col.selectOptions;
+    }
+
+    // Emitir cambio de celda (para selectbutton, etc.)
+    emitCellChange(field: string, value: any, data: any) {
+        this.cellChange.emit({ field, value, data });
     }
 
     // Manejo de Selección

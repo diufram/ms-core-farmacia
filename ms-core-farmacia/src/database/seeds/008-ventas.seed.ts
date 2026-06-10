@@ -7,9 +7,12 @@ import { VentaDetalle } from '../entities/venta-detalle.entity';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
+type EstadoVentaSeed = 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA';
+
 type VentaSeed = {
   sucursalSlug: string;
   diasAtras: number;
+  estado: EstadoVentaSeed;
   walkIn?: {
     nombre: string;
     celular?: string;
@@ -23,6 +26,7 @@ const VENTAS: VentaSeed[] = [
   {
     sucursalSlug: 'sucursal-central',
     diasAtras: 10,
+    estado: 'CONFIRMADA',
     walkIn: { nombre: 'Cliente Walk-in A', celular: '70000001', codigo: 'WI-A' },
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 2 },
@@ -32,11 +36,13 @@ const VENTAS: VentaSeed[] = [
   {
     sucursalSlug: 'sucursal-central',
     diasAtras: 7,
+    estado: 'CONFIRMADA',
     detalles: [{ productoCodigo: 'PROD-002', cantidad: 1 }],
   },
   {
     sucursalSlug: 'sucursal-central',
     diasAtras: 5,
+    estado: 'RECHAZADA',
     walkIn: { nombre: 'Cliente Walk-in B' },
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 3 },
@@ -46,12 +52,14 @@ const VENTAS: VentaSeed[] = [
   {
     sucursalSlug: 'sucursal-central',
     diasAtras: 1,
+    estado: 'PENDIENTE',
     detalles: [{ productoCodigo: 'PROD-003', cantidad: 2 }],
   },
   // === Sucursal Norte ===
   {
     sucursalSlug: 'sucursal-norte',
     diasAtras: 8,
+    estado: 'CONFIRMADA',
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 5 },
       { productoCodigo: 'PROD-003', cantidad: 3 },
@@ -60,12 +68,14 @@ const VENTAS: VentaSeed[] = [
   {
     sucursalSlug: 'sucursal-norte',
     diasAtras: 4,
+    estado: 'RECHAZADA',
     walkIn: { nombre: 'Cliente Walk-in C', codigo: 'WI-C' },
     detalles: [{ productoCodigo: 'PROD-002', cantidad: 4 }],
   },
   {
     sucursalSlug: 'sucursal-norte',
     diasAtras: 2,
+    estado: 'PENDIENTE',
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 1 },
       { productoCodigo: 'PROD-002', cantidad: 1 },
@@ -76,6 +86,7 @@ const VENTAS: VentaSeed[] = [
   {
     sucursalSlug: 'sucursal-sur',
     diasAtras: 6,
+    estado: 'CONFIRMADA',
     walkIn: { nombre: 'Cliente Walk-in D', celular: '70000004', codigo: 'WI-D' },
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 4 },
@@ -85,12 +96,14 @@ const VENTAS: VentaSeed[] = [
   {
     sucursalSlug: 'sucursal-sur',
     diasAtras: 3,
+    estado: 'RECHAZADA',
     walkIn: { nombre: 'Cliente Walk-in E' },
     detalles: [{ productoCodigo: 'PROD-003', cantidad: 6 }],
   },
   {
     sucursalSlug: 'sucursal-sur',
     diasAtras: 0,
+    estado: 'PENDIENTE',
     detalles: [
       { productoCodigo: 'PROD-001', cantidad: 2 },
       { productoCodigo: 'PROD-003', cantidad: 2 },
@@ -139,7 +152,7 @@ export const ventasSeed: Seed = {
           stockInsuficiente = true;
           break;
         }
-        if (producto.stock_actual < det.cantidad) {
+        if (item.estado === 'CONFIRMADA' && producto.stock_actual < det.cantidad) {
           console.log(
             `- Stock insuficiente (${producto.stock_actual}) para ${det.productoCodigo} en ${item.sucursalSlug}, omitido.`,
           );
@@ -164,13 +177,14 @@ export const ventasSeed: Seed = {
       const numeroVenta = `V-${randomUUID()}`;
 
       const esWalkIn = !!item.walkIn;
+      const descuentaStock = item.estado === 'CONFIRMADA';
 
       await seedDataSource.transaction(async (manager) => {
         const venta = manager.create(Venta, {
           numero_venta: numeroVenta,
           fecha_venta: fechaVentaStr,
           total,
-          estado: 'CONFIRMADA',
+          estado: item.estado,
           sucursal,
           usuario: superAdmin,
           cliente_walk_in: esWalkIn,
@@ -191,8 +205,10 @@ export const ventasSeed: Seed = {
             precio_unitario: precio,
           });
           await manager.save(detalle);
-          producto.stock_actual -= det.cantidad;
-          await manager.save(Producto, producto);
+          if (descuentaStock) {
+            producto.stock_actual -= det.cantidad;
+            await manager.save(Producto, producto);
+          }
         }
 
         ventasCreadas.push(numeroVenta);

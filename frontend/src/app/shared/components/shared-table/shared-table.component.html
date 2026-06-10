@@ -99,6 +99,16 @@
                                 <p-tag [value]="item[col.field]" [severity]="getSeverity(item[col.field])"
                                     [rounded]="true"></p-tag>
                             </div>
+                            <div *ngSwitchCase="'selectbutton'">
+                                <p-selectbutton
+                                    [ngModel]="item[col.field]"
+                                    [options]="resolveSelectOptions(col, item)"
+                                    optionDisabled="disabled"
+                                    [allowEmpty]="false"
+                                    size="small"
+                                    (onChange)="emitCellChange(col.field, $event.value, item)"
+                                />
+                            </div>
                             <div *ngSwitchCase="'actions'" class="flex gap-2 action-buttons">
                                 <ng-container *ngFor="let action of rowActions">
                                     <p-button *ngIf="action.visible !== false" [icon]="action.icon"

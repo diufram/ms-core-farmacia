@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,11 +8,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { DatePickerModule } from 'primeng/datepicker';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 import { SharedTableComponent } from '@/shared/components/shared-table/shared-table.component';
 import {
     TableColumn,
     RowAction,
+    SelectButtonOption,
 } from '@/shared/components/shared-table/interfaces/table-config.interface';
 import { ToastService } from '@/core/services/toast.service';
 import { AuthService } from '@/features/auth/services/auth.service';
@@ -20,6 +22,12 @@ import { SucursalesService } from '@/features/sucursales/services/sucursales.ser
 import { Sucursal } from '@/features/sucursales/models/sucursal.interface';
 import { VentasService } from '../../services/ventas.service';
 import { EstadoVenta, Venta } from '../../models/venta.interface';
+
+const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
+    PENDIENTE: ['CONFIRMADA', 'RECHAZADA'],
+    CONFIRMADA: [],
+    RECHAZADA: [],
+};
 
 @Component({
     selector: 'app-ventas-list',
@@ -32,13 +40,14 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
         SelectModule,
         TagModule,
         DatePickerModule,
+        SelectButtonModule,
         SharedTableComponent,
     ],
     providers: [ConfirmationService],
     template: `
         <div class="card">
             <app-shared-table
-                [data]="ventasDecoradas()"
+                [data]="ventas()"
                 [columns]="columns"
                 [rowActions]="rowActions"
                 [loading]="loading()"
@@ -46,6 +55,7 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
                 [title]="esCliente() ? 'Mis Pedidos' : 'Ventas'"
                 dataKey="id"
                 (actionClicked)="onAction($event)"
+                (cellChange)="onCellChange($event)"
             >
                 <p-select
                     table-filters
@@ -120,7 +130,6 @@ export class VentasListComponent implements OnInit {
     filtroFechaHasta: Date | null = null;
 
     columns: TableColumn[] = [
-        { field: 'id', header: 'ID', type: 'text', width: '70px' },
         {
             field: 'numero_venta',
             header: 'Número',
@@ -143,20 +152,15 @@ export class VentasListComponent implements OnInit {
         {
             field: 'estado',
             header: 'Estado',
-            type: 'tag',
-            width: '140px',
-        },
-        {
-            field: 'cantidad_items',
-            header: 'Items',
-            type: 'text',
-            width: '80px',
+            type: 'selectbutton',
+            width: '360px',
+            selectOptions: (row: Venta) => this.opcionesEstadoParaFila(row),
         },
         {
             field: 'acciones',
             header: 'Acciones',
             type: 'actions',
-            width: '180px',
+            width: '90px',
         },
     ];
 
@@ -217,14 +221,7 @@ export class VentasListComponent implements OnInit {
         });
     }
 
-    ventasDecoradas = computed<
-        (Venta & { cantidad_items: number })[]
-    >(() =>
-        this.ventas().map((v) => ({
-            ...v,
-            cantidad_items: v.detalles?.length ?? 0,
-        })),
-    );
+    ventasDecoradas = signal<Venta[]>([]);
 
     nueva(): void {
         this.router.navigate(['/home/ventas/nueva']);
@@ -233,12 +230,6 @@ export class VentasListComponent implements OnInit {
     onAction(event: { action: string; data: Venta }): void {
         if (event.action === 'view') {
             this.verDetalle(event.data);
-        } else if (event.action === 'confirmar') {
-            this.confirmarCambioEstado(event.data, 'CONFIRMADA');
-        } else if (event.action === 'rechazar') {
-            this.confirmarCambioEstado(event.data, 'RECHAZADA');
-        } else if (event.action === 'entregar') {
-            this.confirmarCambioEstado(event.data, 'ENTREGADA');
         } else if (event.action === 'delete') {
             this.confirmarEliminar(event.data);
         }
@@ -255,43 +246,46 @@ export class VentasListComponent implements OnInit {
         ];
 
         if (this.esEmpleado()) {
-            actions.push(
-                {
-                    key: 'confirmar',
-                    icon: 'pi pi-check',
-                    tooltip: 'Confirmar pedido (PENDIENTE -> CONFIRMADA)',
-                    severity: 'success',
-                },
-                {
-                    key: 'rechazar',
-                    icon: 'pi pi-times',
-                    tooltip: 'Rechazar pedido (PENDIENTE -> RECHAZADA)',
-                    severity: 'warn',
-                },
-                {
-                    key: 'entregar',
-                    icon: 'pi pi-truck',
-                    tooltip: 'Marcar como entregada (CONFIRMADA -> ENTREGADA)',
-                    severity: 'primary',
-                },
-                {
-                    key: 'delete',
-                    icon: 'pi pi-trash',
-                    tooltip: 'Eliminar',
-                    severity: 'danger',
-                },
-            );
+            actions.push({
+                key: 'delete',
+                icon: 'pi pi-trash',
+                tooltip: 'Eliminar',
+                severity: 'danger',
+            });
         }
         this.rowActions = actions;
     }
 
     isActionVisible(action: string, venta: Venta): boolean {
-        if (action === 'confirmar') return venta.estado === 'PENDIENTE';
-        if (action === 'rechazar') return venta.estado === 'PENDIENTE';
-        if (action === 'entregar') return venta.estado === 'CONFIRMADA';
         if (action === 'delete')
-            return venta.estado !== 'CONFIRMADA' && venta.estado !== 'ENTREGADA';
+            return venta.estado !== 'CONFIRMADA';
         return true;
+    }
+
+    private opcionesEstadoParaFila(venta: Venta): SelectButtonOption[] {
+        const permitidas = TRANSICIONES_VALIDAS[venta.estado] ?? [];
+        const todas: EstadoVenta[] = [
+            'PENDIENTE',
+            'CONFIRMADA',
+            'RECHAZADA',
+        ];
+        const labelMap: Record<EstadoVenta, string> = {
+            PENDIENTE: 'Pendiente',
+            CONFIRMADA: 'Confirmada',
+            RECHAZADA: 'Rechazada',
+        };
+        return todas.map((estado) => ({
+            label: labelMap[estado],
+            value: estado,
+            disabled: !permitidas.includes(estado),
+        }));
+    }
+
+    onCellChange(event: { field: string; value: any; data: Venta }): void {
+        if (event.field !== 'estado') return;
+        if (event.value === event.data.estado) return;
+        if (!this.esEmpleado()) return;
+        this.confirmarCambioEstado(event.data, event.value as EstadoVenta);
     }
 
     private verDetalle(v: Venta): void {
@@ -309,7 +303,6 @@ export class VentasListComponent implements OnInit {
             PENDIENTE: 'volver a pendiente',
             CONFIRMADA: 'confirmar',
             RECHAZADA: 'rechazar',
-            ENTREGADA: 'marcar como entregada',
         };
         this.confirmation.confirm({
             message: `¿Deseas ${mensajes[nuevoEstado]} la venta "${v.numero_venta}"?`,

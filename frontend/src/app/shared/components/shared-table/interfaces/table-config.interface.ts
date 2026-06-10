@@ -1,12 +1,28 @@
-export type ColumnType = 'text' | 'currency' | 'date' | 'boolean' | 'tag' | 'actions' | 'image' | 'rating';
+export type ColumnType =
+    | 'text'
+    | 'currency'
+    | 'date'
+    | 'boolean'
+    | 'tag'
+    | 'actions'
+    | 'image'
+    | 'rating'
+    | 'selectbutton';
+
+export interface SelectButtonOption {
+    label: string;
+    value: string | number;
+    disabled?: boolean;
+}
 
 export interface TableColumn {
-  field: string;
-  header: string;
-  type?: ColumnType; // Si no se define, es 'text'
-  sortable?: boolean;
-  width?: string;
-  currencyCode?: string; // Para tipo 'currency'
+    field: string;
+    header: string;
+    type?: ColumnType;
+    sortable?: boolean;
+    width?: string;
+    currencyCode?: string;
+    selectOptions?: SelectButtonOption[] | ((row: any) => SelectButtonOption[]);
 }
 
 export interface RowAction {

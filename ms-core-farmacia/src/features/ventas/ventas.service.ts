@@ -13,13 +13,12 @@ import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { VentasRepository } from './ventas.repository';
 
-type EstadoVenta = 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA' | 'ENTREGADA';
+type EstadoVenta = 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA';
 
 const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
   PENDIENTE: ['CONFIRMADA', 'RECHAZADA'],
-  CONFIRMADA: ['ENTREGADA'],
+  CONFIRMADA: [],
   RECHAZADA: [],
-  ENTREGADA: [],
 };
 
 @Injectable()
