@@ -61,7 +61,7 @@ export const DASHBOARD_ROUTES: Routes = [
             {
                 path: 'documentos',
                 canActivate: [roleGuard],
-                data: { roles: EMPLEADO_ROLES },
+                data: { roles: SOLO_SUPER_ADMIN },
                 loadChildren: () =>
                     import('@/features/documentos/documentos.routes').then(
                         (m) => m.DOCUMENTOS_ROUTES,

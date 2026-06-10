@@ -272,16 +272,6 @@ export class MyMenu implements OnInit {
                     ],
                 },
                 {
-                    label: 'Documentos',
-                    items: [
-                        {
-                            label: 'Gestor Documental',
-                            icon: 'pi pi-fw pi-folder',
-                            routerLink: ['/home/documentos'],
-                        },
-                    ],
-                },
-                {
                     label: 'Cuenta',
                     items: [
                         {
