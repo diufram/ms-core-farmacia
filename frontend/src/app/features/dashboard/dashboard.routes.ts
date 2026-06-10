@@ -55,6 +55,13 @@ export const DASHBOARD_ROUTES: Routes = [
                     ),
             },
             {
+                path: 'documentos',
+                loadChildren: () =>
+                    import('@/features/documentos/documentos.routes').then(
+                        (m) => m.DOCUMENTOS_ROUTES,
+                    ),
+            },
+            {
                 path: 'reportes/ventas',
                 component: ComingSoonComponent,
                 data: { title: 'Reporte de Ventas' },

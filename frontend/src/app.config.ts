@@ -5,6 +5,7 @@ import {
 import {
     provideHttpClient,
     withFetch,
+    withInterceptors,
 } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
@@ -20,6 +21,7 @@ import { provideApollo } from 'apollo-angular';
 import { appRoutes } from './app.routes';
 import { AuthService } from '@/features/auth/services/auth.service';
 import { apolloOptionsFactory } from '@/core/graphql/apollo.config';
+import { authHttpInterceptor } from '@/core/interceptors/auth-http.interceptor';
 
 export function initializeAppFactory(authService: AuthService) {
     return () => authService.loadSession();
@@ -35,7 +37,7 @@ export const appConfig: ApplicationConfig = {
             }),
             withEnabledBlockingInitialNavigation(),
         ),
-        provideHttpClient(withFetch()),
+        provideHttpClient(withFetch(), withInterceptors([authHttpInterceptor])),
         provideAnimationsAsync(),
         provideApollo(apolloOptionsFactory),
 

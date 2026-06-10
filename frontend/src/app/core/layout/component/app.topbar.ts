@@ -21,7 +21,7 @@ import { AuthService } from '@/features/auth/services/auth.service';
             </button>
             <a class="layout-topbar-logo" routerLink="/dashboard">
                 <div class="logo-mask" role="img" aria-label="Logo"></div>
-                <span>Compex</span>
+                <span>PharmaFicct</span>
             </a>
         </div>
 

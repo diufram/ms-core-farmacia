@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     standalone: true,
     selector: 'my-footer',
     template: `<div class="layout-footer">
-        Compoex
+        PharmaFicct
         <a
             href="https://primeng.org"
             target="_blank"
