@@ -5,7 +5,6 @@ const USUARIO_FIELDS = `
     nombre_usuario
     correo_electronico
     rol
-    rol_global
     sucursal {
         id
         nombre

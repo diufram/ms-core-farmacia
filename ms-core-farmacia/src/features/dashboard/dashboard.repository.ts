@@ -6,7 +6,7 @@ import { Producto } from '../../database/entities/producto.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 
 export interface DashboardFilters {
   sucursalId?: number;
@@ -297,7 +297,7 @@ export class DashboardRepository {
     userRol: string,
     userSucursalId: number | null,
   ): Promise<number> {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return this.sucursalRepository.count();
     }
     return this.sucursalRepository.count({

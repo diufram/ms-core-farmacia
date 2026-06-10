@@ -1,5 +1,4 @@
-export type RolGlobal = 'super_admin' | 'user';
-export type RolSucursal = 'admin';
+export type Rol = 'super_admin' | 'admin';
 
 export interface Persona {
     id: number;
@@ -16,7 +15,6 @@ export interface SucursalSimple {
 export interface UsuarioAsignacion {
     id: number;
     sucursal: SucursalSimple;
-    rol: RolSucursal;
     activo: boolean;
 }
 
@@ -24,7 +22,7 @@ export interface Usuario {
     id: number;
     nombre_usuario: string;
     correo_electronico: string;
-    rol_global: RolGlobal;
+    rol: Rol;
     persona: Persona;
     asignaciones: UsuarioAsignacion[];
 }
@@ -36,7 +34,6 @@ export interface UsuarioPayload {
 
 export interface SucursalAsignacionInput {
     sucursalId: number;
-    rol?: RolSucursal;
 }
 
 export interface CreateUsuarioInput {
@@ -48,7 +45,7 @@ export interface CreateUsuarioInput {
     nombre_usuario: string;
     correo_electronico: string;
     contrasena: string;
-    rol_global?: RolGlobal;
+    rol?: Rol;
     sucursales?: SucursalAsignacionInput[];
 }
 
@@ -60,11 +57,10 @@ export interface UpdateUsuarioInput {
     };
     nombre_usuario?: string;
     correo_electronico?: string;
-    rol_global?: RolGlobal;
+    rol?: Rol;
     activo?: boolean;
 }
 
 export interface AssignSucursalInput {
     sucursalId: number;
-    rol: RolSucursal;
 }

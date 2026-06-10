@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, IsNull, Repository } from 'typeorm';
 import { RefreshToken } from '../../database/entities/refresh-token.entity';
-import { Usuario, RolGlobal } from '../../database/entities/usuario.entity';
+import { Usuario, Rol } from '../../database/entities/usuario.entity';
 import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
 import { Persona } from '../../database/entities/persona.entity';
 
@@ -101,7 +101,7 @@ export class AuthRepository {
         correo_electronico: correo.toLowerCase(),
         nombre_usuario,
         contrasena: contrasenaHash,
-        rol_global: RolGlobal.USER,
+        rol: Rol.ADMIN,
         persona,
       });
       return await manager.save(usuario);

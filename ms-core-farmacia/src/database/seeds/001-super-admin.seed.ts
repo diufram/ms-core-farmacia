@@ -1,6 +1,6 @@
 import { hash } from 'bcryptjs';
 import { Persona } from '../entities/persona.entity';
-import { RolGlobal, Usuario } from '../entities/usuario.entity';
+import { Rol, Usuario } from '../entities/usuario.entity';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
@@ -37,7 +37,7 @@ export const superAdminSeed: Seed = {
       nombre_usuario: username,
       correo_electronico: correo,
       contrasena: await hash(password, 10),
-      rol_global: RolGlobal.SUPER_ADMIN,
+      rol: Rol.SUPER_ADMIN,
       persona: personaGuardada,
     });
 

@@ -201,7 +201,7 @@ export class ProductosListComponent implements OnInit {
     }
 
     esSuperAdmin(): boolean {
-        return this.auth.currentUser()?.rol_global === 'super_admin';
+        return this.auth.currentUser()?.rol === 'super_admin';
     }
 
     cargar(): void {

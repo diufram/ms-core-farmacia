@@ -134,11 +134,11 @@ export class AuthService {
     }
 
     isAdmin(): boolean {
-        const user = this.currentUser();
-        return (
-            user?.rol?.toLowerCase() === 'admin' ||
-            user?.rol_global?.toLowerCase() === 'admin'
-        );
+        return this.currentUser()?.rol === 'admin';
+    }
+
+    isSuperAdmin(): boolean {
+        return this.currentUser()?.rol === 'super_admin';
     }
 
     loadSession(): Promise<void> {

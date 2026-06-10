@@ -4,12 +4,12 @@ import { Repository } from 'typeorm';
 import { Persona } from '../../database/entities/persona.entity';
 import { RefreshToken } from '../../database/entities/refresh-token.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
-import { RolGlobal, Usuario } from '../../database/entities/usuario.entity';
+import { Rol, Usuario } from '../../database/entities/usuario.entity';
 import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
 
 export interface UsuarioFilters {
   sucursalId?: number;
-  rolGlobal?: RolGlobal;
+  rol?: Rol;
 }
 
 @Injectable()
@@ -35,8 +35,8 @@ export class UsuariosRepository {
       .leftJoinAndSelect('us.sucursal', 's')
       .orderBy('u.created_at', 'DESC');
 
-    if (filters.rolGlobal) {
-      qb.andWhere('u.rol_global = :rolGlobal', { rolGlobal: filters.rolGlobal });
+    if (filters.rol) {
+      qb.andWhere('u.rol = :rol', { rol: filters.rol });
     }
     if (filters.sucursalId) {
       qb.andWhere('us.sucursal_id = :sucursalId', {

@@ -17,7 +17,6 @@ const ASIGNACION_FIELDS = `
     sucursal {
         ${SUCURSAL_SIMPLE_FIELDS}
     }
-    rol
     activo
 `;
 
@@ -25,7 +24,7 @@ const USUARIO_FIELDS = `
     id
     nombre_usuario
     correo_electronico
-    rol_global
+    rol
     persona {
         ${PERSONA_FIELDS}
     }
@@ -35,8 +34,8 @@ const USUARIO_FIELDS = `
 `;
 
 export const USUARIOS_QUERY = gql`
-    query Usuarios($sucursalId: Int, $rolGlobal: String) {
-        usuarios(sucursalId: $sucursalId, rolGlobal: $rolGlobal) {
+    query Usuarios($sucursalId: Int, $rol: String) {
+        usuarios(sucursalId: $sucursalId, rol: $rol) {
             ${USUARIO_FIELDS}
         }
     }

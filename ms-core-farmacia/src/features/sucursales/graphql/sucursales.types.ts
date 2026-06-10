@@ -40,9 +40,6 @@ export class SucursalAdminType {
 
   @Field()
   correo_electronico!: string;
-
-  @Field()
-  rol!: string;
 }
 
 @ObjectType()

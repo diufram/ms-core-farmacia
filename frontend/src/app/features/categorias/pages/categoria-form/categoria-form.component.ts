@@ -182,7 +182,7 @@ export class CategoriaFormComponent implements OnInit {
     private construirFormulario(): void {
         const user = this.auth.currentUser();
         const defaultSucursalId =
-            user?.rol_global === 'super_admin' ? null : user?.sucursal_id ?? null;
+            user?.rol === 'super_admin' ? null : user?.sucursal_id ?? null;
 
         this.form = this.fb.group({
             codigo: ['', [Validators.required, Validators.maxLength(160)]],
@@ -200,7 +200,7 @@ export class CategoriaFormComponent implements OnInit {
             this.sucursalControl?.disable();
             this.cargarCategoria();
         } else {
-            if (this.auth.currentUser()?.rol_global === 'super_admin') {
+            if (this.auth.currentUser()?.rol === 'super_admin') {
                 this.cargarSucursales();
             } else {
                 this.sucursalControl?.disable();
@@ -241,7 +241,7 @@ export class CategoriaFormComponent implements OnInit {
 
     mostrarSucursal(): boolean {
         if (this.esEdicion()) return false;
-        return this.auth.currentUser()?.rol_global === 'super_admin';
+        return this.auth.currentUser()?.rol === 'super_admin';
     }
 
     invalid(field: string): boolean {

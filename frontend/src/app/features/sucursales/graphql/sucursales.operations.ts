@@ -16,7 +16,6 @@ const SUCURSAL_ADMIN_FIELDS = `
     id
     nombre_usuario
     correo_electronico
-    rol
 `;
 
 export const SUCURSALES_QUERY = gql`

@@ -4,9 +4,9 @@ import { Persona } from './persona.entity';
 import { RefreshToken } from './refresh-token.entity';
 import { UsuarioSucursal } from './usuario-sucursal.entity';
 
-export enum RolGlobal {
+export enum Rol {
   SUPER_ADMIN = 'super_admin',
-  USER = 'user',
+  ADMIN = 'admin',
 }
 
 @Entity('usuarios')
@@ -20,8 +20,8 @@ export class Usuario extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   contrasena!: string;
 
-  @Column({ type: 'enum', enum: RolGlobal, default: RolGlobal.USER })
-  rol_global!: RolGlobal;
+  @Column({ type: 'enum', enum: Rol, default: Rol.ADMIN })
+  rol!: Rol;
 
   @OneToOne(() => Persona, (persona) => persona.usuario, {
     nullable: false,

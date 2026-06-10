@@ -14,7 +14,7 @@ import {
 import {
     AssignSucursalInput,
     CreateUsuarioInput,
-    RolGlobal,
+    Rol,
     UpdateUsuarioInput,
     Usuario,
     UsuarioPayload,
@@ -22,7 +22,7 @@ import {
 
 export interface UsuariosFilters {
     sucursalId?: number | null;
-    rolGlobal?: RolGlobal | null;
+    rol?: Rol | null;
 }
 
 @Injectable({
@@ -35,12 +35,12 @@ export class UsuariosService {
         return this.apollo
             .watchQuery<
                 { usuarios: Usuario[] },
-                { sucursalId?: number | null; rolGlobal?: string | null }
+                { sucursalId?: number | null; rol?: string | null }
             >({
                 query: USUARIOS_QUERY,
                 variables: {
                     sucursalId: filters.sucursalId ?? null,
-                    rolGlobal: filters.rolGlobal ?? null,
+                    rol: filters.rol ?? null,
                 },
                 fetchPolicy: 'network-only',
             })

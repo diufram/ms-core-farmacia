@@ -8,7 +8,7 @@ import {
 import { DataSource } from 'typeorm';
 import { Cliente } from '../../database/entities/cliente.entity';
 import { Persona } from '../../database/entities/persona.entity';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
 import { ClientesRepository } from './clientes.repository';
@@ -158,7 +158,7 @@ export class ClientesService {
     userSucursalId: number | null,
     requestedSucursalId: number | null,
   ): number | null {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return requestedSucursalId;
     }
     return userSucursalId;
@@ -169,7 +169,7 @@ export class ClientesService {
     userSucursalId: number | null,
     requestedSucursalId: number,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return;
     }
     if (requestedSucursalId !== userSucursalId) {
@@ -184,7 +184,7 @@ export class ClientesService {
     userRol: string,
     userSucursalId: number | null,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return;
     }
     if (cliente.sucursal.id !== userSucursalId) {

@@ -1,6 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { RolGlobal } from '../../../database/entities/usuario.entity';
-import { RolSucursal } from '../../../database/entities/usuario-sucursal.entity';
+import { Rol } from '../../../database/entities/usuario.entity';
 
 @ObjectType()
 export class PersonaType {
@@ -35,9 +34,6 @@ export class UsuarioSucursalAsignacionType {
   sucursal!: SucursalSimpleType;
 
   @Field()
-  rol!: RolSucursal;
-
-  @Field()
   activo!: boolean;
 }
 
@@ -53,7 +49,7 @@ export class UsuarioType {
   correo_electronico!: string;
 
   @Field()
-  rol_global!: RolGlobal;
+  rol!: Rol;
 
   @Field(() => PersonaType)
   persona!: PersonaType;

@@ -21,7 +21,7 @@ import { SucursalesService } from '@/features/sucursales/services/sucursales.ser
 import { Sucursal } from '@/features/sucursales/models/sucursal.interface';
 import { UsuariosService } from '../../services/usuarios.service';
 import {
-    RolGlobal,
+    Rol,
     Usuario,
 } from '../../models/usuario.interface';
 
@@ -80,7 +80,7 @@ import {
 
                 <p-select
                     [options]="rolOptions"
-                    [(ngModel)]="filtroRolGlobal"
+                    [(ngModel)]="filtroRol"
                     optionLabel="label"
                     optionValue="value"
                     placeholder="Todos los roles"
@@ -131,13 +131,13 @@ export class UsuariosListComponent implements OnInit {
     loading = signal<boolean>(true);
     searchTerm = '';
     filtroSucursalId: number | null = null;
-    filtroRolGlobal: RolGlobal | null = null;
+    filtroRol: Rol | null = null;
 
     sucursalOptions = (): Sucursal[] => this.sucursales();
 
     rolOptions = [
-        { label: 'Super Admin', value: 'super_admin' as RolGlobal },
-        { label: 'Usuario', value: 'user' as RolGlobal },
+        { label: 'Super Administrador', value: 'super_admin' as Rol },
+        { label: 'Administrador', value: 'admin' as Rol },
     ];
 
     columns: TableColumn[] = [
@@ -158,10 +158,10 @@ export class UsuariosListComponent implements OnInit {
             type: 'text',
         },
         {
-            field: 'rol_global',
+            field: 'rol',
             header: 'Rol',
             type: 'tag',
-            width: '140px',
+            width: '160px',
         },
         {
             field: 'asignaciones',
@@ -207,7 +207,7 @@ export class UsuariosListComponent implements OnInit {
         this.usuariosService
             .list({
                 sucursalId: this.filtroSucursalId,
-                rolGlobal: this.filtroRolGlobal,
+                rol: this.filtroRol,
             })
             .subscribe({
                 next: (data) => {

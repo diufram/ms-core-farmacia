@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -29,13 +29,13 @@ export class SucursalesResolver {
   }
 
   @Mutation(() => CreateSucursalPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   createSucursal(@Args('input') input: CreateSucursalDto) {
     return this.sucursalesService.create(input);
   }
 
   @Mutation(() => SucursalPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   updateSucursal(
     @Args('id', { type: () => Int }) id: number,
     @Args('input') input: UpdateSucursalDto,
@@ -44,7 +44,7 @@ export class SucursalesResolver {
   }
 
   @Mutation(() => SucursalPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   deleteSucursal(@Args('id', { type: () => Int }) id: number) {
     return this.sucursalesService.delete(id);
   }

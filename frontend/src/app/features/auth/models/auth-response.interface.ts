@@ -8,8 +8,7 @@ export interface Usuario {
     id: number;
     nombre_usuario: string;
     correo_electronico: string;
-    rol: string;
-    rol_global: string;
+    rol: 'super_admin' | 'admin';
     sucursal?: Sucursal | null;
     sucursal_id?: number | null;
 }

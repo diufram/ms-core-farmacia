@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CategoriaProducto } from '../../database/entities/categoria-producto.entity';
 import { Producto } from '../../database/entities/producto.entity';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { ProductosRepository } from './productos.repository';
@@ -54,7 +54,7 @@ export class ProductosService {
     }
 
     if (
-      userRol !== RolGlobal.SUPER_ADMIN &&
+      userRol !== Rol.SUPER_ADMIN &&
       categoria.sucursal.id !== userSucursalId
     ) {
       throw new ForbiddenException(
@@ -107,7 +107,7 @@ export class ProductosService {
         throw new NotFoundException('Categoria no encontrada.');
       }
       if (
-        userRol !== RolGlobal.SUPER_ADMIN &&
+        userRol !== Rol.SUPER_ADMIN &&
         nuevaCategoria.sucursal.id !== userSucursalId
       ) {
         throw new ForbiddenException(
@@ -145,7 +145,7 @@ export class ProductosService {
     userSucursalId: number | null,
     requestedSucursalId: number | null,
   ): number | null {
-    if (userRol === RolGlobal.SUPER_ADMIN || userRol === RolGlobal.USER) {
+    if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN) {
       return requestedSucursalId;
     }
     return userSucursalId;
@@ -156,7 +156,7 @@ export class ProductosService {
     userRol: string,
     userSucursalId: number | null,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN || userRol === RolGlobal.USER) {
+    if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN) {
       return;
     }
     if (producto.sucursal.id !== userSucursalId) {

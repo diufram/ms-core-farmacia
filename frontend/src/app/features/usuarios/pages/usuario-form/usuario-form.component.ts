@@ -31,7 +31,7 @@ import { Sucursal } from '@/features/sucursales/models/sucursal.interface';
 import { UsuariosService } from '../../services/usuarios.service';
 import {
     AssignSucursalInput,
-    RolGlobal,
+    Rol,
     Usuario,
     UsuarioAsignacion,
 } from '../../models/usuario.interface';
@@ -233,14 +233,14 @@ import {
                         <div>
                             <p-floatlabel variant="on">
                                 <p-select
-                                    inputId="rol_global"
-                                    formControlName="rol_global"
+                                    inputId="rol"
+                                    formControlName="rol"
                                     [options]="rolOptions"
                                     optionLabel="label"
                                     optionValue="value"
                                     styleClass="w-full"
                                 />
-                                <label for="rol_global">Rol global *</label>
+                                <label for="rol">Rol *</label>
                             </p-floatlabel>
                         </div>
                     </div>
@@ -326,9 +326,8 @@ import {
                         >
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th>Sucursal</th>
-                                    <th>Rol</th>
-                                    <th>Estado</th>
+                                <th>Sucursal</th>
+                                <th>Estado</th>
                                     <th class="text-right">Acciones</th>
                                 </tr>
                             </ng-template>
@@ -338,9 +337,6 @@ import {
                             >
                                 <tr>
                                     <td>{{ asig.sucursal.nombre }}</td>
-                                    <td>
-                                        <p-tag [value]="asig.rol" />
-                                    </td>
                                     <td>
                                         <p-tag
                                             [value]="
@@ -371,7 +367,7 @@ import {
                             <ng-template pTemplate="emptymessage">
                                 <tr>
                                     <td
-                                        colspan="4"
+                                        colspan="3"
                                         class="text-center text-muted-color py-4"
                                     >
                                         El usuario no está asignado a ninguna
@@ -459,8 +455,8 @@ export class UsuarioFormComponent implements OnInit {
     nuevaAsignacionSucursalId: number | null = null;
 
     rolOptions = [
-        { label: 'Usuario', value: 'user' as RolGlobal },
-        { label: 'Super Administrador', value: 'super_admin' as RolGlobal },
+        { label: 'Administrador', value: 'admin' as Rol },
+        { label: 'Super Administrador', value: 'super_admin' as Rol },
     ];
 
     get sucursalesControls(): FormArray<FormGroup> {
@@ -484,7 +480,7 @@ export class UsuarioFormComponent implements OnInit {
             ],
             correo_electronico: ['', [Validators.required, Validators.email]],
             contrasena: ['', [Validators.minLength(8)]],
-            rol_global: ['user' as RolGlobal, Validators.required],
+            rol: ['admin' as Rol, Validators.required],
             sucursalesIniciales: this.fb.array<FormGroup>([]),
         });
     }
@@ -519,7 +515,7 @@ export class UsuarioFormComponent implements OnInit {
                     celular: u.persona.celular ?? '',
                     nombre_usuario: u.nombre_usuario,
                     correo_electronico: u.correo_electronico,
-                    rol_global: u.rol_global,
+                    rol: u.rol,
                 });
                 this.loadingData.set(false);
             },
@@ -589,7 +585,7 @@ export class UsuarioFormComponent implements OnInit {
                 },
                 nombre_usuario: v.nombre_usuario,
                 correo_electronico: v.correo_electronico,
-                rol_global: v.rol_global,
+                rol: v.rol,
             };
             this.usuariosService
                 .update(this.usuarioId, input)
@@ -614,15 +610,13 @@ export class UsuarioFormComponent implements OnInit {
                 nombre_usuario: v.nombre_usuario,
                 correo_electronico: v.correo_electronico,
                 contrasena: v.contrasena,
-                rol_global: v.rol_global,
+                rol: v.rol,
                 sucursales: this.sucursalesIniciales
                     .map((g) => ({
                         sucursalId: g.get('sucursalId')?.value,
-                        rol: 'admin' as const,
                     }))
                     .filter((s) => s.sucursalId != null) as {
                     sucursalId: number;
-                    rol: 'admin';
                 }[],
             };
             this.usuariosService.create(input).subscribe({
@@ -643,7 +637,6 @@ export class UsuarioFormComponent implements OnInit {
         if (!this.usuarioId || !this.nuevaAsignacionSucursalId) return;
         const input: AssignSucursalInput = {
             sucursalId: this.nuevaAsignacionSucursalId,
-            rol: 'admin',
         };
         this.usuariosService
             .assignSucursal(this.usuarioId, input)

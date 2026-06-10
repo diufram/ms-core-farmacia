@@ -3,10 +3,6 @@ import { BaseEntity } from '../../core/entities/base.entity';
 import { Sucursal } from './sucursal.entity';
 import { Usuario } from './usuario.entity';
 
-export enum RolSucursal {
-  ADMIN = 'admin',
-}
-
 @Entity('usuarios_sucursal')
 @Unique('UQ_usuario_sucursal', ['usuario', 'sucursal'])
 export class UsuarioSucursal extends BaseEntity {
@@ -24,9 +20,6 @@ export class UsuarioSucursal extends BaseEntity {
   })
   @JoinColumn({ name: 'sucursal_id' })
   sucursal!: Sucursal;
-
-  @Column({ type: 'enum', enum: RolSucursal, default: RolSucursal.ADMIN })
-  rol!: RolSucursal;
 
   @Column({ default: true })
   activo!: boolean;

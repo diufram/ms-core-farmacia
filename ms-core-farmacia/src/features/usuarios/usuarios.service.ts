@@ -7,11 +7,8 @@ import { hash } from 'bcryptjs';
 import { DataSource } from 'typeorm';
 import { Persona } from '../../database/entities/persona.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
-import { RolGlobal, Usuario } from '../../database/entities/usuario.entity';
-import {
-  RolSucursal,
-  UsuarioSucursal,
-} from '../../database/entities/usuario-sucursal.entity';
+import { Rol, Usuario } from '../../database/entities/usuario.entity';
+import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { AssignSucursalDto } from './dto/assign-sucursal.dto';
@@ -57,6 +54,13 @@ export class UsuariosService {
       );
     }
 
+    const targetRol = dto.rol ?? Rol.ADMIN;
+    if (targetRol === Rol.ADMIN && (!dto.sucursales || dto.sucursales.length === 0)) {
+      throw new ConflictException(
+        'Un administrador debe estar asignado a al menos una sucursal.',
+      );
+    }
+
     if (dto.sucursales?.length) {
       const sucursalIds = dto.sucursales.map((s) => s.sucursalId);
       const duplicates = sucursalIds.filter(
@@ -87,7 +91,7 @@ export class UsuariosService {
         nombre_usuario: dto.nombre_usuario,
         correo_electronico: dto.correo_electronico.toLowerCase(),
         contrasena: passwordHash,
-        rol_global: dto.rol_global ?? RolGlobal.USER,
+        rol: dto.rol ?? Rol.ADMIN,
         persona: personaGuardada,
       });
       const usuarioGuardado = await usuarioRepo.save(usuario);
@@ -105,7 +109,6 @@ export class UsuariosService {
           const nuevaAsignacion = usuarioSucursalRepo.create({
             usuario: usuarioGuardado,
             sucursal,
-            rol: asignacion.rol ?? RolSucursal.ADMIN,
             activo: true,
           });
           await usuarioSucursalRepo.save(nuevaAsignacion);
@@ -174,8 +177,8 @@ export class UsuariosService {
     if (dto.correo_electronico !== undefined) {
       usuario.correo_electronico = dto.correo_electronico.toLowerCase();
     }
-    if (dto.rol_global !== undefined) {
-      usuario.rol_global = dto.rol_global;
+    if (dto.rol !== undefined) {
+      usuario.rol = dto.rol;
     }
 
     await this.dataSource.transaction(async (manager) => {
@@ -230,7 +233,6 @@ export class UsuariosService {
     if (existing) {
       if (!existing.activo) {
         existing.activo = true;
-        existing.rol = dto.rol;
         await this.usuariosRepository.saveAsignacion(existing);
       } else {
         throw new ConflictException(
@@ -241,7 +243,6 @@ export class UsuariosService {
       const asignacion = this.usuariosRepository.createAsignacion({
         usuario: { id: usuarioId } as Usuario,
         sucursal,
-        rol: dto.rol,
         activo: true,
       });
       await this.usuariosRepository.saveAsignacion(asignacion);
@@ -288,7 +289,7 @@ export class UsuariosService {
       id: usuario.id,
       nombre_usuario: usuario.nombre_usuario,
       correo_electronico: usuario.correo_electronico,
-      rol_global: usuario.rol_global,
+      rol: usuario.rol,
       persona: {
         id: usuario.persona?.id ?? 0,
         nombre: usuario.persona?.nombre ?? '',
@@ -304,7 +305,6 @@ export class UsuariosService {
               id: us.sucursal.id,
               nombre: us.sucursal.nombre,
             },
-            rol: us.rol,
             activo: us.activo,
           })) ?? [],
     };

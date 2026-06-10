@@ -14,7 +14,6 @@ export interface SucursalAdmin {
     id: number;
     nombre_usuario: string;
     correo_electronico: string;
-    rol: string;
 }
 
 export interface SucursalPayload {

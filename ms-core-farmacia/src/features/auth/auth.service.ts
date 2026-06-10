@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'crypto';
 import { compare, hash } from 'bcryptjs';
-import { RolGlobal, Usuario } from '../../database/entities/usuario.entity';
+import { Rol, Usuario } from '../../database/entities/usuario.entity';
 import { AuthRepository } from './auth.repository';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
@@ -248,7 +248,6 @@ export class AuthService {
       nombre_usuario: usuario.nombre_usuario,
       correo_electronico: usuario.correo_electronico,
       rol: this.obtenerRol(usuario),
-      rol_global: usuario.rol_global,
       sucursal_id: sucursal?.id ?? null,
       sucursal: sucursal
         ? {
@@ -263,17 +262,13 @@ export class AuthService {
   }
 
   private obtenerRol(usuario: Usuario) {
-    if (usuario.rol_global === RolGlobal.SUPER_ADMIN) {
-      return usuario.rol_global;
-    }
-
-    return usuario.sucursales?.[0]?.rol ?? usuario.rol_global;
+    return usuario.rol;
   }
 
   private async obtenerSucursalActiva(
     usuario: Usuario,
   ): Promise<number | null> {
-    if (usuario.rol_global === RolGlobal.SUPER_ADMIN) {
+    if (usuario.rol === Rol.SUPER_ADMIN) {
       return null;
     }
 

@@ -8,11 +8,8 @@ import { hash } from 'bcryptjs';
 import { DataSource, Repository } from 'typeorm';
 import { Persona } from '../../database/entities/persona.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
-import { RolGlobal, Usuario } from '../../database/entities/usuario.entity';
-import {
-  RolSucursal,
-  UsuarioSucursal,
-} from '../../database/entities/usuario-sucursal.entity';
+import { Rol, Usuario } from '../../database/entities/usuario.entity';
+import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
 import { CreateSucursalDto } from './dto/create-sucursal.dto';
 import { UpdateSucursalDto } from './dto/update-sucursal.dto';
 import { SucursalesRepository } from './sucursales.repository';
@@ -90,7 +87,7 @@ export class SucursalesService {
         nombre_usuario: dto.nombre_usuario_admin,
         correo_electronico: dto.correo_admin.toLowerCase(),
         contrasena: passwordHash,
-        rol_global: RolGlobal.USER,
+        rol: Rol.ADMIN,
         persona: personaGuardada,
       });
       const adminGuardado = await manager.save(admin);
@@ -98,7 +95,6 @@ export class SucursalesService {
       const usuarioSucursal = manager.create(UsuarioSucursal, {
         usuario: adminGuardado,
         sucursal: sucursalGuardada,
-        rol: RolSucursal.ADMIN,
       });
       await manager.save(usuarioSucursal);
 
@@ -111,7 +107,7 @@ export class SucursalesService {
         id: result.admin.id,
         nombre_usuario: result.admin.nombre_usuario,
         correo_electronico: result.admin.correo_electronico,
-        rol: RolSucursal.ADMIN,
+        rol: Rol.ADMIN,
       },
       message: 'Sucursal creada correctamente con su usuario administrador.',
     };

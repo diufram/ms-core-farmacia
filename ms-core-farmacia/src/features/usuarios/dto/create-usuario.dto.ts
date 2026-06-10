@@ -12,8 +12,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { RolGlobal } from '../../../database/entities/usuario.entity';
-import { RolSucursal } from '../../../database/entities/usuario-sucursal.entity';
+import { Rol } from '../../../database/entities/usuario.entity';
 
 @InputType()
 export class UsuarioPersonaInput {
@@ -45,12 +44,6 @@ export class SucursalAsignacionInput {
   @Field(() => Int)
   @IsNotEmpty()
   sucursalId!: number;
-
-  @ApiPropertyOptional({ enum: RolSucursal, example: RolSucursal.ADMIN })
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  @IsEnum(RolSucursal)
-  rol?: RolSucursal;
 }
 
 @InputType()
@@ -80,11 +73,11 @@ export class CreateUsuarioDto {
   @MinLength(8)
   contrasena!: string;
 
-  @ApiPropertyOptional({ enum: RolGlobal, example: RolGlobal.USER })
+  @ApiPropertyOptional({ enum: Rol, example: Rol.ADMIN })
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsEnum(RolGlobal)
-  rol_global?: RolGlobal;
+  @IsEnum(Rol)
+  rol?: Rol;
 
   @ApiPropertyOptional({ type: [SucursalAsignacionInput] })
   @Field(() => [SucursalAsignacionInput], { nullable: true })

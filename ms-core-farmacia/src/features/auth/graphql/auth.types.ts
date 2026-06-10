@@ -26,9 +26,6 @@ export class UsuarioAuthType {
   @Field()
   rol!: string;
 
-  @Field()
-  rol_global!: string;
-
   @Field(() => Int, { nullable: true })
   sucursal_id!: number | null;
 

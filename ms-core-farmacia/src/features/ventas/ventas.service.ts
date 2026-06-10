@@ -7,7 +7,7 @@ import {
 import { randomUUID } from 'crypto';
 import { DataSource } from 'typeorm';
 import { Producto } from '../../database/entities/producto.entity';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
@@ -33,7 +33,7 @@ export class VentasService {
     );
     const ventas = await this.ventasRepository.findAll({
       sucursalId: targetSucursalId ?? undefined,
-      usuarioId: userRol === RolGlobal.USER ? userId : undefined,
+      usuarioId: userRol === Rol.ADMIN ? userId : undefined,
       fechaDesde: filters.fechaDesde,
       fechaHasta: filters.fechaHasta,
     });
@@ -158,7 +158,7 @@ export class VentasService {
     userSucursalId: number | null,
     requestedSucursalId: number | null,
   ): number | null {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return requestedSucursalId;
     }
     return userSucursalId;
@@ -169,7 +169,7 @@ export class VentasService {
     userSucursalId: number | null,
     requestedSucursalId: number,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN || userRol === RolGlobal.USER) {
+    if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN) {
       return;
     }
     if (requestedSucursalId !== userSucursalId) {
@@ -184,7 +184,7 @@ export class VentasService {
     userRol: string,
     userSucursalId: number | null,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return;
     }
     if (venta.sucursal.id !== userSucursalId) {

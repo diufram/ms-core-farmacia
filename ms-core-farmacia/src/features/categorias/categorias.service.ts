@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CategoriaProducto } from '../../database/entities/categoria-producto.entity';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { CategoriasRepository } from './categorias.repository';
@@ -137,7 +137,7 @@ export class CategoriasService {
     userSucursalId: number | null,
     requestedSucursalId: number | null,
   ): number | null {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return requestedSucursalId;
     }
     return userSucursalId;
@@ -148,7 +148,7 @@ export class CategoriasService {
     userRol: string,
     userSucursalId: number | null,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return;
     }
     if (categoria.sucursal.id !== userSucursalId) {
@@ -163,7 +163,7 @@ export class CategoriasService {
     userSucursalId: number | null,
     requestedSucursalId: number,
   ) {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return;
     }
     if (requestedSucursalId !== userSucursalId) {

@@ -1,11 +1,8 @@
 import { hash } from 'bcryptjs';
 import { Persona } from '../entities/persona.entity';
 import { Sucursal } from '../entities/sucursal.entity';
-import { RolGlobal, Usuario } from '../entities/usuario.entity';
-import {
-  RolSucursal,
-  UsuarioSucursal,
-} from '../entities/usuario-sucursal.entity';
+import { Rol, Usuario } from '../entities/usuario.entity';
+import { UsuarioSucursal } from '../entities/usuario-sucursal.entity';
 import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
@@ -67,7 +64,7 @@ export const usuariosAdministradoresSeed: Seed = {
           nombre_usuario: item.username,
           correo_electronico: item.correo,
           contrasena: await hash(password, 10),
-          rol_global: RolGlobal.USER,
+          rol: Rol.ADMIN,
           persona: personaGuardada,
         });
         usuario = await usuarioRepository.save(usuario);
@@ -89,7 +86,6 @@ export const usuariosAdministradoresSeed: Seed = {
         usuarioSucursalRepository.create({
           usuario,
           sucursal,
-          rol: RolSucursal.ADMIN,
           activo: true,
         }),
       );

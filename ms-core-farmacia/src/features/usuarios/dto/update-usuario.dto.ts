@@ -11,7 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { RolGlobal } from '../../../database/entities/usuario.entity';
+import { Rol } from '../../../database/entities/usuario.entity';
 import { UsuarioPersonaInput } from './create-usuario.dto';
 
 @InputType()
@@ -37,11 +37,11 @@ export class UpdateUsuarioDto {
   @IsEmail()
   correo_electronico?: string;
 
-  @ApiPropertyOptional({ enum: RolGlobal })
+  @ApiPropertyOptional({ enum: Rol })
   @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsEnum(RolGlobal)
-  rol_global?: RolGlobal;
+  @IsEnum(Rol)
+  rol?: Rol;
 
   @ApiPropertyOptional({ example: true })
   @Field({ nullable: true })

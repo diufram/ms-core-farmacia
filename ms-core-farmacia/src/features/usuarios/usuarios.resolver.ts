@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -20,33 +20,33 @@ export class UsuariosResolver {
   constructor(private readonly usuariosService: UsuariosService) {}
 
   @Query(() => [UsuarioType])
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   usuarios(
     @Args('sucursalId', { type: () => Int, nullable: true })
     sucursalId: number | null,
-    @Args('rolGlobal', { type: () => String, nullable: true })
-    rolGlobal: string | null,
+    @Args('rol', { type: () => String, nullable: true })
+    rol: string | null,
   ) {
     return this.usuariosService.findAll({
       ...(sucursalId ? { sucursalId } : {}),
-      ...(rolGlobal ? { rolGlobal: rolGlobal as RolGlobal } : {}),
+      ...(rol ? { rol: rol as Rol } : {}),
     });
   }
 
   @Query(() => UsuarioType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   usuario(@Args('id', { type: () => Int }) id: number) {
     return this.usuariosService.findOne(id);
   }
 
   @Mutation(() => UsuarioPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   createUsuario(@Args('input') input: CreateUsuarioDto) {
     return this.usuariosService.create(input);
   }
 
   @Mutation(() => UsuarioPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   updateUsuario(
     @Args('id', { type: () => Int }) id: number,
     @Args('input') input: UpdateUsuarioDto,
@@ -55,13 +55,13 @@ export class UsuariosResolver {
   }
 
   @Mutation(() => UsuarioPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   deleteUsuario(@Args('id', { type: () => Int }) id: number) {
     return this.usuariosService.delete(id);
   }
 
   @Mutation(() => UsuarioPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   assignUsuarioSucursal(
     @Args('usuarioId', { type: () => Int }) usuarioId: number,
     @Args('input') input: AssignSucursalDto,
@@ -70,7 +70,7 @@ export class UsuariosResolver {
   }
 
   @Mutation(() => UsuarioPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   unassignUsuarioSucursal(
     @Args('usuarioId', { type: () => Int }) usuarioId: number,
     @Args('sucursalId', { type: () => Int }) sucursalId: number,
@@ -79,7 +79,7 @@ export class UsuariosResolver {
   }
 
   @Mutation(() => UsuarioPayloadType)
-  @Roles(RolGlobal.SUPER_ADMIN)
+  @Roles(Rol.SUPER_ADMIN)
   adminResetUsuarioPassword(
     @Args('id', { type: () => Int }) id: number,
     @Args('input') input: AdminResetPasswordDto,

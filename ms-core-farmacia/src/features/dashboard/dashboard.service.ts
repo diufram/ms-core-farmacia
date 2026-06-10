@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RolGlobal } from '../../database/entities/usuario.entity';
+import { Rol } from '../../database/entities/usuario.entity';
 import {
   DashboardKpisType,
   ProductoStockBajoType,
@@ -123,7 +123,7 @@ export class DashboardService {
     userSucursalId: number | null,
     requestedSucursalId: number | undefined,
   ): number | null {
-    if (userRol === RolGlobal.SUPER_ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN) {
       return requestedSucursalId ?? null;
     }
     return userSucursalId;

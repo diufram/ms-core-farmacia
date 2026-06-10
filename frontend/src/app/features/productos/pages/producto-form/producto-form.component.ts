@@ -282,7 +282,7 @@ export class ProductoFormComponent implements OnInit {
     private cargarCategorias(): void {
         const user = this.auth.currentUser();
         const sucursalId =
-            user?.rol_global === 'super_admin' ? null : user?.sucursal_id;
+            user?.rol === 'super_admin' ? null : user?.sucursal_id;
         this.categoriasService
             .list(sucursalId ?? undefined)
             .subscribe({

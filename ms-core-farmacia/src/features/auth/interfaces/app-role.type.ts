@@ -1,4 +1,3 @@
-import { RolGlobal } from '../../../database/entities/usuario.entity';
-import { RolSucursal } from '../../../database/entities/usuario-sucursal.entity';
+import { Rol } from '../../../database/entities/usuario.entity';
 
-export type AppRole = RolGlobal | RolSucursal;
+export type AppRole = Rol;
