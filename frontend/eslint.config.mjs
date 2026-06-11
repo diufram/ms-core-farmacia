@@ -26,7 +26,7 @@ export default tseslint.config(
         'warn',
         {
           type: 'element',
-          prefix: 'app',
+          prefix: ['app', 'my'],
           style: 'kebab-case'
         }
       ],
@@ -34,7 +34,7 @@ export default tseslint.config(
         'warn',
         {
           type: 'attribute',
-          prefix: 'app',
+          prefix: ['app', 'my'],
           style: 'camelCase'
         }
       ],
@@ -52,16 +52,11 @@ export default tseslint.config(
       '@typescript-eslint/ban-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': 'off',
       'arrow-body-style': ['error', 'as-needed'],
       curly: 0,
       'no-empty': 'off',
-      '@typescript-eslint/member-ordering': [
-        'warn',
-        {
-          default: ['public-static-field', 'static-field', 'instance-field', 'public-instance-method', 'public-static-field']
-        }
-      ],
+      '@typescript-eslint/member-ordering': 'off',
       'no-console': 0,
       'prefer-const': 0,
       'padding-line-between-statements': [

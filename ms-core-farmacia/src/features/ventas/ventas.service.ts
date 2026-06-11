@@ -16,7 +16,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { ethers } from 'ethers';
 
-type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'CONFIRMADA' | 'RECHAZADA';
+export type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'CONFIRMADA' | 'RECHAZADA';
 
 const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
   PENDIENTE: ['PREPARADA', 'RECHAZADA'],
