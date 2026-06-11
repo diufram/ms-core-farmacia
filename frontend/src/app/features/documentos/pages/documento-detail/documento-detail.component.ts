@@ -8,6 +8,8 @@ import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { DividerModule } from 'primeng/divider';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TableModule } from 'primeng/table';
+import { FileUploadModule, FileUploadHandlerEvent } from 'primeng/fileupload';
 
 import { ToastService } from '@/core/services/toast.service';
 import { DocumentosService } from '../../services/documentos.service';
@@ -24,6 +26,8 @@ import { Documento } from '../../models/documento.interface';
         TagModule,
         DividerModule,
         ConfirmDialogModule,
+        TableModule,
+        FileUploadModule,
     ],
     providers: [ConfirmationService],
     styles: [
@@ -123,15 +127,15 @@ import { Documento } from '../../models/documento.interface';
                             }}</span>
                         </div>
                         <div class="meta-row">
-                            <span class="meta-label">Subido por</span>
+                            <span class="meta-label">Creado por</span>
                             <span class="meta-value">{{
-                                documento()?.uploadedBy
+                                documento()?.createdBy
                             }}</span>
                         </div>
                         <div class="meta-row">
-                            <span class="meta-label">Fecha de subida</span>
+                            <span class="meta-label">Fecha de creación</span>
                             <span class="meta-value">{{
-                                documento()?.uploadedAt | date: 'medium'
+                                documento()?.createdAt | date: 'medium'
                             }}</span>
                         </div>
                         <div class="meta-row">
@@ -140,23 +144,69 @@ import { Documento } from '../../models/documento.interface';
                                 documento()?.s3Key
                             }}</span>
                         </div>
+                        
+                        @if (documento()?.status === 'DELETED') {
+                            <div class="meta-row">
+                                <span class="meta-label">Eliminado por</span>
+                                <span class="meta-value">{{
+                                    documento()?.deletedBy
+                                }}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Fecha de eliminación</span>
+                                <span class="meta-value text-red-500">{{
+                                    documento()?.deletedAt | date: 'medium'
+                                }}</span>
+                            </div>
+                        }
                     </div>
 
+                    @if (documento()?.updateHistory?.length) {
+                        <div class="mt-5">
+                            <h4 class="text-lg font-semibold mb-3">Historial de Actualizaciones</h4>
+                            <p-table [value]="documento()?.updateHistory || []" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-sm">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Actualizado por</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-record>
+                                    <tr>
+                                        <td>{{ record.updatedAt | date: 'medium' }}</td>
+                                        <td>{{ record.updatedBy }}</td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                    }
+
                     <ng-template pTemplate="footer">
-                        <div class="flex justify-end gap-3">
-                            <p-button
-                                icon="pi pi-trash"
-                                label="Eliminar"
-                                severity="danger"
-                                [outlined]="true"
-                                (onClick)="confirmarEliminar()"
-                            />
-                            <p-button
-                                icon="pi pi-download"
-                                label="Descargar"
-                                severity="success"
-                                (onClick)="descargar()"
-                            />
+                        <div class="flex justify-end gap-3 flex-wrap items-center">
+                            @if (documento()?.status !== 'DELETED') {
+                                <p-fileUpload
+                                    mode="basic"
+                                    chooseLabel="Actualizar Archivo"
+                                    chooseIcon="pi pi-upload"
+                                    [auto]="true"
+                                    [customUpload]="true"
+                                    (uploadHandler)="onUpdateFile($event)"
+                                    styleClass="p-button-outlined p-button-secondary"
+                                />
+                                <p-button
+                                    icon="pi pi-trash"
+                                    label="Eliminar"
+                                    severity="danger"
+                                    [outlined]="true"
+                                    (onClick)="confirmarEliminar()"
+                                />
+                                <p-button
+                                    icon="pi pi-download"
+                                    label="Descargar"
+                                    severity="success"
+                                    (onClick)="descargar()"
+                                />
+                            }
                         </div>
                     </ng-template>
                 </p-card>
@@ -184,6 +234,24 @@ export class DocumentoDetailComponent implements OnInit {
 
     documento = signal<Documento | null>(null);
     loading = signal<boolean>(true);
+
+    onUpdateFile(event: FileUploadHandlerEvent): void {
+        const file = event.files?.[0];
+        const doc = this.documento();
+        if (!file || !doc) return;
+
+        this.loading.set(true);
+        this.documentosService.updateFile(doc.id, file).subscribe({
+            next: (res) => {
+                this.toast.success('Archivo actualizado correctamente');
+                this.cargar(doc.id);
+            },
+            error: (err) => {
+                this.loading.set(false);
+                this.toast.error(err, 'Error al actualizar el archivo');
+            },
+        });
+    }
 
     ngOnInit(): void {
         const id = this.route.snapshot.paramMap.get('id');

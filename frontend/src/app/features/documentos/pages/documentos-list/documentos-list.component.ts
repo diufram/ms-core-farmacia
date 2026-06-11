@@ -95,14 +95,14 @@ export class DocumentosListComponent implements OnInit {
             width: '120px',
         },
         {
-            field: 'uploadedBy',
-            header: 'Subido por',
+            field: 'createdBy',
+            header: 'Creado por',
             type: 'text',
             width: '120px',
         },
         {
-            field: 'uploadedAt',
-            header: 'Fecha',
+            field: 'createdAt',
+            header: 'Fecha de creación',
             type: 'date',
             width: '160px',
         },
