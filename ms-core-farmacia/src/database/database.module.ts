@@ -17,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         ssl: configService.get<string>('DB_SSL') === 'true' ? { rejectUnauthorized: false } : false,
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
-        synchronize: true,
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
         migrationsRun: true,
       }),
     }),
