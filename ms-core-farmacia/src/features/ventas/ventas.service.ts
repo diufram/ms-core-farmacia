@@ -12,12 +12,14 @@ import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { VentasRepository } from './ventas.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 
-type EstadoVenta = 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA';
+type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'COMPLETADA' | 'RECHAZADA';
 
 const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
-  PENDIENTE: ['CONFIRMADA', 'RECHAZADA'],
-  CONFIRMADA: [],
+  PENDIENTE: ['PREPARADA', 'RECHAZADA'],
+  PREPARADA: ['COMPLETADA', 'RECHAZADA'],
+  COMPLETADA: [],
   RECHAZADA: [],
 };
 
@@ -26,6 +28,7 @@ export class VentasService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly ventasRepository: VentasRepository,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async findAll(
@@ -184,7 +187,7 @@ export class VentasService {
     }
 
     await this.dataSource.transaction(async (manager) => {
-      if (nuevoEstado === 'CONFIRMADA') {
+      if (nuevoEstado === 'PREPARADA') {
         const detalles = await manager
           .getRepository(VentaDetalle)
           .find({ where: { venta: { id: venta.id } }, relations: ['producto'] });
@@ -206,6 +209,20 @@ export class VentasService {
       venta.estado = nuevoEstado;
       await manager.save(Venta, venta);
     });
+
+    if (nuevoEstado === 'PREPARADA') {
+      await this.notificationsService.sendPushToUser(
+        venta.usuario.id,
+        `¡Tu pedido #${venta.id} está listo!`,
+        `Tu pedido ha sido preparado en ${venta.sucursal.nombre} y está listo para ser recogido.`,
+      );
+    } else if (nuevoEstado === 'COMPLETADA') {
+      await this.notificationsService.sendPushToUser(
+        venta.usuario.id,
+        `¡Pedido #${venta.id} completado!`,
+        `Tu pedido en ${venta.sucursal.nombre} ha sido pagado y recogido. ¡Gracias por tu compra!`,
+      );
+    }
 
     const reloaded = await this.ventasRepository.findById(id);
     return {

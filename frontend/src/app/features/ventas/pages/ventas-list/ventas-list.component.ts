@@ -24,8 +24,9 @@ import { VentasService } from '../../services/ventas.service';
 import { EstadoVenta, Venta } from '../../models/venta.interface';
 
 const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
-    PENDIENTE: ['CONFIRMADA', 'RECHAZADA'],
-    CONFIRMADA: [],
+    PENDIENTE: ['PREPARADA', 'RECHAZADA'],
+    PREPARADA: ['COMPLETADA', 'RECHAZADA'],
+    COMPLETADA: [],
     RECHAZADA: [],
 };
 
@@ -258,7 +259,7 @@ export class VentasListComponent implements OnInit {
 
     isActionVisible(action: string, venta: Venta): boolean {
         if (action === 'delete')
-            return venta.estado !== 'CONFIRMADA';
+            return venta.estado === 'PENDIENTE' || venta.estado === 'RECHAZADA';
         return true;
     }
 
@@ -266,12 +267,14 @@ export class VentasListComponent implements OnInit {
         const permitidas = TRANSICIONES_VALIDAS[venta.estado] ?? [];
         const todas: EstadoVenta[] = [
             'PENDIENTE',
-            'CONFIRMADA',
+            'PREPARADA',
+            'COMPLETADA',
             'RECHAZADA',
         ];
         const labelMap: Record<EstadoVenta, string> = {
             PENDIENTE: 'Pendiente',
-            CONFIRMADA: 'Confirmada',
+            PREPARADA: 'Preparada',
+            COMPLETADA: 'Completada',
             RECHAZADA: 'Rechazada',
         };
         return todas.map((estado) => ({
@@ -301,7 +304,8 @@ export class VentasListComponent implements OnInit {
     private confirmarCambioEstado(v: Venta, nuevoEstado: EstadoVenta): void {
         const mensajes: Record<EstadoVenta, string> = {
             PENDIENTE: 'volver a pendiente',
-            CONFIRMADA: 'confirmar',
+            PREPARADA: 'preparar',
+            COMPLETADA: 'completar',
             RECHAZADA: 'rechazar',
         };
         this.confirmation.confirm({

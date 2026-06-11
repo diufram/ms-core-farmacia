@@ -71,7 +71,7 @@ export class VentasResolver {
   ) {
     return this.ventasService.cambiarEstado(
       id,
-      nuevoEstado as 'CONFIRMADA' | 'RECHAZADA',
+      nuevoEstado as any,
       user.rol,
       user.sucursal_id,
     );

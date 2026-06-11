@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Field, InputType } from '@nestjs/graphql';
 
@@ -14,4 +14,16 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty()
   contrasena!: string;
+
+  @ApiProperty({ example: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]', required: false })
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  notification_token?: string;
+
+  @ApiProperty({ example: true, required: false })
+  @Field({ nullable: true })
+  @IsBoolean()
+  @IsOptional()
+  is_mobile?: boolean;
 }

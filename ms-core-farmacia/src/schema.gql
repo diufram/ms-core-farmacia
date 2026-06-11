@@ -121,6 +121,8 @@ scalar DateTime
 input LoginDto {
   contrasena: String!
   correo_electronico: String!
+  is_mobile: Boolean
+  notification_token: String
 }
 
 input LogoutDto {
@@ -247,8 +249,10 @@ input RegisterClienteDto {
   celular: String
   contrasena: String!
   correo_electronico: String!
+  is_mobile: Boolean
   nombre: String!
   nombre_usuario: String!
+  notification_token: String
 }
 
 input RegisterDto {

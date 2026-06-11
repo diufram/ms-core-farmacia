@@ -145,7 +145,7 @@ export class ProductosService {
     userSucursalId: number | null,
     requestedSucursalId: number | null,
   ): number | null {
-    if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN || userRol === Rol.CLIENTE) {
       return requestedSucursalId;
     }
     return userSucursalId;

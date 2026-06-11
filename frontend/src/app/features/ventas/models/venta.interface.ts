@@ -7,7 +7,7 @@ export interface VentaDetalle {
     subtotal: number;
 }
 
-export type EstadoVenta = 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA';
+export type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'COMPLETADA' | 'RECHAZADA';
 
 export interface Venta {
     id: number;

@@ -15,6 +15,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterClienteDto } from './dto/register-cliente.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 type TokensResponse = {
   access_token: string;
@@ -27,6 +28,7 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -84,6 +86,10 @@ export class AuthService {
       throw new BadRequestException('Error al registrar el cliente.');
     }
 
+    if (dto.notification_token) {
+      await this.notificationsService.registrarToken(usuarioActualizado.id, dto.notification_token);
+    }
+
     const tokens = await this.generarTokens(usuarioActualizado);
     return {
       usuario: this.serializarUsuario(usuarioActualizado),
@@ -103,6 +109,14 @@ export class AuthService {
     const passwordValida = await compare(dto.contrasena, usuario.contrasena);
     if (!passwordValida) {
       throw new UnauthorizedException('Credenciales invalidas.');
+    }
+
+    if (dto.is_mobile && (usuario.rol === Rol.SUPER_ADMIN || usuario.rol === Rol.ADMIN)) {
+      throw new UnauthorizedException('Los administradores no pueden iniciar sesion en la aplicacion movil.');
+    }
+
+    if (dto.notification_token) {
+      await this.notificationsService.registrarToken(usuario.id, dto.notification_token);
     }
 
     const tokens = await this.generarTokens(usuario);
