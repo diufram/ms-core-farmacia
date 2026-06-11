@@ -14,6 +14,8 @@ import { SucursalesModule } from './features/sucursales/sucursales.module';
 import { UsuariosModule } from './features/usuarios/usuarios.module';
 import { VentasModule } from './features/ventas/ventas.module';
 import { NotificationsModule } from './features/notifications/notifications.module';
+import { ChatVentaModule } from './features/chat-venta/chat-venta.module';
+import { EmailModule } from './features/email/email.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { NotificationsModule } from './features/notifications/notifications.modu
     VentasModule,
     DashboardModule,
     NotificationsModule,
+    ChatVentaModule,
+    EmailModule,
   ],
 })
 export class AppModule {}
