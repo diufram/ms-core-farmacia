@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Persona } from '../../database/entities/persona.entity';
 import { RefreshToken } from '../../database/entities/refresh-token.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
+import { TokenDispositivo } from '../../database/entities/token-dispositivo.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
 import { UsuariosRepository } from './usuarios.repository';
@@ -17,6 +18,7 @@ import { UsuariosService } from './usuarios.service';
       UsuarioSucursal,
       Sucursal,
       RefreshToken,
+      TokenDispositivo,
     ]),
   ],
   providers: [UsuariosService, UsuariosRepository, UsuariosResolver],

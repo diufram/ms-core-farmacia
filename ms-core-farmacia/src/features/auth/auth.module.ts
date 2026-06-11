@@ -5,6 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Persona } from '../../database/entities/persona.entity';
 import { RefreshToken } from '../../database/entities/refresh-token.entity';
+import { TokenDispositivo } from '../../database/entities/token-dispositivo.entity';
 import { Usuario } from '../../database/entities/usuario.entity';
 import { UsuarioSucursal } from '../../database/entities/usuario-sucursal.entity';
 import { AuthRepository } from './auth.repository';
@@ -17,7 +18,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ConfigModule,
     PassportModule,
     JwtModule.register({}),
-    TypeOrmModule.forFeature([Usuario, Persona, RefreshToken, UsuarioSucursal]),
+    TypeOrmModule.forFeature([
+      Usuario,
+      Persona,
+      RefreshToken,
+      UsuarioSucursal,
+      TokenDispositivo,
+    ]),
   ],
   providers: [AuthService, AuthRepository, AuthResolver, JwtStrategy],
 })

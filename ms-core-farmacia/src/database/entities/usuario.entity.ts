@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
 import { Persona } from './persona.entity';
 import { RefreshToken } from './refresh-token.entity';
+import { TokenDispositivo } from './token-dispositivo.entity';
 import { UsuarioSucursal } from './usuario-sucursal.entity';
 
 export enum Rol {
@@ -40,4 +41,7 @@ export class Usuario extends BaseEntity {
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.usuario)
   refresh_tokens!: RefreshToken[];
+
+  @OneToMany(() => TokenDispositivo, (t) => t.usuario)
+  tokens_dispositivo!: TokenDispositivo[];
 }

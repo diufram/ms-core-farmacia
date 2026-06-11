@@ -113,6 +113,11 @@ type DashboardKpisType {
   ventasPorSucursal: [VentasPorSucursalType!]!
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 input LoginDto {
   contrasena: String!
   correo_electronico: String!
@@ -149,11 +154,13 @@ type Mutation {
   deleteSucursal(id: Int!): SucursalPayloadType!
   deleteUsuario(id: Int!): UsuarioPayloadType!
   deleteVenta(id: Int!): VentaPayloadType!
+  eliminarTodosMisTokens: Boolean!
   login(input: LoginDto!): AuthPayloadType!
   logout(input: LogoutDto!): LogoutPayloadType!
   refresh(input: RefreshTokenDto!): AuthPayloadType!
   register(input: RegisterDto!): AuthPayloadType!
   registerCliente(input: RegisterClienteDto!): AuthPayloadType!
+  registrarTokenDispositivo(input: RegistrarTokenDispositivoInput!): TokenDispositivoType!
   unassignUsuarioSucursal(sucursalId: Int!, usuarioId: Int!): UsuarioPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
   updateProducto(id: Int!, input: UpdateProductoDto!): ProductoType!
@@ -219,6 +226,7 @@ type Query {
   checkUsername(input: CheckUsernameDto!): CheckUsernameResultType!
   dashboardKpis(fechaDesde: String, fechaHasta: String, stockBajoUmbral: Int, sucursalId: Int): DashboardKpisType!
   me: MePayloadType!
+  misDispositivos: [TokenDispositivoType!]!
   producto(id: Int!): ProductoType!
   productos(categoriaId: Int, sucursalId: Int): [ProductoType!]!
   profile: ProfileType!
@@ -250,6 +258,10 @@ input RegisterDto {
   correo_electronico: String!
   nombre: String!
   nombre_usuario: String!
+}
+
+input RegistrarTokenDispositivoInput {
+  token: String!
 }
 
 type RiesgoCategoriaType {
@@ -297,6 +309,13 @@ type SucursalType {
   nombre: String!
   slug: String!
   telefono: String
+}
+
+type TokenDispositivoType {
+  createdAt: DateTime!
+  id: Int!
+  token: String!
+  usuarioId: Int!
 }
 
 type TopClienteType {

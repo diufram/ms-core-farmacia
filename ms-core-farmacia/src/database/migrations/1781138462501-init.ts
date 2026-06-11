@@ -1,11 +1,12 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Init1781127387316 implements MigrationInterface {
-    name = 'Init1781127387316'
+export class Init1781138462501 implements MigrationInterface {
+    name = 'Init1781138462501'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "personas" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre" character varying(120) NOT NULL, "apellido" character varying(120) NOT NULL, "celular" character varying(20), CONSTRAINT "PK_714aa5d028f8f3e6645e971cecd" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "refresh_tokens" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "token_hash" character varying(255) NOT NULL, "expires_at" TIMESTAMP NOT NULL, "revoked_at" TIMESTAMP, "usuario_id" integer NOT NULL, CONSTRAINT "UQ_a7838d2ba25be1342091b6695f1" UNIQUE ("token_hash"), CONSTRAINT "PK_7d8bee0204106019488c4c50ffa" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "tokens_dispositivo" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "token" character varying(255) NOT NULL, "usuario_id" integer NOT NULL, CONSTRAINT "UQ_b6ee6c532a7e2b3cfcd742f01f9" UNIQUE ("token"), CONSTRAINT "PK_3c464611e7def1de872fdfe5f75" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "public"."usuarios_rol_enum" AS ENUM('super_admin', 'admin', 'cliente')`);
         await queryRunner.query(`CREATE TABLE "usuarios" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "nombre_usuario" character varying(60) NOT NULL, "correo_electronico" character varying(150) NOT NULL, "contrasena" character varying(255) NOT NULL, "rol" "public"."usuarios_rol_enum" NOT NULL DEFAULT 'admin', "persona_id" integer NOT NULL, CONSTRAINT "UQ_1a7a36f3dffef210b4c0ba5c6c0" UNIQUE ("nombre_usuario"), CONSTRAINT "UQ_e871b7157e4b74290df9baa9c93" UNIQUE ("correo_electronico"), CONSTRAINT "REL_899199fd151861c079720cc508" UNIQUE ("persona_id"), CONSTRAINT "PK_d7281c63c176e152e4c531594a8" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "usuarios_sucursal" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "activo" boolean NOT NULL DEFAULT true, "usuario_id" integer NOT NULL, "sucursal_id" integer NOT NULL, CONSTRAINT "UQ_usuario_sucursal" UNIQUE ("usuario_id", "sucursal_id"), CONSTRAINT "PK_7719925fa8ab656620a0f394777" PRIMARY KEY ("id"))`);
@@ -18,6 +19,7 @@ export class Init1781127387316 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "venta_detalles" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "cantidad" integer NOT NULL, "precio_unitario" numeric(10,2) NOT NULL, "venta_id" integer NOT NULL, "producto_id" integer NOT NULL, CONSTRAINT "PK_505b25e384908bdf1f67bf3c669" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "ventas" ("id" SERIAL NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP, "numero_venta" character varying(40) NOT NULL, "fecha_venta" date NOT NULL, "total" numeric(12,2) NOT NULL DEFAULT '0', "estado" character varying(20) NOT NULL DEFAULT 'PENDIENTE', "cliente_walk_in" boolean NOT NULL DEFAULT false, "cliente_nombre" character varying(120), "cliente_celular" character varying(20), "cliente_codigo" character varying(60), "sucursal_id" integer NOT NULL, "usuario_id" integer NOT NULL, CONSTRAINT "UQ_ventas_sucursal_numero" UNIQUE ("sucursal_id", "numero_venta"), CONSTRAINT "PK_b8b73abe8561829c019531d9a2e" PRIMARY KEY ("id"))`);
         await queryRunner.query(`ALTER TABLE "refresh_tokens" ADD CONSTRAINT "FK_c8349fdadc1bc791125bdd8c855" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "tokens_dispositivo" ADD CONSTRAINT "FK_5d75d1220f803f28a5374a39e92" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "usuarios" ADD CONSTRAINT "FK_899199fd151861c079720cc508f" FOREIGN KEY ("persona_id") REFERENCES "personas"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "usuarios_sucursal" ADD CONSTRAINT "FK_b455910d5a8ff78ed34b8eae98c" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "usuarios_sucursal" ADD CONSTRAINT "FK_b13d161124fd90027e5202ae1a6" FOREIGN KEY ("sucursal_id") REFERENCES "sucursales"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -45,6 +47,7 @@ export class Init1781127387316 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "usuarios_sucursal" DROP CONSTRAINT "FK_b13d161124fd90027e5202ae1a6"`);
         await queryRunner.query(`ALTER TABLE "usuarios_sucursal" DROP CONSTRAINT "FK_b455910d5a8ff78ed34b8eae98c"`);
         await queryRunner.query(`ALTER TABLE "usuarios" DROP CONSTRAINT "FK_899199fd151861c079720cc508f"`);
+        await queryRunner.query(`ALTER TABLE "tokens_dispositivo" DROP CONSTRAINT "FK_5d75d1220f803f28a5374a39e92"`);
         await queryRunner.query(`ALTER TABLE "refresh_tokens" DROP CONSTRAINT "FK_c8349fdadc1bc791125bdd8c855"`);
         await queryRunner.query(`DROP TABLE "ventas"`);
         await queryRunner.query(`DROP TABLE "venta_detalles"`);
@@ -57,6 +60,7 @@ export class Init1781127387316 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "usuarios_sucursal"`);
         await queryRunner.query(`DROP TABLE "usuarios"`);
         await queryRunner.query(`DROP TYPE "public"."usuarios_rol_enum"`);
+        await queryRunner.query(`DROP TABLE "tokens_dispositivo"`);
         await queryRunner.query(`DROP TABLE "refresh_tokens"`);
         await queryRunner.query(`DROP TABLE "personas"`);
     }
