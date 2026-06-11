@@ -12,14 +12,7 @@ import { ChatVentaService } from './chat-venta.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Producto,
-      Sucursal,
-      Usuario,
-      UsuarioSucursal,
-      Venta,
-      VentaDetalle,
-    ]),
+    TypeOrmModule.forFeature([Producto, Sucursal, Usuario, UsuarioSucursal, Venta, VentaDetalle]),
     EmailModule,
   ],
   controllers: [ChatVentaController],

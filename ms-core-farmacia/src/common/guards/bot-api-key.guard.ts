@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 
 @Injectable()
@@ -14,9 +9,7 @@ export class BotApiKeyGuard implements CanActivate {
     const expectedApiKey = process.env.BOT_API_KEY;
 
     if (!expectedApiKey) {
-      throw new UnauthorizedException(
-        'BOT_API_KEY no está configurado en el servidor.',
-      );
+      throw new UnauthorizedException('BOT_API_KEY no está configurado en el servidor.');
     }
 
     if (!apiKey || apiKey !== expectedApiKey) {

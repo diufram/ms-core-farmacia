@@ -141,6 +141,13 @@ type MessageResultType {
   message: String!
 }
 
+type MlModelStatusType {
+  cargado: Boolean!
+  categoriasEntrenadas: Int!
+  fechaEntrenamiento: String
+  oobAccuracy: Float
+}
+
 type Mutation {
   adminResetUsuarioPassword(id: Int!, input: AdminResetPasswordDto!): UsuarioPayloadType!
   assignUsuarioSucursal(input: AssignSucursalDto!, usuarioId: Int!): UsuarioPayloadType!
@@ -163,6 +170,7 @@ type Mutation {
   register(input: RegisterDto!): AuthPayloadType!
   registerCliente(input: RegisterClienteDto!): AuthPayloadType!
   registrarTokenDispositivo(input: RegistrarTokenDispositivoInput!): TokenDispositivoType!
+  retrainCategoryRiskModel(fechaDesde: String, fechaHasta: String, stockBajoUmbral: Int, sucursalId: Int): MlModelStatusType!
   unassignUsuarioSucursal(sucursalId: Int!, usuarioId: Int!): UsuarioPayloadType!
   updateCategoria(id: Int!, input: UpdateCategoriaDto!): CategoriaType!
   updateProducto(id: Int!, input: UpdateProductoDto!): ProductoType!
@@ -229,6 +237,7 @@ type Query {
   dashboardKpis(fechaDesde: String, fechaHasta: String, stockBajoUmbral: Int, sucursalId: Int): DashboardKpisType!
   me: MePayloadType!
   misDispositivos: [TokenDispositivoType!]!
+  mlModelStatus: MlModelStatusType!
   producto(id: Int!): ProductoType!
   productos(categoriaId: Int, sucursalId: Int): [ProductoType!]!
   profile: ProfileType!
@@ -272,6 +281,9 @@ input RegistrarTokenDispositivoInput {
 type RiesgoCategoriaType {
   categoria_id: Int!
   categoria_nombre: String!
+  clase_riesgo: String!
+  importancia_features: [Float!]
+  probabilidad_riesgo: Float!
   productos_stock_bajo: Int!
   score_riesgo: Float!
   total_productos: Int!

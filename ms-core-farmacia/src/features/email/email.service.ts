@@ -67,11 +67,7 @@ export class EmailService {
     data: VentaEmailData,
   ): Promise<{ enviado: boolean; messageId?: string }> {
     try {
-      const templatePath = path.join(
-        __dirname,
-        'templates',
-        'venta-creada.hbs',
-      );
+      const templatePath = path.join(__dirname, 'templates', 'venta-creada.hbs');
 
       let html: string;
 

@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { BotApiKeyGuard } from '../../common/guards/bot-api-key.guard';
 import { ChatVentaService } from './chat-venta.service';
 import { BuscarProductoDto } from './dto/buscar-producto.dto';

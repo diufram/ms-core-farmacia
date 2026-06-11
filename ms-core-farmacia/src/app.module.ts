@@ -17,6 +17,7 @@ import { NotificationsModule } from './features/notifications/notifications.modu
 import { ChatVentaModule } from './features/chat-venta/chat-venta.module';
 import { EmailModule } from './features/email/email.module';
 import { BlockchainModule } from './features/blockchain/blockchain.module';
+import { MlModule } from './features/ml/ml.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { BlockchainModule } from './features/blockchain/blockchain.module';
     ChatVentaModule,
     EmailModule,
     BlockchainModule,
+    MlModule,
   ],
 })
 export class AppModule {}

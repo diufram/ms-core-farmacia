@@ -24,7 +24,8 @@
     "db:drop": "typeorm-ts-node-commonjs schema:drop -d src/database/data-source.ts",
     "db:fresh": "pnpm run db:drop && pnpm run db:migrate",
     "db:reset": "pnpm run db:revert && pnpm run db:migrate",
-    "db:seed": "ts-node src/database/seeds/run-seeds.ts"
+    "db:seed": "ts-node src/database/seeds/run-seeds.ts",
+    "ml:train": "ts-node src/features/ml/scripts/train.ts"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
@@ -47,6 +48,7 @@
     "graphql": "^16.14.0",
     "graphql-scalars": "^1.25.0",
     "hbs": "^4.2.1",
+    "ml-random-forest": "^2.1.0",
     "nodemailer": "^8.0.11",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
@@ -88,7 +90,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

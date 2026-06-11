@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Producto } from '../../database/entities/producto.entity';
@@ -116,9 +111,7 @@ export class ChatVentaService {
     });
 
     if (!sucursal) {
-      throw new NotFoundException(
-        `Sucursal con ID ${dto.sucursalId} no encontrada.`,
-      );
+      throw new NotFoundException(`Sucursal con ID ${dto.sucursalId} no encontrada.`);
     }
 
     // 2. Obtener SUPER_ADMIN
@@ -127,16 +120,11 @@ export class ChatVentaService {
     });
 
     if (!superAdmin) {
-      throw new NotFoundException(
-        'Usuario SUPER_ADMIN no encontrado. Contacte al administrador.',
-      );
+      throw new NotFoundException('Usuario SUPER_ADMIN no encontrado. Contacte al administrador.');
     }
 
     // 3. Resolver códigos de productos a IDs
-    const productosMap = new Map<
-      string,
-      { producto: Producto; cantidad: number }
-    >();
+    const productosMap = new Map<string, { producto: Producto; cantidad: number }>();
 
     for (const item of dto.productos) {
       const producto = await this.productoRepository.findOne({
@@ -206,12 +194,10 @@ export class ChatVentaService {
       }
 
       // CAMBIAR A CONFIRMADA (descuenta stock)
-      const detalles = await manager
-        .getRepository(VentaDetalle)
-        .find({
-          where: { venta: { id: ventaGuardada.id } },
-          relations: ['producto'],
-        });
+      const detalles = await manager.getRepository(VentaDetalle).find({
+        where: { venta: { id: ventaGuardada.id } },
+        relations: ['producto'],
+      });
 
       for (const detalle of detalles) {
         const producto = await manager
@@ -237,12 +223,10 @@ export class ChatVentaService {
     });
 
     // 5. Recargar venta con relaciones
-    const ventaCompleta = await this.dataSource
-      .getRepository(Venta)
-      .findOne({
-        where: { id: ventaCreada.id },
-        relations: ['sucursal', 'detalles', 'detalles.producto'],
-      });
+    const ventaCompleta = await this.dataSource.getRepository(Venta).findOne({
+      where: { id: ventaCreada.id },
+      relations: ['sucursal', 'detalles', 'detalles.producto'],
+    });
 
     if (!ventaCompleta) {
       throw new NotFoundException('Error al recargar la venta creada.');

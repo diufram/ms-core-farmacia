@@ -1,16 +1,21 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Producto } from '../../database/entities/producto.entity';
 import { Sucursal } from '../../database/entities/sucursal.entity';
 import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 import { CategoriaProducto } from '../../database/entities/categoria-producto.entity';
+import { MlModule } from '../ml/ml.module';
 import { DashboardRepository } from './dashboard.repository';
 import { DashboardResolver } from './dashboard.resolver';
 import { DashboardService } from './dashboard.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Venta, VentaDetalle, Producto, Sucursal, CategoriaProducto])],
+  imports: [
+    TypeOrmModule.forFeature([Venta, VentaDetalle, Producto, Sucursal, CategoriaProducto]),
+    forwardRef(() => MlModule),
+  ],
   providers: [DashboardService, DashboardRepository, DashboardResolver],
+  exports: [DashboardRepository],
 })
 export class DashboardModule {}

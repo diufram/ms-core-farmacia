@@ -1,5 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Rol } from '../../database/entities/usuario.entity';
+import {
+  CategoryRiskFeatures,
+  CategoryRiskModel,
+  CategoryRiskPrediction,
+} from '../ml/category-risk.model';
+import { FeatureBuilderService } from '../ml/feature-builder.service';
+import { RISK_CLASS_THRESHOLD } from '../ml/ml.constants';
 import {
   DashboardKpisType,
   ProductoSinMovimientoType,
@@ -21,7 +28,13 @@ const DEFAULT_PRODUCTOS_SIN_MOV_LIMITE = 5;
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly dashboardRepository: DashboardRepository) {}
+  private readonly logger = new Logger(DashboardService.name);
+
+  constructor(
+    private readonly dashboardRepository: DashboardRepository,
+    private readonly categoryRiskModel: CategoryRiskModel,
+    private readonly featureBuilderService: FeatureBuilderService,
+  ) {}
 
   async getKpis(
     userRol: string,
@@ -148,7 +161,34 @@ export class DashboardService {
         categoria_nombre: p.categoria_nombre,
         dias_sin_venta: p.dias_sin_venta,
       })),
-      riesgoPorCategoria: riesgoPorCategoria
+      riesgoPorCategoria: await this.enrichRiesgoPorCategoria(riesgoPorCategoria, {
+        ...(effectiveSucursalId ? { sucursalId: effectiveSucursalId } : {}),
+        stockBajoUmbral: umbral,
+        ...dateFilters,
+      }),
+    };
+  }
+
+  private async enrichRiesgoPorCategoria(
+    rows: {
+      categoria_id: number;
+      categoria_nombre: string;
+      total_productos: number;
+      productos_stock_bajo: number;
+      ventas_periodo: number;
+      score_riesgo: number;
+    }[],
+    filters: {
+      sucursalId?: number;
+      stockBajoUmbral?: number;
+      fechaDesde?: string;
+      fechaHasta?: string;
+    },
+  ): Promise<RiesgoCategoriaType[]> {
+    const mlActive = this.categoryRiskModel.isLoaded();
+
+    if (!mlActive) {
+      return rows
         .map<RiesgoCategoriaType>((r) => ({
           categoria_id: r.categoria_id,
           categoria_nombre: r.categoria_nombre,
@@ -156,8 +196,88 @@ export class DashboardService {
           productos_stock_bajo: r.productos_stock_bajo,
           ventas_periodo: r.ventas_periodo,
           score_riesgo: r.score_riesgo,
+          clase_riesgo: r.score_riesgo > RISK_CLASS_THRESHOLD ? 'RIESGO_ALTO' : 'RIESGO_BAJO',
+          probabilidad_riesgo: r.score_riesgo,
+          importancia_features: null,
         }))
-        .sort((a, b) => b.score_riesgo - a.score_riesgo),
+        .sort((a, b) => b.score_riesgo - a.score_riesgo);
+    }
+
+    try {
+      const { rows: dataset } = await this.featureBuilderService.buildCategoryRiskDataset(filters);
+      const datasetByCategoriaId = new Map(dataset.map((d) => [d.categoria_id, d] as const));
+      const featuresByCategoriaId = new Map<number, CategoryRiskFeatures>();
+      for (const d of dataset) {
+        featuresByCategoriaId.set(
+          d.categoria_id,
+          this.featureBuilderService.buildFeaturesFromRow(d),
+        );
+      }
+
+      return rows
+        .map<RiesgoCategoriaType>((r) => {
+          const baseFeature = datasetByCategoriaId.get(r.categoria_id);
+          const features =
+            featuresByCategoriaId.get(r.categoria_id) ?? this.buildFallbackFeatures(r, baseFeature);
+          const prediction: CategoryRiskPrediction = this.categoryRiskModel.predict(features);
+          return {
+            categoria_id: r.categoria_id,
+            categoria_nombre: r.categoria_nombre,
+            total_productos: r.total_productos,
+            productos_stock_bajo: r.productos_stock_bajo,
+            ventas_periodo: r.ventas_periodo,
+            score_riesgo: prediction.probability,
+            clase_riesgo: prediction.label === 1 ? 'RIESGO_ALTO' : 'RIESGO_BAJO',
+            probabilidad_riesgo: prediction.probability,
+            importancia_features: null,
+          };
+        })
+        .sort((a, b) => b.score_riesgo - a.score_riesgo);
+    } catch (err) {
+      this.logger.warn(`Fallo al predecir con ML, usando heurística: ${(err as Error).message}`);
+      return rows
+        .map<RiesgoCategoriaType>((r) => ({
+          categoria_id: r.categoria_id,
+          categoria_nombre: r.categoria_nombre,
+          total_productos: r.total_productos,
+          productos_stock_bajo: r.productos_stock_bajo,
+          ventas_periodo: r.ventas_periodo,
+          score_riesgo: r.score_riesgo,
+          clase_riesgo: r.score_riesgo > RISK_CLASS_THRESHOLD ? 'RIESGO_ALTO' : 'RIESGO_BAJO',
+          probabilidad_riesgo: r.score_riesgo,
+          importancia_features: null,
+        }))
+        .sort((a, b) => b.score_riesgo - a.score_riesgo);
+    }
+  }
+
+  private buildFallbackFeatures(
+    r: {
+      total_productos: number;
+      productos_stock_bajo: number;
+      ventas_periodo: number;
+    },
+    datasetRow:
+      | {
+          ratio_stock_bajo: number;
+          ventas_por_producto: number;
+          tendencia_ventas: number;
+          dias_promedio_sin_venta: number;
+        }
+      | undefined,
+  ): CategoryRiskFeatures {
+    return {
+      total_productos: r.total_productos,
+      productos_stock_bajo: r.productos_stock_bajo,
+      ratio_stock_bajo:
+        datasetRow?.ratio_stock_bajo ??
+        (r.total_productos ? r.productos_stock_bajo / r.total_productos : 0),
+      ventas_periodo: r.ventas_periodo,
+      ventas_por_producto:
+        datasetRow?.ventas_por_producto ??
+        (r.total_productos ? r.ventas_periodo / r.total_productos : 0),
+      tendencia_ventas: datasetRow?.tendencia_ventas ?? 0,
+      dias_promedio_sin_venta: datasetRow?.dias_promedio_sin_venta ?? 0,
     };
   }
 

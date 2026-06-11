@@ -121,6 +121,15 @@ export class RiesgoCategoriaType {
 
   @Field(() => Int)
   ventas_periodo!: number;
+
+  @Field()
+  clase_riesgo!: string;
+
+  @Field(() => Float)
+  probabilidad_riesgo!: number;
+
+  @Field(() => [Float], { nullable: true })
+  importancia_features!: number[] | null;
 }
 
 @ObjectType()

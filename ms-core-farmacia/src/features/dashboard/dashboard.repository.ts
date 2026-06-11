@@ -523,6 +523,119 @@ export class DashboardRepository {
     });
   }
 
+  async ventasTendenciaCategoria(filters: {
+    sucursalId?: number;
+    fechaDesde?: string;
+    fechaHasta?: string;
+  }): Promise<Map<number, { recientes: number; previas: number }>> {
+    const fechaFin = filters.fechaHasta ? new Date(filters.fechaHasta) : new Date();
+    const fechaInicioRecientes = new Date(fechaFin);
+    fechaInicioRecientes.setDate(fechaInicioRecientes.getDate() - 30);
+    const fechaInicioPeriodoPrevio = new Date(fechaFin);
+    fechaInicioPeriodoPrevio.setDate(fechaInicioPeriodoPrevio.getDate() - 60);
+    const fechaFinPeriodoPrevio = new Date(fechaFin);
+    fechaFinPeriodoPrevio.setDate(fechaFinPeriodoPrevio.getDate() - 30);
+
+    const inicioRecientesStr = fechaInicioRecientes.toISOString().slice(0, 10);
+    const inicioPrevioStr = fechaInicioPeriodoPrevio.toISOString().slice(0, 10);
+    const finPrevioStr = fechaFinPeriodoPrevio.toISOString().slice(0, 10);
+
+    const recientesQb = this.ventaDetalleRepository
+      .createQueryBuilder('d')
+      .innerJoin('d.venta', 'v')
+      .innerJoin('d.producto', 'p')
+      .innerJoin('p.categoria', 'c')
+      .select('c.id', 'categoria_id')
+      .addSelect('COALESCE(SUM(d.cantidad), 0)', 'total')
+      .where('v.estado = :estado', { estado: 'CONFIRMADA' })
+      .andWhere('v.fecha_venta >= :desde', { desde: inicioRecientesStr })
+      .groupBy('c.id');
+
+    const previosQb = this.ventaDetalleRepository
+      .createQueryBuilder('d')
+      .innerJoin('d.venta', 'v')
+      .innerJoin('d.producto', 'p')
+      .innerJoin('p.categoria', 'c')
+      .select('c.id', 'categoria_id')
+      .addSelect('COALESCE(SUM(d.cantidad), 0)', 'total')
+      .where('v.estado = :estado', { estado: 'CONFIRMADA' })
+      .andWhere('v.fecha_venta >= :desde', { desde: inicioPrevioStr })
+      .andWhere('v.fecha_venta < :hasta', { hasta: finPrevioStr })
+      .groupBy('c.id');
+
+    if (filters.sucursalId) {
+      recientesQb.andWhere('v.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+      previosQb.andWhere('v.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+    }
+
+    const [recientes, previos] = await Promise.all([
+      recientesQb.getRawMany<{ categoria_id: string; total: string }>(),
+      previosQb.getRawMany<{ categoria_id: string; total: string }>(),
+    ]);
+
+    const map = new Map<number, { recientes: number; previas: number }>();
+    for (const r of recientes) {
+      const id = Number(r.categoria_id);
+      map.set(id, { recientes: Number(r.total), previas: 0 });
+    }
+    for (const p of previos) {
+      const id = Number(p.categoria_id);
+      const entry = map.get(id) ?? { recientes: 0, previas: 0 };
+      entry.previas = Number(p.total);
+      map.set(id, entry);
+    }
+    return map;
+  }
+
+  async diasSinVentaPromedioPorCategoria(filters: {
+    sucursalId?: number;
+    rangoDias?: number;
+  }): Promise<Map<number, number>> {
+    const rangoDias = filters.rangoDias ?? 60;
+
+    const qb = this.productoRepository
+      .createQueryBuilder('p')
+      .innerJoin('p.categoria', 'c')
+      .leftJoin(
+        (sub) =>
+          sub
+            .select('d.producto_id', 'producto_id')
+            .addSelect('MAX(v.fecha_venta)', 'ultima_venta')
+            .from(VentaDetalle, 'd')
+            .innerJoin('d.venta', 'v')
+            .where('v.estado = :estado', { estado: 'CONFIRMADA' })
+            .groupBy('d.producto_id'),
+        'uv',
+        'uv.producto_id = p.id',
+      )
+      .select('c.id', 'categoria_id')
+      .addSelect(
+        `AVG(COALESCE(DATE_PART('day', NOW() - uv.ultima_venta::timestamp), ${rangoDias}))`,
+        'dias_promedio',
+      )
+      .groupBy('c.id');
+
+    if (filters.sucursalId) {
+      qb.andWhere('p.sucursal_id = :sucursalId', {
+        sucursalId: filters.sucursalId,
+      });
+    }
+
+    const rows = await qb.getRawMany<{
+      categoria_id: string;
+      dias_promedio: string;
+    }>();
+    const map = new Map<number, number>();
+    for (const r of rows) {
+      map.set(Number(r.categoria_id), Number(r.dias_promedio));
+    }
+    return map;
+  }
+
   private toDateString(value: unknown): string {
     if (value == null) return '';
     if (value instanceof Date) {
