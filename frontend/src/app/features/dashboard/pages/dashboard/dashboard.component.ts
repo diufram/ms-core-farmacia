@@ -125,8 +125,8 @@ interface Tendencia {
                 <div
                     [class]="
                         esSuperAdmin()
-                            ? 'col-span-12 sm:col-span-6 lg:col-span-3'
-                            : 'col-span-12 sm:col-span-6 lg:col-span-4'
+                            ? 'col-span-12 sm:col-span-6 lg:col-span-4'
+                            : 'col-span-12 sm:col-span-6 lg:col-span-6'
                     "
                 >
                     <p-card styleClass="h-full">
@@ -154,8 +154,8 @@ interface Tendencia {
                 <div
                     [class]="
                         esSuperAdmin()
-                            ? 'col-span-12 sm:col-span-6 lg:col-span-3'
-                            : 'col-span-12 sm:col-span-6 lg:col-span-4'
+                            ? 'col-span-12 sm:col-span-6 lg:col-span-4'
+                            : 'col-span-12 sm:col-span-6 lg:col-span-6'
                     "
                 >
                     <p-card styleClass="h-full">
@@ -182,7 +182,7 @@ interface Tendencia {
 
                 <div
                     *ngIf="esSuperAdmin()"
-                    class="col-span-12 sm:col-span-6 lg:col-span-3"
+                    class="col-span-12 sm:col-span-6 lg:col-span-4"
                 >
                     <p-card styleClass="h-full">
                         <div class="flex items-center justify-between">
@@ -250,7 +250,7 @@ interface Tendencia {
                     </p-card>
                 </div>
 
-                <div class="col-span-12 lg:col-span-7">
+                <div class="col-span-12 lg:col-span-6">
                     <p-card>
                         <ng-template pTemplate="header">
                             <div class="px-6 pt-5 pb-2">
@@ -306,135 +306,82 @@ interface Tendencia {
                     </p-card>
                 </div>
 
-                <div class="col-span-12">
+                <!-- === KPI: Clientes frecuentes === -->
+                <div class="col-span-12 lg:col-span-6">
                     <p-card>
                         <ng-template pTemplate="header">
                             <div
                                 class="px-6 pt-5 pb-2 flex items-center justify-between"
                             >
-                                <div>
-                                    <h3
-                                        class="text-lg font-semibold text-color m-0 flex items-center gap-2"
-                                    >
-                                        <i
-                                            class="pi pi-chart-line text-primary"
-                                        ></i>
-                                        Predicción de demanda
-                                        <p-tag
-                                            value="Score ML"
-                                            severity="info"
-                                            [rounded]="true"
-                                            pTooltip="Score compuesto por 4 features: presión de demanda (45%), demanda normalizada (30%), presión de stock (20%) y alerta de stock bajo (5%)"
-                                            tooltipPosition="top"
-                                        />
-                                    </h3>
-                                    <p
-                                        class="text-muted-color text-xs m-0 mt-1"
-                                    >
-                                        Top 5 productos con mayor probabilidad
-                                        de agotarse
-                                        ({{ rangoSeleccionado }} días)
-                                    </p>
-                                </div>
+                                <h3
+                                    class="text-lg font-semibold text-color m-0 flex items-center gap-2"
+                                >
+                                    <i
+                                        class="pi pi-users text-primary"
+                                    ></i>
+                                    Clientes frecuentes
+                                    <p-tag
+                                        value="Score ML"
+                                        severity="info"
+                                        [rounded]="true"
+                                    />
+                                </h3>
                             </div>
                         </ng-template>
                         <p-table
-                            [value]="prediccionesDemanda()"
+                            [value]="data.topClientes"
                             styleClass="p-datatable-sm"
                             [tableStyle]="{ 'min-width': '100%' }"
                         >
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th>Código</th>
-                                    <th>Producto</th>
-                                    <th class="text-right">Vendidos</th>
-                                    <th class="text-right">Stock</th>
-                                    <th class="text-right">
-                                        Días p/ agotar
-                                    </th>
-                                    <th class="text-right">Score</th>
-                                    <th>Riesgo</th>
+                                    <th>Cliente</th>
+                                    <th class="text-right">Ventas</th>
+                                    <th class="text-right">Total</th>
                                 </tr>
                             </ng-template>
                             <ng-template
                                 pTemplate="body"
-                                let-pred
+                                let-cli
                             >
                                 <tr>
                                     <td>
-                                        <span class="font-mono text-sm">
-                                            {{ pred.codigo }}
-                                        </span>
-                                    </td>
-                                    <td>{{ pred.nombre }}</td>
-                                    <td class="text-right">
-                                        {{ pred.cantidad_vendida }}
-                                    </td>
-                                    <td class="text-right">
-                                        {{ pred.stock_actual }}
-                                    </td>
-                                    <td class="text-right">
-                                        {{
-                                            pred.dias_estimados_agotamiento
-                                        }}
-                                    </td>
-                                    <td class="text-right">
+                                        <div class="font-medium text-sm">
+                                            {{
+                                                cli.cliente_nombre ||
+                                                    'Sin nombre'
+                                            }}
+                                        </div>
                                         <div
-                                            class="inline-flex items-center gap-2"
-                                            [pTooltip]="
-                                                tooltipFeatures(pred.features)
-                                            "
-                                            tooltipPosition="left"
+                                            class="text-muted-color text-xs font-mono"
                                         >
-                                            <div
-                                                class="w-24 h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden"
-                                            >
-                                                <div
-                                                    class="h-full transition-all"
-                                                    [style.width.%]="
-                                                        prediccionPorcentaje(
-                                                            pred.score
-                                                        )
-                                                    "
-                                                    [ngClass]="
-                                                        barraFillClasses(
-                                                            pred.nivel_riesgo
-                                                        )
-                                                    "
-                                                ></div>
-                                            </div>
-                                            <span
-                                                class="text-xs font-medium"
-                                            >
-                                                {{
-                                                    prediccionPorcentaje(
-                                                        pred.score
-                                                    )
-                                                }}%
-                                            </span>
+                                            {{
+                                                cli.cliente_codigo || '—'
+                                            }}
                                         </div>
                                     </td>
-                                    <td>
-                                        <p-tag
-                                            [value]="pred.nivel_riesgo"
-                                            [severity]="
-                                                prediccionColor(
-                                                    pred.nivel_riesgo
-                                                )
-                                            "
-                                            [rounded]="true"
-                                        />
+                                    <td class="text-right text-sm">
+                                        {{ cli.cantidad_ventas }}
+                                    </td>
+                                    <td
+                                        class="text-right text-sm font-medium"
+                                    >
+                                        Bs
+                                        {{
+                                            cli.total_comprado
+                                                | number: '1.2-2'
+                                        }}
                                     </td>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="emptymessage">
                                 <tr>
                                     <td
-                                        colspan="7"
-                                        class="text-center text-muted-color py-4"
+                                        colspan="3"
+                                        class="text-center text-muted-color py-4 text-sm"
                                     >
-                                        Sin datos suficientes para predecir
-                                        demanda.
+                                        Sin clientes frecuentes en el
+                                        período.
                                     </td>
                                 </tr>
                             </ng-template>
@@ -442,8 +389,8 @@ interface Tendencia {
                     </p-card>
                 </div>
 
-                <!-- === KPI 1: Tendencia de ventas === -->
-                <div *ngIf="tendencia() as t" class="col-span-12 lg:col-span-4">
+                <!-- === KPI: Tendencia de ventas === -->
+                <div *ngIf="tendencia() as t" class="col-span-12 lg:col-span-6">
                     <p-card styleClass="h-full">
                         <ng-template pTemplate="header">
                             <div
@@ -583,91 +530,8 @@ interface Tendencia {
                     </p-card>
                 </div>
 
-                <!-- === KPI 2: Top clientes frecuentes === -->
-                <div class="col-span-12 lg:col-span-4">
-                    <p-card>
-                        <ng-template pTemplate="header">
-                            <div
-                                class="px-6 pt-5 pb-2 flex items-center justify-between"
-                            >
-                                <h3
-                                    class="text-lg font-semibold text-color m-0 flex items-center gap-2"
-                                >
-                                    <i
-                                        class="pi pi-users text-primary"
-                                    ></i>
-                                    Clientes frecuentes
-                                    <p-tag
-                                        value="Score ML"
-                                        severity="info"
-                                        [rounded]="true"
-                                    />
-                                </h3>
-                            </div>
-                        </ng-template>
-                        <p-table
-                            [value]="data.topClientes"
-                            styleClass="p-datatable-sm"
-                            [tableStyle]="{ 'min-width': '100%' }"
-                        >
-                            <ng-template pTemplate="header">
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th class="text-right">Ventas</th>
-                                    <th class="text-right">Total</th>
-                                </tr>
-                            </ng-template>
-                            <ng-template
-                                pTemplate="body"
-                                let-cli
-                            >
-                                <tr>
-                                    <td>
-                                        <div class="font-medium text-sm">
-                                            {{
-                                                cli.cliente_nombre ||
-                                                    'Sin nombre'
-                                            }}
-                                        </div>
-                                        <div
-                                            class="text-muted-color text-xs font-mono"
-                                        >
-                                            {{
-                                                cli.cliente_codigo || '—'
-                                            }}
-                                        </div>
-                                    </td>
-                                    <td class="text-right text-sm">
-                                        {{ cli.cantidad_ventas }}
-                                    </td>
-                                    <td
-                                        class="text-right text-sm font-medium"
-                                    >
-                                        Bs
-                                        {{
-                                            cli.total_comprado
-                                                | number: '1.2-2'
-                                        }}
-                                    </td>
-                                </tr>
-                            </ng-template>
-                            <ng-template pTemplate="emptymessage">
-                                <tr>
-                                    <td
-                                        colspan="3"
-                                        class="text-center text-muted-color py-4 text-sm"
-                                    >
-                                        Sin clientes frecuentes en el
-                                        período.
-                                    </td>
-                                </tr>
-                            </ng-template>
-                        </p-table>
-                    </p-card>
-                </div>
-
-                <!-- === KPI 3: Riesgo de stock por categoría === -->
-                <div class="col-span-12 lg:col-span-4">
+                <!-- === KPI: Riesgo de stock por categoría === -->
+                <div class="col-span-12 lg:col-span-6">
                     <p-card>
                         <ng-template pTemplate="header">
                             <div
@@ -776,6 +640,142 @@ interface Tendencia {
                                         class="text-center text-muted-color py-4 text-sm"
                                     >
                                         Sin categorías registradas.
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </p-card>
+                </div>
+
+                <div class="col-span-12">
+                    <p-card>
+                        <ng-template pTemplate="header">
+                            <div
+                                class="px-6 pt-5 pb-2 flex items-center justify-between"
+                            >
+                                <div>
+                                    <h3
+                                        class="text-lg font-semibold text-color m-0 flex items-center gap-2"
+                                    >
+                                        <i
+                                            class="pi pi-chart-line text-primary"
+                                        ></i>
+                                        Predicción de demanda
+                                        <p-tag
+                                            value="Score ML"
+                                            severity="info"
+                                            [rounded]="true"
+                                            pTooltip="Score compuesto por 4 features: presión de demanda (45%), demanda normalizada (30%), presión de stock (20%) y alerta de stock bajo (5%)"
+                                            tooltipPosition="top"
+                                        />
+                                    </h3>
+                                    <p
+                                        class="text-muted-color text-xs m-0 mt-1"
+                                    >
+                                        Top 5 productos con mayor probabilidad
+                                        de agotarse
+                                        ({{ rangoSeleccionado }} días)
+                                    </p>
+                                </div>
+                            </div>
+                        </ng-template>
+                        <p-table
+                            [value]="prediccionesDemanda()"
+                            styleClass="p-datatable-sm"
+                            [tableStyle]="{ 'min-width': '100%' }"
+                        >
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Producto</th>
+                                    <th class="text-right">Vendidos</th>
+                                    <th class="text-right">Stock</th>
+                                    <th class="text-right">
+                                        Días p/ agotar
+                                    </th>
+                                    <th class="text-right">Score</th>
+                                    <th>Riesgo</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template
+                                pTemplate="body"
+                                let-pred
+                            >
+                                <tr>
+                                    <td>
+                                        <span class="font-mono text-sm">
+                                            {{ pred.codigo }}
+                                        </span>
+                                    </td>
+                                    <td>{{ pred.nombre }}</td>
+                                    <td class="text-right">
+                                        {{ pred.cantidad_vendida }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{ pred.stock_actual }}
+                                    </td>
+                                    <td class="text-right">
+                                        {{
+                                            pred.dias_estimados_agotamiento
+                                        }}
+                                    </td>
+                                    <td class="text-right">
+                                        <div
+                                            class="inline-flex items-center gap-2"
+                                            [pTooltip]="
+                                                tooltipFeatures(pred.features)
+                                            "
+                                            tooltipPosition="left"
+                                        >
+                                            <div
+                                                class="w-24 h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden"
+                                            >
+                                                <div
+                                                    class="h-full transition-all"
+                                                    [style.width.%]="
+                                                        prediccionPorcentaje(
+                                                            pred.score
+                                                        )
+                                                    "
+                                                    [ngClass]="
+                                                        barraFillClasses(
+                                                            pred.nivel_riesgo
+                                                        )
+                                                    "
+                                                ></div>
+                                            </div>
+                                            <span
+                                                class="text-xs font-medium"
+                                            >
+                                                {{
+                                                    prediccionPorcentaje(
+                                                        pred.score
+                                                    )
+                                                }}%
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p-tag
+                                            [value]="pred.nivel_riesgo"
+                                            [severity]="
+                                                prediccionColor(
+                                                    pred.nivel_riesgo
+                                                )
+                                            "
+                                            [rounded]="true"
+                                        />
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td
+                                        colspan="7"
+                                        class="text-center text-muted-color py-4"
+                                    >
+                                        Sin datos suficientes para predecir
+                                        demanda.
                                     </td>
                                 </tr>
                             </ng-template>
