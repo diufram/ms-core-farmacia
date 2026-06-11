@@ -50,6 +50,9 @@ export class Venta extends BaseEntity {
   @Column({ type: 'varchar', length: 60, nullable: true })
   cliente_codigo?: string | null;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  tx_hash?: string | null;
+
   @OneToMany(() => VentaDetalle, (detalle) => detalle.venta)
   detalles!: VentaDetalle[];
 }

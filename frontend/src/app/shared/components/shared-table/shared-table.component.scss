@@ -176,11 +176,11 @@
 
         .cell-actions .cell-content {
             display: flex;
-            justify-content: flex-start;
+            justify-content: flex-end;
         }
 
         .action-buttons {
-            justify-content: flex-start;
+            justify-content: flex-end;
             gap: 0.35rem;
         }
 
@@ -218,6 +218,32 @@
 
         .image-placeholder i {
             font-size: 1.25rem;
+        }
+
+        .status-progressive-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            
+            /* En móvil, mostramos las acciones siempre */
+            @media screen and (max-width: 959px) {
+                .progressive-actions-hover {
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                }
+            }
+        }
+
+        .progressive-actions-hover {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .status-progressive-container:hover .progressive-actions-hover {
+            opacity: 1;
+            visibility: visible;
         }
     }
 

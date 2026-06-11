@@ -7,6 +7,7 @@ import {
     DELETE_VENTA_MUTATION,
     VENTA_QUERY,
     VENTAS_QUERY,
+    VERIFICAR_INTEGRIDAD_QUERY,
 } from '../graphql/ventas.operations';
 import {
     CreateVentaInput,
@@ -132,6 +133,18 @@ export class VentasService {
                     }
                     return res.data.deleteVenta;
                 }),
+            );
+    }
+
+    verificarIntegridad(id: number): Observable<{ isVerified: boolean; currentHash: string; blockchainHash: string }> {
+        return this.apollo
+            .query<any>({
+                query: VERIFICAR_INTEGRIDAD_QUERY,
+                variables: { id },
+                fetchPolicy: 'network-only',
+            })
+            .pipe(
+                map((res) => res.data.verificarIntegridadVenta),
             );
     }
 }

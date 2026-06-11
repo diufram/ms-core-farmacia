@@ -29,7 +29,7 @@ export interface RowAction {
   key: string;
   icon: string;
   tooltip?: string;
-  visible?: boolean; // 👈 CRUCIAL: Propiedad para ocultar/mostrar
+  visible?: boolean | ((row: any) => boolean); // 👈 Modified to accept a function
   severity?: 'success' | 'info' | 'warn' | 'danger' | 'help' | 'primary' | 'secondary' | 'contrast'; 
 }
 

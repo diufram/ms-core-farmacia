@@ -13,13 +13,15 @@ import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { VentasRepository } from './ventas.repository';
 import { NotificationsService } from '../notifications/notifications.service';
+import { BlockchainService } from '../blockchain/blockchain.service';
+import { ethers } from 'ethers';
 
-type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'COMPLETADA' | 'RECHAZADA';
+type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'CONFIRMADA' | 'RECHAZADA';
 
 const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
   PENDIENTE: ['PREPARADA', 'RECHAZADA'],
-  PREPARADA: ['COMPLETADA', 'RECHAZADA'],
-  COMPLETADA: [],
+  PREPARADA: ['CONFIRMADA', 'RECHAZADA'],
+  CONFIRMADA: [],
   RECHAZADA: [],
 };
 
@@ -29,6 +31,7 @@ export class VentasService {
     private readonly dataSource: DataSource,
     private readonly ventasRepository: VentasRepository,
     private readonly notificationsService: NotificationsService,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   async findAll(
@@ -216,12 +219,25 @@ export class VentasService {
         `¡Tu pedido #${venta.id} está listo!`,
         `Tu pedido ha sido preparado en ${venta.sucursal.nombre} y está listo para ser recogido.`,
       );
-    } else if (nuevoEstado === 'COMPLETADA') {
+    } else if (nuevoEstado === 'CONFIRMADA') {
       await this.notificationsService.sendPushToUser(
         venta.usuario.id,
         `¡Pedido #${venta.id} completado!`,
         `Tu pedido en ${venta.sucursal.nombre} ha sido pagado y recogido. ¡Gracias por tu compra!`,
       );
+
+      try {
+        const saleData = this.getSaleDataPayload(venta);
+        const txHash = await this.blockchainService.registerSaleOnChain(venta.numero_venta, saleData);
+        if (txHash) {
+          venta.tx_hash = txHash;
+          // Update outside the transaction is fine here since it's just appending the hash
+          await this.dataSource.getRepository(Venta).update(venta.id, { tx_hash: txHash });
+        }
+      } catch (error) {
+        // Log but don't throw, we don't want to fail the completion if blockchain fails
+        console.error('Failed to register sale on blockchain', error);
+      }
     }
 
     const reloaded = await this.ventasRepository.findById(id);
@@ -251,6 +267,36 @@ export class VentasService {
     return {
       venta: snapshot,
       message: 'Venta eliminada correctamente.',
+    };
+  }
+
+  async verificarIntegridad(id: number, userRol: string, userSucursalId: number | null, userId: number) {
+    const venta = await this.ventasRepository.findById(id);
+    if (!venta) {
+      throw new NotFoundException('Venta no encontrada.');
+    }
+    this.assertCanViewVenta(venta, userRol, userSucursalId, userId);
+
+    if (!venta.tx_hash) {
+      throw new BadRequestException('Esta venta no tiene un registro en la blockchain.');
+    }
+
+    // Recalculate local hash
+    const saleData = this.getSaleDataPayload(venta);
+    const dataBytes = ethers.toUtf8Bytes(saleData);
+    const localHash = ethers.keccak256(dataBytes);
+
+    // Fetch blockchain hash
+    const blockchainHash = await this.blockchainService.getSaleHashOnChain(venta.numero_venta);
+    if (!blockchainHash) {
+      throw new BadRequestException('No se pudo obtener el hash de la blockchain o no está registrado.');
+    }
+
+    const isVerified = localHash === blockchainHash;
+    return {
+      isVerified,
+      currentHash: localHash,
+      blockchainHash,
     };
   }
 
@@ -335,6 +381,7 @@ export class VentasService {
       cliente_nombre: venta.cliente_nombre ?? null,
       cliente_celular: venta.cliente_celular ?? null,
       cliente_codigo: venta.cliente_codigo ?? null,
+      tx_hash: venta.tx_hash ?? null,
       detalles:
         venta.detalles?.map((d) => ({
           id: d.id,
@@ -345,5 +392,15 @@ export class VentasService {
           subtotal: Number(d.precio_unitario) * d.cantidad,
         })) ?? [],
     };
+  }
+
+  private getSaleDataPayload(venta: Venta): string {
+    return JSON.stringify({
+      id: venta.id,
+      numero: venta.numero_venta,
+      total: venta.total,
+      fecha: venta.fecha_venta,
+      cliente: venta.cliente_nombre ?? venta.usuario?.persona?.nombre ?? 'Cliente',
+    });
   }
 }

@@ -8,6 +8,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { DatePickerModule } from 'primeng/datepicker';
+import { DialogModule } from 'primeng/dialog';
 import { SelectButtonModule } from 'primeng/selectbutton';
 
 import { SharedTableComponent } from '@/shared/components/shared-table/shared-table.component';
@@ -25,8 +26,8 @@ import { EstadoVenta, Venta } from '../../models/venta.interface';
 
 const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
     PENDIENTE: ['PREPARADA', 'RECHAZADA'],
-    PREPARADA: ['COMPLETADA', 'RECHAZADA'],
-    COMPLETADA: [],
+    PREPARADA: ['CONFIRMADA', 'RECHAZADA'],
+    CONFIRMADA: [],
     RECHAZADA: [],
 };
 
@@ -43,6 +44,7 @@ const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
         DatePickerModule,
         SelectButtonModule,
         SharedTableComponent,
+        DialogModule,
     ],
     providers: [ConfirmationService],
     template: `
@@ -52,6 +54,7 @@ const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
                 [columns]="columns"
                 [rowActions]="rowActions"
                 [loading]="loading()"
+                [updatingId]="updatingId()"
                 [searchFields]="['numero_venta', 'estado', 'cliente_nombre']"
                 [title]="esCliente() ? 'Mis Pedidos' : 'Ventas'"
                 dataKey="id"
@@ -112,6 +115,43 @@ const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
                 />
             </app-shared-table>
             <p-confirmDialog />
+            
+            <p-dialog header="Verificación de Blockchain" [(visible)]="verifyDialogVisible" [modal]="true" [style]="{ width: '450px' }">
+                <div *ngIf="isVerifying()" class="flex flex-col items-center justify-center py-5">
+                    <i class="pi pi-spin pi-spinner text-4xl text-primary mb-3"></i>
+                    <p class="m-0 text-color-secondary">Verificando criptográficamente en la blockchain...</p>
+                </div>
+                
+                <div *ngIf="!isVerifying() && verificationResult()" class="py-3">
+                    <div *ngIf="verificationResult()?.isVerified" class="flex flex-col items-center">
+                        <i class="pi pi-check-circle text-green-500 text-6xl mb-3"></i>
+                        <h3 class="text-green-500 font-bold text-xl m-0 mb-2">¡Integridad Verificada!</h3>
+                        <p class="text-center text-color-secondary m-0 mb-4">Los datos de esta venta coinciden exactamente con el registro inmutable en la blockchain.</p>
+                        
+                        <div class="w-full bg-gray-100 dark:bg-gray-800 p-3 rounded-lg text-xs break-all">
+                            <span class="font-bold text-color block mb-1">Hash Almacenado:</span>
+                            <span class="text-color-secondary block mb-3">{{ verificationResult()?.blockchainHash }}</span>
+                            
+                            <span class="font-bold text-color block mb-1">Hash Actual:</span>
+                            <span class="text-color-secondary">{{ verificationResult()?.currentHash }}</span>
+                        </div>
+                    </div>
+                    
+                    <div *ngIf="!verificationResult()?.isVerified" class="flex flex-col items-center">
+                        <i class="pi pi-times-circle text-red-500 text-6xl mb-3"></i>
+                        <h3 class="text-red-500 font-bold text-xl m-0 mb-2">¡Alerta de Manipulación!</h3>
+                        <p class="text-center text-color-secondary m-0 mb-4">Los datos de esta venta en la base de datos han sido alterados y ya no coinciden con el registro original de la blockchain.</p>
+                        
+                        <div class="w-full bg-red-50 dark:bg-red-900/20 p-3 rounded-lg text-xs break-all border border-red-200 dark:border-red-800">
+                            <span class="font-bold text-red-700 dark:text-red-400 block mb-1">Hash Original (Blockchain):</span>
+                            <span class="text-red-600 dark:text-red-300 block mb-3">{{ verificationResult()?.blockchainHash }}</span>
+                            
+                            <span class="font-bold text-red-700 dark:text-red-400 block mb-1">Hash Alterado (Base de Datos):</span>
+                            <span class="text-red-600 dark:text-red-300">{{ verificationResult()?.currentHash }}</span>
+                        </div>
+                    </div>
+                </div>
+            </p-dialog>
         </div>
     `,
 })
@@ -129,6 +169,11 @@ export class VentasListComponent implements OnInit {
     filtroSucursalId: number | null = null;
     filtroFechaDesde: Date | null = null;
     filtroFechaHasta: Date | null = null;
+
+    verifyDialogVisible = signal<boolean>(false);
+    isVerifying = signal<boolean>(false);
+    verificationResult = signal<{isVerified: boolean; currentHash: string; blockchainHash: string} | null>(null);
+    updatingId = signal<number | null>(null);
 
     columns: TableColumn[] = [
         {
@@ -233,6 +278,10 @@ export class VentasListComponent implements OnInit {
             this.verDetalle(event.data);
         } else if (event.action === 'delete') {
             this.confirmarEliminar(event.data);
+        } else if (event.action === 'verify') {
+            this.verificarIntegridad(event.data);
+        } else if (event.action === 'etherscan') {
+            window.open(`https://sepolia.etherscan.io/tx/${event.data.tx_hash}`, '_blank');
         }
     }
 
@@ -252,14 +301,30 @@ export class VentasListComponent implements OnInit {
                 icon: 'pi pi-trash',
                 tooltip: 'Eliminar',
                 severity: 'danger',
+                visible: (row: Venta) => row.estado === 'PENDIENTE' || row.estado === 'RECHAZADA'
             });
         }
+        
+        actions.push({
+            key: 'etherscan',
+            icon: 'pi pi-link',
+            tooltip: 'Ver en Blockchain',
+            severity: 'help',
+            visible: (row: Venta) => !!row.tx_hash
+        });
+        
+        actions.push({
+            key: 'verify',
+            icon: 'pi pi-shield',
+            tooltip: 'Verificar Integridad',
+            severity: 'success',
+            visible: (row: Venta) => !!row.tx_hash
+        });
+
         this.rowActions = actions;
     }
 
     isActionVisible(action: string, venta: Venta): boolean {
-        if (action === 'delete')
-            return venta.estado === 'PENDIENTE' || venta.estado === 'RECHAZADA';
         return true;
     }
 
@@ -268,13 +333,13 @@ export class VentasListComponent implements OnInit {
         const todas: EstadoVenta[] = [
             'PENDIENTE',
             'PREPARADA',
-            'COMPLETADA',
+            'CONFIRMADA',
             'RECHAZADA',
         ];
         const labelMap: Record<EstadoVenta, string> = {
             PENDIENTE: 'Pendiente',
             PREPARADA: 'Preparada',
-            COMPLETADA: 'Completada',
+            CONFIRMADA: 'Confirmada',
             RECHAZADA: 'Rechazada',
         };
         return todas.map((estado) => ({
@@ -305,7 +370,7 @@ export class VentasListComponent implements OnInit {
         const mensajes: Record<EstadoVenta, string> = {
             PENDIENTE: 'volver a pendiente',
             PREPARADA: 'preparar',
-            COMPLETADA: 'completar',
+            CONFIRMADA: 'confirmar',
             RECHAZADA: 'rechazar',
         };
         this.confirmation.confirm({
@@ -319,12 +384,17 @@ export class VentasListComponent implements OnInit {
     }
 
     private cambiarEstado(v: Venta, nuevoEstado: EstadoVenta): void {
+        this.updatingId.set(v.id);
         this.ventasService.cambiarEstado(v.id, nuevoEstado).subscribe({
             next: (res) => {
                 this.toast.success(res.message);
+                this.updatingId.set(null);
                 this.cargar();
             },
-            error: (err) => this.toast.error(err, 'Error al cambiar el estado'),
+            error: (err) => {
+                this.toast.error(err, 'Error al cambiar el estado');
+                this.updatingId.set(null);
+            },
         });
     }
 
@@ -347,6 +417,24 @@ export class VentasListComponent implements OnInit {
                 this.cargar();
             },
             error: (err) => this.toast.error(err),
+        });
+    }
+
+    private verificarIntegridad(v: Venta): void {
+        this.isVerifying.set(true);
+        this.verifyDialogVisible.set(true);
+        this.verificationResult.set(null);
+        
+        this.ventasService.verificarIntegridad(v.id).subscribe({
+            next: (res) => {
+                this.verificationResult.set(res);
+                this.isVerifying.set(false);
+            },
+            error: (err) => {
+                this.toast.error(err, 'Error de Verificación');
+                this.isVerifying.set(false);
+                this.verifyDialogVisible.set(false);
+            }
         });
     }
 

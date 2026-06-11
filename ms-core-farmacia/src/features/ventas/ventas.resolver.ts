@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
 import { Rol } from '../../database/entities/usuario.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -10,6 +10,7 @@ import { CreateVentaDto } from './dto/create-venta.dto';
 import {
   VentaPayloadType,
   VentaType,
+  VentaVerificationType,
 } from './graphql/ventas.types';
 import { VentasService } from './ventas.service';
 
@@ -80,10 +81,25 @@ export class VentasResolver {
   @Mutation(() => VentaPayloadType)
   @UseGuards(RolesGuard)
   @Roles(Rol.SUPER_ADMIN, Rol.ADMIN)
-  deleteVenta(
-    @CurrentUser() user: JwtPayload,
+  async deleteVenta(
     @Args('id', { type: () => Int }) id: number,
+    @Context() context: any,
   ) {
+    const user = context.req.user;
     return this.ventasService.delete(id, user.rol, user.sucursal_id);
+  }
+
+  @Query(() => VentaVerificationType)
+  async verificarIntegridadVenta(
+    @Args('id', { type: () => Int }) id: number,
+    @Context() context: any,
+  ) {
+    const user = context.req.user;
+    return this.ventasService.verificarIntegridad(
+      id,
+      user.rol,
+      user.sucursal_id,
+      user.userId,
+    );
   }
 }

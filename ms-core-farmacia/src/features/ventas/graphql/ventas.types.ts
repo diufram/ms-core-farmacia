@@ -56,8 +56,23 @@ export class VentaType {
   @Field(() => String, { nullable: true })
   cliente_codigo?: string | null;
 
+  @Field(() => String, { nullable: true })
+  tx_hash?: string | null;
+
   @Field(() => [VentaDetalleType])
   detalles!: VentaDetalleType[];
+}
+
+@ObjectType()
+export class VentaVerificationType {
+  @Field(() => Boolean)
+  isVerified!: boolean;
+
+  @Field(() => String)
+  currentHash!: string;
+
+  @Field(() => String)
+  blockchainHash!: string;
 }
 
 @ObjectType()

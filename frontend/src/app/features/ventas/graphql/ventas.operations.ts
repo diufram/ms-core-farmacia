@@ -21,6 +21,7 @@ const VENTA_FIELDS = `
     cliente_nombre
     cliente_celular
     cliente_codigo
+    tx_hash
     detalles {
         ${VENTA_DETALLE_FIELDS}
     }
@@ -72,6 +73,16 @@ export const DELETE_VENTA_MUTATION = gql`
                 id
                 numero_venta
             }
+        }
+    }
+`;
+
+export const VERIFICAR_INTEGRIDAD_QUERY = gql`
+    query VerificarIntegridadVenta($id: Int!) {
+        verificarIntegridadVenta(id: $id) {
+            isVerified
+            currentHash
+            blockchainHash
         }
     }
 `;

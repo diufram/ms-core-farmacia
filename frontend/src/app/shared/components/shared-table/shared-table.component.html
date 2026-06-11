@@ -100,18 +100,43 @@
                                     [rounded]="true"></p-tag>
                             </div>
                             <div *ngSwitchCase="'selectbutton'">
-                                <p-selectbutton
-                                    [ngModel]="item[col.field]"
-                                    [options]="resolveSelectOptions(col, item)"
-                                    optionDisabled="disabled"
-                                    [allowEmpty]="false"
-                                    size="small"
-                                    (onChange)="emitCellChange(col.field, $event.value, item)"
-                                />
+                                <ng-container *ngIf="updatingId === item.id; else buttonsTpl">
+                                    <div class="flex items-center gap-2">
+                                        <i class="pi pi-spin pi-spinner text-primary text-lg"></i>
+                                        <span class="text-xs text-color-secondary">Actualizando...</span>
+                                    </div>
+                                </ng-container>
+                                
+                                <ng-template #buttonsTpl>
+                                    <div class="status-progressive-container flex items-center gap-2">
+                                        <p-tag [value]="item[col.field]" [severity]="getSeverity(item[col.field])" [rounded]="true"></p-tag>
+                                        
+                                        <div class="progressive-actions-hover flex items-center gap-1" *ngIf="item[col.field] === 'PENDIENTE' || item[col.field] === 'PREPARADA'">
+                                            <p-button 
+                                                [icon]="item[col.field] === 'PENDIENTE' ? 'pi pi-cog' : 'pi pi-check'" 
+                                                [severity]="item[col.field] === 'PENDIENTE' ? 'warn' : 'success'" 
+                                                [text]="true" 
+                                                [rounded]="true"
+                                                [pTooltip]="item[col.field] === 'PENDIENTE' ? 'Preparar pedido' : 'Confirmar pedido'" 
+                                                tooltipPosition="top"
+                                                (onClick)="emitCellChange(col.field, item[col.field] === 'PENDIENTE' ? 'PREPARADA' : 'CONFIRMADA', item)">
+                                            </p-button>
+                                            <p-button 
+                                                icon="pi pi-times" 
+                                                severity="danger" 
+                                                [text]="true" 
+                                                [rounded]="true"
+                                                pTooltip="Rechazar pedido" 
+                                                tooltipPosition="top"
+                                                (onClick)="emitCellChange(col.field, 'RECHAZADA', item)">
+                                            </p-button>
+                                        </div>
+                                    </div>
+                                </ng-template>
                             </div>
                             <div *ngSwitchCase="'actions'" class="flex gap-2 action-buttons">
                                 <ng-container *ngFor="let action of rowActions">
-                                    <p-button *ngIf="action.visible !== false" [icon]="action.icon"
+                                    <p-button *ngIf="resolveActionVisible(action, item)" [icon]="action.icon"
                                         [severity]="action.severity" [text]="true" [rounded]="true"
                                         [pTooltip]="action.tooltip" tooltipPosition="top"
                                         (onClick)="emitAction(action.key, item)">

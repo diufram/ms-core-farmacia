@@ -7,7 +7,7 @@ export interface VentaDetalle {
     subtotal: number;
 }
 
-export type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'COMPLETADA' | 'RECHAZADA';
+export type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'CONFIRMADA' | 'RECHAZADA';
 
 export interface Venta {
     id: number;
@@ -19,9 +19,10 @@ export interface Venta {
     usuario_id: number | null;
     cliente_id?: never;
     cliente_walk_in: boolean;
-    cliente_nombre: string | null;
-    cliente_celular: string | null;
-    cliente_codigo: string | null;
+    cliente_nombre?: string | null;
+    cliente_celular?: string | null;
+    cliente_codigo?: string | null;
+    tx_hash?: string | null;
     detalles: VentaDetalle[];
 }
 

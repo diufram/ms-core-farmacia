@@ -14,6 +14,7 @@ import { SucursalesModule } from './features/sucursales/sucursales.module';
 import { UsuariosModule } from './features/usuarios/usuarios.module';
 import { VentasModule } from './features/ventas/ventas.module';
 import { NotificationsModule } from './features/notifications/notifications.module';
+import { BlockchainModule } from './features/blockchain/blockchain.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { NotificationsModule } from './features/notifications/notifications.modu
     VentasModule,
     DashboardModule,
     NotificationsModule,
+    BlockchainModule,
   ],
 })
 export class AppModule {}

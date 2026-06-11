@@ -17,6 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { SelectModule } from 'primeng/select';
 import {
     TableColumn,
     RowAction,
@@ -42,6 +43,7 @@ import { SkeletonModule } from 'primeng/skeleton';
         RatingModule,
         SkeletonModule,
         SelectButtonModule,
+        SelectModule,
     ],
     templateUrl: './shared-table.component.html',
     styleUrl: './shared-table.component.scss',
@@ -76,6 +78,7 @@ export class SharedTableComponent {
     @Input() skeletonItemTemplate: TemplateRef<any> | null = null; // Template para skeleton items
 
     // --- Paginación Lazy ---
+    @Input() updatingId: number | null = null; // ID del registro que se está actualizando (para spinner)
     @Input() totalRecords: number = 0; // Total de registros (del backend)
     @Input() lazyLoad: boolean = false; // Habilitar carga lazy
     @Output() onPageChange = new EventEmitter<{ first: number; rows: number }>();
@@ -86,7 +89,7 @@ export class SharedTableComponent {
         return this.columns
             .map((col) => {
                 const type = col.type || 'text';
-                if (type === 'actions') return 'max-content';
+                if (type === 'actions') return '180px';
                 if (type === 'image') return '96px';
                 if (type === 'tag') return 'minmax(140px, 0.8fr)';
                 return 'minmax(160px, 1fr)';
@@ -162,6 +165,13 @@ export class SharedTableComponent {
             : col.selectOptions;
     }
 
+    resolveActionVisible(action: RowAction, item: any): boolean {
+        if (typeof action.visible === 'function') {
+            return action.visible(item);
+        }
+        return action.visible !== false;
+    }
+
     // Emitir cambio de celda (para selectbutton, etc.)
     emitCellChange(field: string, value: any, data: any) {
         this.cellChange.emit({ field, value, data });
@@ -185,9 +195,9 @@ export class SharedTableComponent {
         | 'contrast'
         | undefined {
         const s = status?.toString().toUpperCase();
-        if (['ACTIVO', 'INSTOCK', 'VERIFIED'].includes(s)) return 'success';
-        if (['PENDIENTE', 'LOWSTOCK'].includes(s)) return 'warn';
-        if (['INACTIVO', 'OUTOFSTOCK', 'DELETED'].includes(s)) return 'danger';
+        if (['ACTIVO', 'INSTOCK', 'VERIFIED', 'CONFIRMADA'].includes(s)) return 'success';
+        if (['PENDIENTE', 'LOWSTOCK', 'PREPARADA'].includes(s)) return 'warn';
+        if (['INACTIVO', 'OUTOFSTOCK', 'DELETED', 'RECHAZADA'].includes(s)) return 'danger';
         return 'info';
     }
 }

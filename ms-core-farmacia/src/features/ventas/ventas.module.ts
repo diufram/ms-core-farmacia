@@ -6,11 +6,13 @@ import { VentasRepository } from './ventas.repository';
 import { VentasResolver } from './ventas.resolver';
 import { VentasService } from './ventas.service';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Venta, Producto]),
     NotificationsModule,
+    BlockchainModule,
   ],
   providers: [VentasService, VentasRepository, VentasResolver],
 })
