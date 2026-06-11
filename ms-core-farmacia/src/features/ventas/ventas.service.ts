@@ -55,12 +55,7 @@ export class VentasService {
     return ventas.map((v) => this.serializeVenta(v));
   }
 
-  async findOne(
-    id: number,
-    userRol: string,
-    userSucursalId: number | null,
-    userId: number,
-  ) {
+  async findOne(id: number, userRol: string, userSucursalId: number | null, userId: number) {
     const venta = await this.ventasRepository.findById(id);
     if (!venta) {
       throw new NotFoundException('Venta no encontrada.');
@@ -115,8 +110,7 @@ export class VentasService {
     for (const detalle of dto.detalles) {
       const producto = productos.find((p) => p.id === detalle.productoId);
       if (!producto) continue;
-      const precioUnitario =
-        detalle.precioUnitario ?? Number(producto.precio_venta);
+      const precioUnitario = detalle.precioUnitario ?? Number(producto.precio_venta);
       total += precioUnitario * detalle.cantidad;
     }
 
@@ -138,8 +132,7 @@ export class VentasService {
       for (const detalle of dto.detalles) {
         const producto = productos.find((p) => p.id === detalle.productoId);
         if (!producto) continue;
-        const precioUnitario =
-          detalle.precioUnitario ?? Number(producto.precio_venta);
+        const precioUnitario = detalle.precioUnitario ?? Number(producto.precio_venta);
         const detalleEntity = manager.create(VentaDetalle, {
           venta: ventaGuardada,
           producto: { id: producto.id } as VentaDetalle['producto'],
@@ -177,16 +170,12 @@ export class VentasService {
     }
 
     if (userRol === Rol.ADMIN && venta.sucursal.id !== userSucursalId) {
-      throw new ForbiddenException(
-        'Solo puede cambiar el estado de ventas de su propia sucursal.',
-      );
+      throw new ForbiddenException('Solo puede cambiar el estado de ventas de su propia sucursal.');
     }
 
     const estadoActual = (venta.estado ?? 'PENDIENTE') as EstadoVenta;
     if (!TRANSICIONES_VALIDAS[estadoActual]?.includes(nuevoEstado)) {
-      throw new BadRequestException(
-        `No se puede cambiar de ${estadoActual} a ${nuevoEstado}.`,
-      );
+      throw new BadRequestException(`No se puede cambiar de ${estadoActual} a ${nuevoEstado}.`);
     }
 
     await this.dataSource.transaction(async (manager) => {
@@ -228,7 +217,10 @@ export class VentasService {
 
       try {
         const saleData = this.getSaleDataPayload(venta);
-        const txHash = await this.blockchainService.registerSaleOnChain(venta.numero_venta, saleData);
+        const txHash = await this.blockchainService.registerSaleOnChain(
+          venta.numero_venta,
+          saleData,
+        );
         if (txHash) {
           venta.tx_hash = txHash;
           // Update outside the transaction is fine here since it's just appending the hash
@@ -249,18 +241,14 @@ export class VentasService {
 
   async delete(id: number, userRol: string, userSucursalId: number | null) {
     if (userRol !== Rol.SUPER_ADMIN && userRol !== Rol.ADMIN) {
-      throw new ForbiddenException(
-        'Solo super admin o admin pueden eliminar ventas.',
-      );
+      throw new ForbiddenException('Solo super admin o admin pueden eliminar ventas.');
     }
     const venta = await this.ventasRepository.findById(id);
     if (!venta) {
       throw new NotFoundException('Venta no encontrada.');
     }
     if (userRol === Rol.ADMIN && venta.sucursal.id !== userSucursalId) {
-      throw new ForbiddenException(
-        'Solo puede eliminar ventas de su propia sucursal.',
-      );
+      throw new ForbiddenException('Solo puede eliminar ventas de su propia sucursal.');
     }
     const snapshot = this.serializeVenta(venta);
     await this.ventasRepository.softDelete(id);
@@ -270,7 +258,12 @@ export class VentasService {
     };
   }
 
-  async verificarIntegridad(id: number, userRol: string, userSucursalId: number | null, userId: number) {
+  async verificarIntegridad(
+    id: number,
+    userRol: string,
+    userSucursalId: number | null,
+    userId: number,
+  ) {
     const venta = await this.ventasRepository.findById(id);
     if (!venta) {
       throw new NotFoundException('Venta no encontrada.');
@@ -289,7 +282,9 @@ export class VentasService {
     // Fetch blockchain hash
     const blockchainHash = await this.blockchainService.getSaleHashOnChain(venta.numero_venta);
     if (!blockchainHash) {
-      throw new BadRequestException('No se pudo obtener el hash de la blockchain o no está registrado.');
+      throw new BadRequestException(
+        'No se pudo obtener el hash de la blockchain o no está registrado.',
+      );
     }
 
     const isVerified = localHash === blockchainHash;
@@ -332,9 +327,7 @@ export class VentasService {
     }
     if (userRol === Rol.ADMIN) {
       if (userSucursalId !== requestedSucursalId) {
-        throw new ForbiddenException(
-          'Solo puede registrar ventas en su propia sucursal.',
-        );
+        throw new ForbiddenException('Solo puede registrar ventas en su propia sucursal.');
       }
       return;
     }
@@ -353,9 +346,7 @@ export class VentasService {
     if (userRol === Rol.SUPER_ADMIN) return;
     if (userRol === Rol.ADMIN) {
       if (venta.sucursal.id !== userSucursalId) {
-        throw new ForbiddenException(
-          'No tiene permiso para ver ventas de otra sucursal.',
-        );
+        throw new ForbiddenException('No tiene permiso para ver ventas de otra sucursal.');
       }
       return;
     }

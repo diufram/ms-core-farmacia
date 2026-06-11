@@ -46,8 +46,7 @@ async function bootstrap() {
   }
 
   app.enableCors({
-    origin:
-      configService.get<string>('ALLOWED_ORIGIN') || 'http://localhost:8080',
+    origin: configService.get<string>('ALLOWED_ORIGIN') || 'http://localhost:8080',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

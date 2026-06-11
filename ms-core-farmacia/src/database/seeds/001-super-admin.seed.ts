@@ -11,9 +11,7 @@ export const superAdminSeed: Seed = {
     const usuarioRepository = seedDataSource.getRepository(Usuario);
     const personaRepository = seedDataSource.getRepository(Persona);
 
-    const correo = (
-      process.env.SEED_SUPER_ADMIN_EMAIL || 'admin@gmail.com'
-    ).toLowerCase();
+    const correo = (process.env.SEED_SUPER_ADMIN_EMAIL || 'admin@gmail.com').toLowerCase();
     const username = process.env.SEED_SUPER_ADMIN_USERNAME || 'admin';
     const password = process.env.SEED_SUPER_ADMIN_PASSWORD || '123123';
 

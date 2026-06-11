@@ -3,8 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { ethers } from 'ethers';
 
 const ABI = [
-  "function recordSale(string memory _numeroVenta, string memory _saleHash) public",
-  "function getSaleHash(string memory _numeroVenta) public view returns (string memory)"
+  'function recordSale(string memory _numeroVenta, string memory _saleHash) public',
+  'function getSaleHash(string memory _numeroVenta) public view returns (string memory)',
 ];
 
 @Injectable()
@@ -24,7 +24,9 @@ export class BlockchainService {
     const contractAddress = this.configService.get<string>('CONTRACT_ADDRESS');
 
     if (!rpcUrl || !privateKey || !contractAddress) {
-      this.logger.warn('Blockchain credentials are not fully configured. Blockchain integration is disabled.');
+      this.logger.warn(
+        'Blockchain credentials are not fully configured. Blockchain integration is disabled.',
+      );
       return;
     }
 

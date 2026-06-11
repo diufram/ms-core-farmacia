@@ -8,10 +8,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { AssignSucursalDto } from './dto/assign-sucursal.dto';
 import { AdminResetPasswordDto } from './dto/admin-reset-password.dto';
-import {
-  UsuarioPayloadType,
-  UsuarioType,
-} from './graphql/usuarios.types';
+import { UsuarioPayloadType, UsuarioType } from './graphql/usuarios.types';
 import { UsuariosService } from './usuarios.service';
 
 @Resolver()

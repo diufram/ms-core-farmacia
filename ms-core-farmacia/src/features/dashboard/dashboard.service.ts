@@ -33,11 +33,7 @@ export class DashboardService {
       stockBajoUmbral?: number;
     },
   ): Promise<DashboardKpisType> {
-    const effectiveSucursalId = this.resolveSucursalId(
-      userRol,
-      userSucursalId,
-      filters.sucursalId,
-    );
+    const effectiveSucursalId = this.resolveSucursalId(userRol, userSucursalId, filters.sucursalId);
     const umbral = filters.stockBajoUmbral ?? DEFAULT_STOCK_BAJO_UMBRAL;
 
     const dateFilters = {
@@ -144,16 +140,14 @@ export class DashboardService {
         cantidad_ventas: c.cantidad_ventas,
         total_comprado: c.total_comprado,
       })),
-      productosSinMovimiento: productosSinMovimiento.map<ProductoSinMovimientoType>(
-        (p) => ({
-          id: p.id,
-          codigo: p.codigo,
-          nombre: p.nombre,
-          stock_actual: p.stock_actual,
-          categoria_nombre: p.categoria_nombre,
-          dias_sin_venta: p.dias_sin_venta,
-        }),
-      ),
+      productosSinMovimiento: productosSinMovimiento.map<ProductoSinMovimientoType>((p) => ({
+        id: p.id,
+        codigo: p.codigo,
+        nombre: p.nombre,
+        stock_actual: p.stock_actual,
+        categoria_nombre: p.categoria_nombre,
+        dias_sin_venta: p.dias_sin_venta,
+      })),
       riesgoPorCategoria: riesgoPorCategoria
         .map<RiesgoCategoriaType>((r) => ({
           categoria_id: r.categoria_id,

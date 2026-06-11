@@ -39,11 +39,11 @@ export const REFRESH_MUTATION = gql`
 `;
 
 export const LOGOUT_MUTATION = gql`
-    mutation Logout($input: LogoutDto!) {
-        logout(input: $input) {
-            message
-        }
+  mutation Logout($input: LogoutDto!) {
+    logout(input: $input) {
+      message
     }
+  }
 `;
 
 export const ME_QUERY = gql`

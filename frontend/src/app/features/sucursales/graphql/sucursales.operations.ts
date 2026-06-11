@@ -60,13 +60,13 @@ export const UPDATE_SUCURSAL_MUTATION = gql`
 `;
 
 export const DELETE_SUCURSAL_MUTATION = gql`
-    mutation DeleteSucursal($id: Int!) {
-        deleteSucursal(id: $id) {
-            message
-            sucursal {
-                id
-                nombre
-            }
-        }
+  mutation DeleteSucursal($id: Int!) {
+    deleteSucursal(id: $id) {
+      message
+      sucursal {
+        id
+        nombre
+      }
     }
+  }
 `;

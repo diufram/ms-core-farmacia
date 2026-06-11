@@ -1,12 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Field, Float, InputType } from '@nestjs/graphql';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 @InputType()
 export class UpdateSucursalDto {

@@ -7,9 +7,7 @@ import { NotificationsResolver } from './notifications.resolver';
 import { NotificationsService } from './notifications.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([TokenDispositivo]),
-  ],
+  imports: [TypeOrmModule.forFeature([TokenDispositivo])],
   providers: [NotificationsService, NotificationsRepository, NotificationsResolver],
   exports: [NotificationsService],
 })

@@ -66,23 +66,23 @@ export const CAMBIAR_ESTADO_VENTA_MUTATION = gql`
 `;
 
 export const DELETE_VENTA_MUTATION = gql`
-    mutation DeleteVenta($id: Int!) {
-        deleteVenta(id: $id) {
-            message
-            venta {
-                id
-                numero_venta
-            }
-        }
+  mutation DeleteVenta($id: Int!) {
+    deleteVenta(id: $id) {
+      message
+      venta {
+        id
+        numero_venta
+      }
     }
+  }
 `;
 
 export const VERIFICAR_INTEGRIDAD_QUERY = gql`
-    query VerificarIntegridadVenta($id: Int!) {
-        verificarIntegridadVenta(id: $id) {
-            isVerified
-            currentHash
-            blockchainHash
-        }
+  query VerificarIntegridadVenta($id: Int!) {
+    verificarIntegridadVenta(id: $id) {
+      isVerified
+      currentHash
+      blockchainHash
     }
+  }
 `;

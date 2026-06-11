@@ -5,11 +5,7 @@ import { LogoutDto } from './dto/logout.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
-import {
-  AuthPayloadType,
-  LogoutPayloadType,
-  MePayloadType,
-} from './graphql/auth.types';
+import { AuthPayloadType, LogoutPayloadType, MePayloadType } from './graphql/auth.types';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 

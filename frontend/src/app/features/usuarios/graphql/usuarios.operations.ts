@@ -72,11 +72,11 @@ export const UPDATE_USUARIO_MUTATION = gql`
 `;
 
 export const DELETE_USUARIO_MUTATION = gql`
-    mutation DeleteUsuario($id: Int!) {
-        deleteUsuario(id: $id) {
-            message
-        }
+  mutation DeleteUsuario($id: Int!) {
+    deleteUsuario(id: $id) {
+      message
     }
+  }
 `;
 
 export const ASSIGN_USUARIO_SUCURSAL_MUTATION = gql`
@@ -108,12 +108,9 @@ export const UNASSIGN_USUARIO_SUCURSAL_MUTATION = gql`
 `;
 
 export const ADMIN_RESET_PASSWORD_MUTATION = gql`
-    mutation AdminResetUsuarioPassword(
-        $id: Int!
-        $input: AdminResetPasswordDto!
-    ) {
-        adminResetUsuarioPassword(id: $id, input: $input) {
-            message
-        }
+  mutation AdminResetUsuarioPassword($id: Int!, $input: AdminResetPasswordDto!) {
+    adminResetUsuarioPassword(id: $id, input: $input) {
+      message
     }
+  }
 `;

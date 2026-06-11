@@ -94,7 +94,7 @@ function generarProductos(): ProductoItem[] {
     { nombre: 'Gasas Esteriles 10x10cm x 100', precio: 15.0, stock: 60 },
     { nombre: 'Vendas Elasticas 10cm x 12', precio: 9.0, stock: 70 },
     { nombre: 'Cinta Adhesiva Medica 5cm', precio: 4.5, stock: 90 },
-  { nombre: 'Termometro Digital', precio: 18.0, stock: 45 },
+    { nombre: 'Termometro Digital', precio: 18.0, stock: 45 },
     { nombre: 'Tensiometro Digital de Brazo', precio: 95.0, stock: 15 },
     { nombre: 'Mascarillas Quirurgicas x 50', precio: 12.0, stock: 100 },
     { nombre: 'Guantes de Latex M x 100', precio: 22.0, stock: 60 },

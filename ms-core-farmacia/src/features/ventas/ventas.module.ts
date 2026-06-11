@@ -9,11 +9,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { BlockchainModule } from '../blockchain/blockchain.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Venta, Producto]),
-    NotificationsModule,
-    BlockchainModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Venta, Producto]), NotificationsModule, BlockchainModule],
   providers: [VentasService, VentasRepository, VentasResolver],
 })
 export class VentasModule {}

@@ -36,10 +36,7 @@ export class ProductosRepository {
     });
   }
 
-  findByCodigoAndSucursal(
-    codigo: string,
-    sucursalId: number,
-  ): Promise<Producto | null> {
+  findByCodigoAndSucursal(codigo: string, sucursalId: number): Promise<Producto | null> {
     return this.productoRepository.findOne({
       where: { codigo, sucursal: { id: sucursalId } },
     });

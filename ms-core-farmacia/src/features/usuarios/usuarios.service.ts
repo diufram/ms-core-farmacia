@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { hash } from 'bcryptjs';
 import { DataSource } from 'typeorm';
 import { Persona } from '../../database/entities/persona.entity';
@@ -36,41 +32,27 @@ export class UsuariosService {
   }
 
   async create(dto: CreateUsuarioDto) {
-    const usernameExists = await this.usuariosRepository.findByUsername(
-      dto.nombre_usuario,
-    );
+    const usernameExists = await this.usuariosRepository.findByUsername(dto.nombre_usuario);
     if (usernameExists) {
-      throw new ConflictException(
-        'Ya existe un usuario con ese nombre de usuario.',
-      );
+      throw new ConflictException('Ya existe un usuario con ese nombre de usuario.');
     }
 
-    const emailExists = await this.usuariosRepository.findByEmail(
-      dto.correo_electronico,
-    );
+    const emailExists = await this.usuariosRepository.findByEmail(dto.correo_electronico);
     if (emailExists) {
-      throw new ConflictException(
-        'Ya existe un usuario con ese correo electrónico.',
-      );
+      throw new ConflictException('Ya existe un usuario con ese correo electrónico.');
     }
 
     const targetRol = dto.rol ?? Rol.ADMIN;
     if (targetRol === Rol.ADMIN && (!dto.sucursales || dto.sucursales.length === 0)) {
-      throw new ConflictException(
-        'Un administrador debe estar asignado a al menos una sucursal.',
-      );
+      throw new ConflictException('Un administrador debe estar asignado a al menos una sucursal.');
     }
     if (targetRol === Rol.CLIENTE && dto.sucursales && dto.sucursales.length > 0) {
-      throw new ConflictException(
-        'Un cliente no debe estar asignado a sucursales.',
-      );
+      throw new ConflictException('Un cliente no debe estar asignado a sucursales.');
     }
 
     if (dto.sucursales?.length) {
       const sucursalIds = dto.sucursales.map((s) => s.sucursalId);
-      const duplicates = sucursalIds.filter(
-        (id, i) => sucursalIds.indexOf(id) !== i,
-      );
+      const duplicates = sucursalIds.filter((id, i) => sucursalIds.indexOf(id) !== i);
       if (duplicates.length) {
         throw new ConflictException(
           'No se puede asignar el mismo usuario dos veces a la misma sucursal.',
@@ -107,9 +89,7 @@ export class UsuariosService {
             .getRepository(Sucursal)
             .findOne({ where: { id: asignacion.sucursalId } });
           if (!sucursal) {
-            throw new NotFoundException(
-              `Sucursal con id ${asignacion.sucursalId} no encontrada.`,
-            );
+            throw new NotFoundException(`Sucursal con id ${asignacion.sucursalId} no encontrada.`);
           }
           const nuevaAsignacion = usuarioSucursalRepo.create({
             usuario: usuarioGuardado,
@@ -136,34 +116,20 @@ export class UsuariosService {
       throw new NotFoundException('Usuario no encontrado.');
     }
 
-    if (
-      dto.nombre_usuario &&
-      dto.nombre_usuario !== usuario.nombre_usuario
-    ) {
-      const existing = await this.usuariosRepository.findByUsername(
-        dto.nombre_usuario,
-        id,
-      );
+    if (dto.nombre_usuario && dto.nombre_usuario !== usuario.nombre_usuario) {
+      const existing = await this.usuariosRepository.findByUsername(dto.nombre_usuario, id);
       if (existing) {
-        throw new ConflictException(
-          'Ya existe un usuario con ese nombre de usuario.',
-        );
+        throw new ConflictException('Ya existe un usuario con ese nombre de usuario.');
       }
     }
 
     if (
       dto.correo_electronico &&
-      dto.correo_electronico.toLowerCase() !==
-        usuario.correo_electronico.toLowerCase()
+      dto.correo_electronico.toLowerCase() !== usuario.correo_electronico.toLowerCase()
     ) {
-      const existing = await this.usuariosRepository.findByEmail(
-        dto.correo_electronico,
-        id,
-      );
+      const existing = await this.usuariosRepository.findByEmail(dto.correo_electronico, id);
       if (existing) {
-        throw new ConflictException(
-          'Ya existe un usuario con ese correo electrónico.',
-        );
+        throw new ConflictException('Ya existe un usuario con ese correo electrónico.');
       }
     }
 
@@ -224,25 +190,18 @@ export class UsuariosService {
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado.');
     }
-    const sucursal = await this.usuariosRepository.findSucursalById(
-      dto.sucursalId,
-    );
+    const sucursal = await this.usuariosRepository.findSucursalById(dto.sucursalId);
     if (!sucursal) {
       throw new NotFoundException('Sucursal no encontrada.');
     }
 
-    const existing = await this.usuariosRepository.findAsignacion(
-      usuarioId,
-      dto.sucursalId,
-    );
+    const existing = await this.usuariosRepository.findAsignacion(usuarioId, dto.sucursalId);
     if (existing) {
       if (!existing.activo) {
         existing.activo = true;
         await this.usuariosRepository.saveAsignacion(existing);
       } else {
-        throw new ConflictException(
-          'El usuario ya está asignado a esa sucursal.',
-        );
+        throw new ConflictException('El usuario ya está asignado a esa sucursal.');
       }
     } else {
       const asignacion = this.usuariosRepository.createAsignacion({
@@ -261,10 +220,7 @@ export class UsuariosService {
   }
 
   async unassignSucursal(usuarioId: number, sucursalId: number) {
-    const asignacion = await this.usuariosRepository.findAsignacion(
-      usuarioId,
-      sucursalId,
-    );
+    const asignacion = await this.usuariosRepository.findAsignacion(usuarioId, sucursalId);
     if (!asignacion) {
       throw new NotFoundException('Asignación no encontrada.');
     }

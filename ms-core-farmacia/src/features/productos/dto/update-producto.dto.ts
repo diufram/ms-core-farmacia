@@ -1,13 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Field, Float, InputType, Int } from '@nestjs/graphql';
-import {
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 @InputType()
 export class UpdateProductoDto {
@@ -32,7 +25,10 @@ export class UpdateProductoDto {
   @Min(0)
   precio_venta?: number;
 
-  @ApiPropertyOptional({ example: 1, description: 'Nueva categoria; cambiarla tambien puede cambiar la sucursal' })
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Nueva categoria; cambiarla tambien puede cambiar la sucursal',
+  })
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()

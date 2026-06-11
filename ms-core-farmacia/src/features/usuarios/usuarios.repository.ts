@@ -61,10 +61,7 @@ export class UsuariosRepository {
     });
   }
 
-  findByUsername(
-    nombreUsuario: string,
-    excludeId?: number,
-  ): Promise<Usuario | null> {
+  findByUsername(nombreUsuario: string, excludeId?: number): Promise<Usuario | null> {
     const qb = this.usuarioRepository
       .createQueryBuilder('u')
       .where('u.nombre_usuario = :nombreUsuario', { nombreUsuario });
@@ -74,10 +71,7 @@ export class UsuariosRepository {
     return qb.getOne();
   }
 
-  findByEmail(
-    correo: string,
-    excludeId?: number,
-  ): Promise<Usuario | null> {
+  findByEmail(correo: string, excludeId?: number): Promise<Usuario | null> {
     const qb = this.usuarioRepository
       .createQueryBuilder('u')
       .where('LOWER(u.correo_electronico) = LOWER(:correo)', { correo });
@@ -87,10 +81,7 @@ export class UsuariosRepository {
     return qb.getOne();
   }
 
-  findAsignacion(
-    usuarioId: number,
-    sucursalId: number,
-  ): Promise<UsuarioSucursal | null> {
+  findAsignacion(usuarioId: number, sucursalId: number): Promise<UsuarioSucursal | null> {
     return this.usuarioSucursalRepository.findOne({
       where: {
         usuario: { id: usuarioId },
@@ -131,9 +122,7 @@ export class UsuariosRepository {
     return this.usuarioRepository.save(usuario);
   }
 
-  async saveAsignacion(
-    asignacion: UsuarioSucursal,
-  ): Promise<UsuarioSucursal> {
+  async saveAsignacion(asignacion: UsuarioSucursal): Promise<UsuarioSucursal> {
     return this.usuarioSucursalRepository.save(asignacion);
   }
 
@@ -151,10 +140,7 @@ export class UsuariosRepository {
       .execute();
   }
 
-  async setActivoAllAsignaciones(
-    usuarioId: number,
-    activo: boolean,
-  ): Promise<void> {
+  async setActivoAllAsignaciones(usuarioId: number, activo: boolean): Promise<void> {
     await this.usuarioSucursalRepository
       .createQueryBuilder()
       .update()

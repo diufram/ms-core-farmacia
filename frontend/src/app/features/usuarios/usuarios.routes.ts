@@ -4,25 +4,25 @@ import { UsuariosListComponent } from './pages/usuarios-list/usuarios-list.compo
 import { UsuarioFormComponent } from './pages/usuario-form/usuario-form.component';
 
 export const USUARIOS_ROUTES: Routes = [
-    {
+  {
+    path: '',
+    canActivate: [authGuard],
+    children: [
+      {
         path: '',
-        canActivate: [authGuard],
-        children: [
-            {
-                path: '',
-                component: UsuariosListComponent,
-                title: 'Usuarios',
-            },
-            {
-                path: 'nuevo',
-                component: UsuarioFormComponent,
-                title: 'Nuevo Usuario',
-            },
-            {
-                path: ':id/editar',
-                component: UsuarioFormComponent,
-                title: 'Editar Usuario',
-            },
-        ],
-    },
+        component: UsuariosListComponent,
+        title: 'Usuarios'
+      },
+      {
+        path: 'nuevo',
+        component: UsuarioFormComponent,
+        title: 'Nuevo Usuario'
+      },
+      {
+        path: ':id/editar',
+        component: UsuarioFormComponent,
+        title: 'Editar Usuario'
+      }
+    ]
+  }
 ];

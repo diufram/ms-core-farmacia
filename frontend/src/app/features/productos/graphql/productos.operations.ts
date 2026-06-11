@@ -46,13 +46,13 @@ export const UPDATE_PRODUCTO_MUTATION = gql`
 `;
 
 export const DELETE_PRODUCTO_MUTATION = gql`
-    mutation DeleteProducto($id: Int!) {
-        deleteProducto(id: $id) {
-            message
-            producto {
-                id
-                nombre
-            }
-        }
+  mutation DeleteProducto($id: Int!) {
+    deleteProducto(id: $id) {
+      message
+      producto {
+        id
+        nombre
+      }
     }
+  }
 `;

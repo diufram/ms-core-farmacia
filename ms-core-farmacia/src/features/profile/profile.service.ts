@@ -36,10 +36,7 @@ export class ProfileService {
   }
 
   async updateUsername(usuarioId: number, dto: UpdateUsernameDto) {
-    const taken = await this.profileRepository.isUsernameTaken(
-      dto.username,
-      usuarioId,
-    );
+    const taken = await this.profileRepository.isUsernameTaken(dto.username, usuarioId);
     if (taken) {
       throw new ConflictException('El nombre de usuario ya esta en uso');
     }
@@ -49,18 +46,12 @@ export class ProfileService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    const passwordValid = await compare(
-      dto.current_password,
-      usuario.contrasena,
-    );
+    const passwordValid = await compare(dto.current_password, usuario.contrasena);
     if (!passwordValid) {
       throw new UnauthorizedException('Contraseña incorrecta');
     }
 
-    const updated = await this.profileRepository.updateUsername(
-      usuarioId,
-      dto.username,
-    );
+    const updated = await this.profileRepository.updateUsername(usuarioId, dto.username);
 
     const persona = updated.persona;
     const sucursal = updated.sucursales?.[0]?.sucursal;
@@ -83,10 +74,7 @@ export class ProfileService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    const passwordValid = await compare(
-      dto.current_password,
-      usuario.contrasena,
-    );
+    const passwordValid = await compare(dto.current_password, usuario.contrasena);
     if (!passwordValid) {
       throw new UnauthorizedException('Contraseña actual incorrecta');
     }
