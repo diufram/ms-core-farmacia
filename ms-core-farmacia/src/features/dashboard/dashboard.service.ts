@@ -186,6 +186,9 @@ export class DashboardService {
     },
   ): Promise<RiesgoCategoriaType[]> {
     const mlActive = this.categoryRiskModel.isLoaded();
+    this.logger.log(
+      `[ML-CHECK] isLoaded=${mlActive} → usando ${mlActive ? 'ML-RANDOM-FOREST' : 'HEURISTICA'}`,
+    );
 
     if (!mlActive) {
       return rows
