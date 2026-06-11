@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 
 type ValidationErrorItem = {
@@ -27,13 +21,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // Determinar el código de estado HTTP
     const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
     // Extraer la respuesta original de NestJS (útil para validaciones)
-    const exceptionResponse =
-      exception instanceof HttpException ? exception.getResponse() : null;
+    const exceptionResponse = exception instanceof HttpException ? exception.getResponse() : null;
 
     // 1. Manejo de Errores del Cliente (4XX) -> "fail"
     if (status >= 400 && status < 500) {
@@ -42,10 +33,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           ? (exceptionResponse as ExceptionResponseShape)
           : null;
 
-      const erroresValidacion = this.mapValidationErrors(
-        parsedException?.message,
-        status,
-      );
+      const erroresValidacion = this.mapValidationErrors(parsedException?.message, status);
 
       const data =
         erroresValidacion.length > 0
@@ -79,10 +67,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private mapValidationErrors(
-    rawMessage: unknown,
-    status: number,
-  ): ValidationErrorItem[] {
+  private mapValidationErrors(rawMessage: unknown, status: number): ValidationErrorItem[] {
     if (!Array.isArray(rawMessage)) {
       return [];
     }

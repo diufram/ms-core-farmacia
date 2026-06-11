@@ -8,40 +8,36 @@ import { LayoutService } from '../service/layout.service';
 import { AuthService } from '@/features/auth/services/auth.service';
 
 @Component({
-    selector: 'my-topbar',
-    standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, MyConfigurator],
-    template: ` <div class="layout-topbar">
-        <div class="layout-topbar-logo-container">
-            <button
-                class="layout-menu-button layout-topbar-action"
-                (click)="layoutService.onMenuToggle()"
-            >
-                <i class="pi pi-bars"></i>
-            </button>
-            <a class="layout-topbar-logo" routerLink="/dashboard">
-                <div class="logo-mask" role="img" aria-label="Logo"></div>
-                <span>PharmaFicct</span>
-            </a>
-        </div>
+  selector: 'my-topbar',
+  standalone: true,
+  imports: [RouterModule, CommonModule, StyleClassModule, MyConfigurator],
+  template: ` <div class="layout-topbar">
+    <div class="layout-topbar-logo-container">
+      <button
+        class="layout-menu-button layout-topbar-action"
+        (click)="layoutService.onMenuToggle()"
+      >
+        <i class="pi pi-bars"></i>
+      </button>
+      <a class="layout-topbar-logo" routerLink="/dashboard">
+        <div class="logo-mask" role="img" aria-label="Logo"></div>
+        <span>PharmaFicct</span>
+      </a>
+    </div>
 
-        <div class="layout-topbar-actions">
-            <div class="layout-config-menu">
-                <button
-                    type="button"
-                    class="layout-topbar-action"
-                    (click)="toggleDarkMode()"
-                >
-                    <i
-                        [ngClass]="{
-                            'pi ': true,
-                            'pi-moon': layoutService.isDarkTheme(),
-                            'pi-sun': !layoutService.isDarkTheme(),
-                        }"
-                    ></i>
-                </button>
-                <div class="relative">
-                    <!-- <button
+    <div class="layout-topbar-actions">
+      <div class="layout-config-menu">
+        <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
+          <i
+            [ngClass]="{
+              'pi ': true,
+              'pi-moon': layoutService.isDarkTheme(),
+              'pi-sun': !layoutService.isDarkTheme()
+            }"
+          ></i>
+        </button>
+        <div class="relative">
+          <!-- <button
                         class="layout-topbar-action layout-topbar-action-highlight"
                         pStyleClass="@next"
                         enterFromClass="hidden"
@@ -52,24 +48,24 @@ import { AuthService } from '@/features/auth/services/auth.service';
                     >
                         <i class="pi pi-palette"></i>
                     </button> -->
-                    <my-configurator />
-                </div>
-            </div>
+          <my-configurator />
         </div>
-    </div>`,
+      </div>
+    </div>
+  </div>`
 })
 export class AppTopbar {
-    items!: MenuItem[];
+  items!: MenuItem[];
 
-    private authService = inject(AuthService);
+  private authService = inject(AuthService);
 
-    constructor(public layoutService: LayoutService) {}
+  constructor(public layoutService: LayoutService) {}
 
-    toggleDarkMode() {
-        this.layoutService.toggleTheme();
-    }
+  toggleDarkMode() {
+    this.layoutService.toggleTheme();
+  }
 
-    logout() {
-        this.authService.logout();
-    }
+  logout() {
+    this.authService.logout();
+  }
 }

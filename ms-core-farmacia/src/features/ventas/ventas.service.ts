@@ -12,11 +12,15 @@ import { Venta } from '../../database/entities/venta.entity';
 import { VentaDetalle } from '../../database/entities/venta-detalle.entity';
 import { CreateVentaDto } from './dto/create-venta.dto';
 import { VentasRepository } from './ventas.repository';
+import { NotificationsService } from '../notifications/notifications.service';
+import { BlockchainService } from '../blockchain/blockchain.service';
+import { ethers } from 'ethers';
 
-type EstadoVenta = 'PENDIENTE' | 'CONFIRMADA' | 'RECHAZADA';
+export type EstadoVenta = 'PENDIENTE' | 'PREPARADA' | 'CONFIRMADA' | 'RECHAZADA';
 
 const TRANSICIONES_VALIDAS: Record<EstadoVenta, EstadoVenta[]> = {
-  PENDIENTE: ['CONFIRMADA', 'RECHAZADA'],
+  PENDIENTE: ['PREPARADA', 'RECHAZADA'],
+  PREPARADA: ['CONFIRMADA', 'RECHAZADA'],
   CONFIRMADA: [],
   RECHAZADA: [],
 };
@@ -26,6 +30,8 @@ export class VentasService {
   constructor(
     private readonly dataSource: DataSource,
     private readonly ventasRepository: VentasRepository,
+    private readonly notificationsService: NotificationsService,
+    private readonly blockchainService: BlockchainService,
   ) {}
 
   async findAll(
@@ -49,12 +55,7 @@ export class VentasService {
     return ventas.map((v) => this.serializeVenta(v));
   }
 
-  async findOne(
-    id: number,
-    userRol: string,
-    userSucursalId: number | null,
-    userId: number,
-  ) {
+  async findOne(id: number, userRol: string, userSucursalId: number | null, userId: number) {
     const venta = await this.ventasRepository.findById(id);
     if (!venta) {
       throw new NotFoundException('Venta no encontrada.');
@@ -109,8 +110,7 @@ export class VentasService {
     for (const detalle of dto.detalles) {
       const producto = productos.find((p) => p.id === detalle.productoId);
       if (!producto) continue;
-      const precioUnitario =
-        detalle.precioUnitario ?? Number(producto.precio_venta);
+      const precioUnitario = detalle.precioUnitario ?? Number(producto.precio_venta);
       total += precioUnitario * detalle.cantidad;
     }
 
@@ -132,8 +132,7 @@ export class VentasService {
       for (const detalle of dto.detalles) {
         const producto = productos.find((p) => p.id === detalle.productoId);
         if (!producto) continue;
-        const precioUnitario =
-          detalle.precioUnitario ?? Number(producto.precio_venta);
+        const precioUnitario = detalle.precioUnitario ?? Number(producto.precio_venta);
         const detalleEntity = manager.create(VentaDetalle, {
           venta: ventaGuardada,
           producto: { id: producto.id } as VentaDetalle['producto'],
@@ -171,20 +170,16 @@ export class VentasService {
     }
 
     if (userRol === Rol.ADMIN && venta.sucursal.id !== userSucursalId) {
-      throw new ForbiddenException(
-        'Solo puede cambiar el estado de ventas de su propia sucursal.',
-      );
+      throw new ForbiddenException('Solo puede cambiar el estado de ventas de su propia sucursal.');
     }
 
     const estadoActual = (venta.estado ?? 'PENDIENTE') as EstadoVenta;
     if (!TRANSICIONES_VALIDAS[estadoActual]?.includes(nuevoEstado)) {
-      throw new BadRequestException(
-        `No se puede cambiar de ${estadoActual} a ${nuevoEstado}.`,
-      );
+      throw new BadRequestException(`No se puede cambiar de ${estadoActual} a ${nuevoEstado}.`);
     }
 
     await this.dataSource.transaction(async (manager) => {
-      if (nuevoEstado === 'CONFIRMADA') {
+      if (nuevoEstado === 'PREPARADA') {
         const detalles = await manager
           .getRepository(VentaDetalle)
           .find({ where: { venta: { id: venta.id } }, relations: ['producto'] });
@@ -207,6 +202,36 @@ export class VentasService {
       await manager.save(Venta, venta);
     });
 
+    if (nuevoEstado === 'PREPARADA') {
+      await this.notificationsService.sendPushToUser(
+        venta.usuario.id,
+        `¡Tu pedido #${venta.id} está listo!`,
+        `Tu pedido ha sido preparado en ${venta.sucursal.nombre} y está listo para ser recogido.`,
+      );
+    } else if (nuevoEstado === 'CONFIRMADA') {
+      await this.notificationsService.sendPushToUser(
+        venta.usuario.id,
+        `¡Pedido #${venta.id} completado!`,
+        `Tu pedido en ${venta.sucursal.nombre} ha sido pagado y recogido. ¡Gracias por tu compra!`,
+      );
+
+      try {
+        const saleData = this.getSaleDataPayload(venta);
+        const txHash = await this.blockchainService.registerSaleOnChain(
+          venta.numero_venta,
+          saleData,
+        );
+        if (txHash) {
+          venta.tx_hash = txHash;
+          // Update outside the transaction is fine here since it's just appending the hash
+          await this.dataSource.getRepository(Venta).update(venta.id, { tx_hash: txHash });
+        }
+      } catch (error) {
+        // Log but don't throw, we don't want to fail the completion if blockchain fails
+        console.error('Failed to register sale on blockchain', error);
+      }
+    }
+
     const reloaded = await this.ventasRepository.findById(id);
     return {
       venta: this.serializeVenta(reloaded!),
@@ -216,24 +241,57 @@ export class VentasService {
 
   async delete(id: number, userRol: string, userSucursalId: number | null) {
     if (userRol !== Rol.SUPER_ADMIN && userRol !== Rol.ADMIN) {
-      throw new ForbiddenException(
-        'Solo super admin o admin pueden eliminar ventas.',
-      );
+      throw new ForbiddenException('Solo super admin o admin pueden eliminar ventas.');
     }
     const venta = await this.ventasRepository.findById(id);
     if (!venta) {
       throw new NotFoundException('Venta no encontrada.');
     }
     if (userRol === Rol.ADMIN && venta.sucursal.id !== userSucursalId) {
-      throw new ForbiddenException(
-        'Solo puede eliminar ventas de su propia sucursal.',
-      );
+      throw new ForbiddenException('Solo puede eliminar ventas de su propia sucursal.');
     }
     const snapshot = this.serializeVenta(venta);
     await this.ventasRepository.softDelete(id);
     return {
       venta: snapshot,
       message: 'Venta eliminada correctamente.',
+    };
+  }
+
+  async verificarIntegridad(
+    id: number,
+    userRol: string,
+    userSucursalId: number | null,
+    userId: number,
+  ) {
+    const venta = await this.ventasRepository.findById(id);
+    if (!venta) {
+      throw new NotFoundException('Venta no encontrada.');
+    }
+    this.assertCanViewVenta(venta, userRol, userSucursalId, userId);
+
+    if (!venta.tx_hash) {
+      throw new BadRequestException('Esta venta no tiene un registro en la blockchain.');
+    }
+
+    // Recalculate local hash
+    const saleData = this.getSaleDataPayload(venta);
+    const dataBytes = ethers.toUtf8Bytes(saleData);
+    const localHash = ethers.keccak256(dataBytes);
+
+    // Fetch blockchain hash
+    const blockchainHash = await this.blockchainService.getSaleHashOnChain(venta.numero_venta);
+    if (!blockchainHash) {
+      throw new BadRequestException(
+        'No se pudo obtener el hash de la blockchain o no está registrado.',
+      );
+    }
+
+    const isVerified = localHash === blockchainHash;
+    return {
+      isVerified,
+      currentHash: localHash,
+      blockchainHash,
     };
   }
 
@@ -269,9 +327,7 @@ export class VentasService {
     }
     if (userRol === Rol.ADMIN) {
       if (userSucursalId !== requestedSucursalId) {
-        throw new ForbiddenException(
-          'Solo puede registrar ventas en su propia sucursal.',
-        );
+        throw new ForbiddenException('Solo puede registrar ventas en su propia sucursal.');
       }
       return;
     }
@@ -290,9 +346,7 @@ export class VentasService {
     if (userRol === Rol.SUPER_ADMIN) return;
     if (userRol === Rol.ADMIN) {
       if (venta.sucursal.id !== userSucursalId) {
-        throw new ForbiddenException(
-          'No tiene permiso para ver ventas de otra sucursal.',
-        );
+        throw new ForbiddenException('No tiene permiso para ver ventas de otra sucursal.');
       }
       return;
     }
@@ -318,6 +372,7 @@ export class VentasService {
       cliente_nombre: venta.cliente_nombre ?? null,
       cliente_celular: venta.cliente_celular ?? null,
       cliente_codigo: venta.cliente_codigo ?? null,
+      tx_hash: venta.tx_hash ?? null,
       detalles:
         venta.detalles?.map((d) => ({
           id: d.id,
@@ -328,5 +383,15 @@ export class VentasService {
           subtotal: Number(d.precio_unitario) * d.cantidad,
         })) ?? [],
     };
+  }
+
+  private getSaleDataPayload(venta: Venta): string {
+    return JSON.stringify({
+      id: venta.id,
+      numero: venta.numero_venta,
+      total: venta.total,
+      fecha: venta.fecha_venta,
+      cliente: venta.cliente_nombre ?? venta.usuario?.persona?.nombre ?? 'Cliente',
+    });
   }
 }

@@ -7,8 +7,7 @@ export const CurrentUser = createParamDecorator(
     const gqlRequest = GqlExecutionContext.create(ctx).getContext<{
       req?: { user: JwtPayload };
     }>().req;
-    const request =
-      gqlRequest ?? ctx.switchToHttp().getRequest<{ user: JwtPayload }>();
+    const request = gqlRequest ?? ctx.switchToHttp().getRequest<{ user: JwtPayload }>();
     return request.user;
   },
 );

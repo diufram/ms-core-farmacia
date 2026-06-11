@@ -121,6 +121,8 @@ scalar DateTime
 input LoginDto {
   contrasena: String!
   correo_electronico: String!
+  is_mobile: Boolean
+  notification_token: String
 }
 
 input LogoutDto {
@@ -236,6 +238,7 @@ type Query {
   usuarios(rol: String, sucursalId: Int): [UsuarioType!]!
   venta(id: Int!): VentaType!
   ventas(fechaDesde: String, fechaHasta: String, sucursalId: Int): [VentaType!]!
+  verificarIntegridadVenta(id: Int!): VentaVerificationType!
 }
 
 input RefreshTokenDto {
@@ -247,8 +250,10 @@ input RegisterClienteDto {
   celular: String
   contrasena: String!
   correo_electronico: String!
+  is_mobile: Boolean
   nombre: String!
   nombre_usuario: String!
+  notification_token: String
 }
 
 input RegisterDto {
@@ -435,7 +440,14 @@ type VentaType {
   numero_venta: String!
   sucursal_id: Int
   total: Float!
+  tx_hash: String
   usuario_id: Int
+}
+
+type VentaVerificationType {
+  blockchainHash: String!
+  currentHash: String!
+  isVerified: Boolean!
 }
 
 type VentasPorDiaType {

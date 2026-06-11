@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'crypto';
@@ -15,6 +11,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterClienteDto } from './dto/register-cliente.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 type TokensResponse = {
   access_token: string;
@@ -27,6 +24,7 @@ export class AuthService {
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -77,11 +75,13 @@ export class AuthService {
 
     await this.authRepository.actualizarRolUsuario(usuario.id, Rol.CLIENTE);
 
-    const usuarioActualizado = await this.authRepository.buscarUsuarioPorId(
-      usuario.id,
-    );
+    const usuarioActualizado = await this.authRepository.buscarUsuarioPorId(usuario.id);
     if (!usuarioActualizado) {
       throw new BadRequestException('Error al registrar el cliente.');
+    }
+
+    if (dto.notification_token) {
+      await this.notificationsService.registrarToken(usuarioActualizado.id, dto.notification_token);
     }
 
     const tokens = await this.generarTokens(usuarioActualizado);
@@ -103,6 +103,16 @@ export class AuthService {
     const passwordValida = await compare(dto.contrasena, usuario.contrasena);
     if (!passwordValida) {
       throw new UnauthorizedException('Credenciales invalidas.');
+    }
+
+    if (dto.is_mobile && (usuario.rol === Rol.SUPER_ADMIN || usuario.rol === Rol.ADMIN)) {
+      throw new UnauthorizedException(
+        'Los administradores no pueden iniciar sesion en la aplicacion movil.',
+      );
+    }
+
+    if (dto.notification_token) {
+      await this.notificationsService.registrarToken(usuario.id, dto.notification_token);
     }
 
     const tokens = await this.generarTokens(usuario);
@@ -178,10 +188,7 @@ export class AuthService {
       return null;
     }
 
-    const relacion = await this.authRepository.buscarRelacionUsuarioSucursal(
-      usuarioId,
-      sucursalId,
-    );
+    const relacion = await this.authRepository.buscarRelacionUsuarioSucursal(usuarioId, sucursalId);
 
     if (!relacion) {
       throw new BadRequestException(
@@ -211,16 +218,13 @@ export class AuthService {
     );
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret:
-        this.configService.get<string>('JWT_ACCESS_SECRET') ||
-        'dev_access_secret_change_me',
+      secret: this.configService.get<string>('JWT_ACCESS_SECRET') || 'dev_access_secret_change_me',
       expiresIn: accessExpiresIn,
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret:
-        this.configService.get<string>('JWT_REFRESH_SECRET') ||
-        'dev_refresh_secret_change_me',
+        this.configService.get<string>('JWT_REFRESH_SECRET') || 'dev_refresh_secret_change_me',
       expiresIn: refreshExpiresIn,
     });
 
@@ -242,8 +246,7 @@ export class AuthService {
     try {
       return await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret:
-          this.configService.get<string>('JWT_REFRESH_SECRET') ||
-          'dev_refresh_secret_change_me',
+          this.configService.get<string>('JWT_REFRESH_SECRET') || 'dev_refresh_secret_change_me',
       });
     } catch {
       throw new UnauthorizedException('Refresh token invalido o expirado.');
@@ -302,9 +305,7 @@ export class AuthService {
     return usuario.rol;
   }
 
-  private async obtenerSucursalActiva(
-    usuario: Usuario,
-  ): Promise<number | null> {
+  private async obtenerSucursalActiva(usuario: Usuario): Promise<number | null> {
     if (usuario.rol === Rol.SUPER_ADMIN || usuario.rol === Rol.CLIENTE) {
       return null;
     }

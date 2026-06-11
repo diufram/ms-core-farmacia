@@ -47,6 +47,9 @@ jobs:
         # Since it's hosted on a custom domain (pharmacy.lonk.dev), base-href should be /
         run: npm run build -- --configuration production --base-href /
 
+      - name: Copy index.html to 404.html
+        run: cp dist/sakai-ng/browser/index.html dist/sakai-ng/browser/404.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

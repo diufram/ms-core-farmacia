@@ -5,10 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
-import {
-  CategoriaPayloadType,
-  CategoriaType,
-} from './graphql/categorias.types';
+import { CategoriaPayloadType, CategoriaType } from './graphql/categorias.types';
 import { CategoriasService } from './categorias.service';
 
 @Resolver()
@@ -26,18 +23,12 @@ export class CategoriasResolver {
   }
 
   @Query(() => CategoriaType)
-  categoria(
-    @CurrentUser() user: JwtPayload,
-    @Args('id', { type: () => Int }) id: number,
-  ) {
+  categoria(@CurrentUser() user: JwtPayload, @Args('id', { type: () => Int }) id: number) {
     return this.categoriasService.findOne(id, user.rol, user.sucursal_id);
   }
 
   @Mutation(() => CategoriaPayloadType)
-  createCategoria(
-    @CurrentUser() user: JwtPayload,
-    @Args('input') input: CreateCategoriaDto,
-  ) {
+  createCategoria(@CurrentUser() user: JwtPayload, @Args('input') input: CreateCategoriaDto) {
     return this.categoriasService.create(input, user.rol, user.sucursal_id);
   }
 
@@ -51,10 +42,7 @@ export class CategoriasResolver {
   }
 
   @Mutation(() => CategoriaPayloadType)
-  deleteCategoria(
-    @CurrentUser() user: JwtPayload,
-    @Args('id', { type: () => Int }) id: number,
-  ) {
+  deleteCategoria(@CurrentUser() user: JwtPayload, @Args('id', { type: () => Int }) id: number) {
     return this.categoriasService.delete(id, user.rol, user.sucursal_id);
   }
 }

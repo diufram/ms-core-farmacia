@@ -5,10 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
-import {
-  ProductoPayloadType,
-  ProductoType,
-} from './graphql/productos.types';
+import { ProductoPayloadType, ProductoType } from './graphql/productos.types';
 import { ProductosService } from './productos.service';
 
 @Resolver()
@@ -31,18 +28,12 @@ export class ProductosResolver {
   }
 
   @Query(() => ProductoType)
-  producto(
-    @CurrentUser() user: JwtPayload,
-    @Args('id', { type: () => Int }) id: number,
-  ) {
+  producto(@CurrentUser() user: JwtPayload, @Args('id', { type: () => Int }) id: number) {
     return this.productosService.findOne(id, user.rol, user.sucursal_id);
   }
 
   @Mutation(() => ProductoPayloadType)
-  createProducto(
-    @CurrentUser() user: JwtPayload,
-    @Args('input') input: CreateProductoDto,
-  ) {
+  createProducto(@CurrentUser() user: JwtPayload, @Args('input') input: CreateProductoDto) {
     return this.productosService.create(input, user.rol, user.sucursal_id);
   }
 
@@ -56,10 +47,7 @@ export class ProductosResolver {
   }
 
   @Mutation(() => ProductoPayloadType)
-  deleteProducto(
-    @CurrentUser() user: JwtPayload,
-    @Args('id', { type: () => Int }) id: number,
-  ) {
+  deleteProducto(@CurrentUser() user: JwtPayload, @Args('id', { type: () => Int }) id: number) {
     return this.productosService.delete(id, user.rol, user.sucursal_id);
   }
 }

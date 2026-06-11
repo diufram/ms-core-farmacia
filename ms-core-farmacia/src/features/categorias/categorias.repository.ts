@@ -26,10 +26,7 @@ export class CategoriasRepository {
     });
   }
 
-  findByCodigoAndSucursal(
-    codigo: string,
-    sucursalId: number,
-  ): Promise<CategoriaProducto | null> {
+  findByCodigoAndSucursal(codigo: string, sucursalId: number): Promise<CategoriaProducto | null> {
     return this.categoriaRepository.findOne({
       where: { codigo, sucursal: { id: sucursalId } },
     });

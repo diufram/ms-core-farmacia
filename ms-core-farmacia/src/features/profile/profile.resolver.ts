@@ -6,11 +6,7 @@ import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CheckUsernameDto } from './dto/check-username.dto';
 import { UpdateUsernameDto } from './dto/update-username.dto';
-import {
-  CheckUsernameResultType,
-  MessageResultType,
-  ProfileType,
-} from './graphql/profile.types';
+import { CheckUsernameResultType, MessageResultType, ProfileType } from './graphql/profile.types';
 import { ProfileService } from './profile.service';
 
 @Resolver()
@@ -24,18 +20,12 @@ export class ProfileResolver {
   }
 
   @Mutation(() => ProfileType)
-  updateUsername(
-    @CurrentUser() user: JwtPayload,
-    @Args('input') input: UpdateUsernameDto,
-  ) {
+  updateUsername(@CurrentUser() user: JwtPayload, @Args('input') input: UpdateUsernameDto) {
     return this.profileService.updateUsername(user.sub, input);
   }
 
   @Mutation(() => MessageResultType)
-  changePassword(
-    @CurrentUser() user: JwtPayload,
-    @Args('input') input: ChangePasswordDto,
-  ) {
+  changePassword(@CurrentUser() user: JwtPayload, @Args('input') input: ChangePasswordDto) {
     return this.profileService.changePassword(user.sub, input);
   }
 

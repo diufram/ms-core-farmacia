@@ -1,17 +1,10 @@
-import {
-    ApplicationConfig,
-    APP_INITIALIZER,
-} from '@angular/core';
-import {
-    provideHttpClient,
-    withFetch,
-    withInterceptors,
-} from '@angular/common/http';
+import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
-    provideRouter,
-    withEnabledBlockingInitialNavigation,
-    withInMemoryScrolling,
+  provideRouter,
+  withEnabledBlockingInitialNavigation,
+  withInMemoryScrolling
 } from '@angular/router';
 
 import { providePrimeNG } from 'primeng/config';
@@ -24,38 +17,38 @@ import { apolloOptionsFactory } from '@/core/graphql/apollo.config';
 import { authHttpInterceptor } from '@/core/interceptors/auth-http.interceptor';
 
 export function initializeAppFactory(authService: AuthService) {
-    return () => authService.loadSession();
+  return () => authService.loadSession();
 }
 
 export const appConfig: ApplicationConfig = {
-    providers: [
-        provideRouter(
-            appRoutes,
-            withInMemoryScrolling({
-                anchorScrolling: 'enabled',
-                scrollPositionRestoration: 'enabled',
-            }),
-            withEnabledBlockingInitialNavigation(),
-        ),
-        provideHttpClient(withFetch(), withInterceptors([authHttpInterceptor])),
-        provideAnimationsAsync(),
-        provideApollo(apolloOptionsFactory),
+  providers: [
+    provideRouter(
+      appRoutes,
+      withInMemoryScrolling({
+        anchorScrolling: 'enabled',
+        scrollPositionRestoration: 'enabled'
+      }),
+      withEnabledBlockingInitialNavigation()
+    ),
+    provideHttpClient(withFetch(), withInterceptors([authHttpInterceptor])),
+    provideAnimationsAsync(),
+    provideApollo(apolloOptionsFactory),
 
-        {
-            provide: APP_INITIALIZER,
-            useFactory: initializeAppFactory,
-            deps: [AuthService],
-            multi: true,
-        },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAppFactory,
+      deps: [AuthService],
+      multi: true
+    },
 
-        providePrimeNG({
-            theme: {
-                options: {
-                    darkModeSelector: '.app-dark',
-                },
-            },
-        }),
+    providePrimeNG({
+      theme: {
+        options: {
+          darkModeSelector: '.app-dark'
+        }
+      }
+    }),
 
-        MessageService,
-    ],
+    MessageService
+  ]
 };

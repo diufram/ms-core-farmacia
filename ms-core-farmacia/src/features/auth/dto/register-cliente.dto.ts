@@ -7,6 +7,7 @@ import {
   IsString,
   MaxLength,
   MinLength,
+  IsBoolean,
 } from 'class-validator';
 
 @InputType()
@@ -51,4 +52,16 @@ export class RegisterClienteDto {
   @IsString()
   @MinLength(8)
   contrasena!: string;
+
+  @ApiProperty({ example: 'ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]', required: false })
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  notification_token?: string;
+
+  @ApiProperty({ example: true, required: false })
+  @Field({ nullable: true })
+  @IsBoolean()
+  @IsOptional()
+  is_mobile?: boolean;
 }

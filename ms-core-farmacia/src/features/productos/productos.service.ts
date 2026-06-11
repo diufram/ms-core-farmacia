@@ -41,25 +41,14 @@ export class ProductosService {
     return this.serializeProducto(producto);
   }
 
-  async create(
-    dto: CreateProductoDto,
-    userRol: string,
-    userSucursalId: number | null,
-  ) {
-    const categoria = await this.productosRepository.findCategoriaById(
-      dto.categoriaId,
-    );
+  async create(dto: CreateProductoDto, userRol: string, userSucursalId: number | null) {
+    const categoria = await this.productosRepository.findCategoriaById(dto.categoriaId);
     if (!categoria) {
       throw new NotFoundException('Categoria no encontrada.');
     }
 
-    if (
-      userRol !== Rol.SUPER_ADMIN &&
-      categoria.sucursal.id !== userSucursalId
-    ) {
-      throw new ForbiddenException(
-        'No puede crear productos con categorias de otra sucursal.',
-      );
+    if (userRol !== Rol.SUPER_ADMIN && categoria.sucursal.id !== userSucursalId) {
+      throw new ForbiddenException('No puede crear productos con categorias de otra sucursal.');
     }
 
     const existing = await this.productosRepository.findByCodigoAndSucursal(
@@ -67,9 +56,7 @@ export class ProductosService {
       categoria.sucursal.id,
     );
     if (existing) {
-      throw new ConflictException(
-        'Ya existe un producto con ese codigo en esta sucursal.',
-      );
+      throw new ConflictException('Ya existe un producto con ese codigo en esta sucursal.');
     }
 
     const producto = this.productosRepository.create({
@@ -87,12 +74,7 @@ export class ProductosService {
     };
   }
 
-  async update(
-    id: number,
-    dto: UpdateProductoDto,
-    userRol: string,
-    userSucursalId: number | null,
-  ) {
+  async update(id: number, dto: UpdateProductoDto, userRol: string, userSucursalId: number | null) {
     const producto = await this.productosRepository.findById(id);
     if (!producto) {
       throw new NotFoundException('Producto no encontrado.');
@@ -100,19 +82,12 @@ export class ProductosService {
     this.assertSucursalAccess(producto, userRol, userSucursalId);
 
     if (dto.categoriaId && dto.categoriaId !== producto.categoria.id) {
-      const nuevaCategoria = await this.productosRepository.findCategoriaById(
-        dto.categoriaId,
-      );
+      const nuevaCategoria = await this.productosRepository.findCategoriaById(dto.categoriaId);
       if (!nuevaCategoria) {
         throw new NotFoundException('Categoria no encontrada.');
       }
-      if (
-        userRol !== Rol.SUPER_ADMIN &&
-        nuevaCategoria.sucursal.id !== userSucursalId
-      ) {
-        throw new ForbiddenException(
-          'No puede asignar categorias de otra sucursal.',
-        );
+      if (userRol !== Rol.SUPER_ADMIN && nuevaCategoria.sucursal.id !== userSucursalId) {
+        throw new ForbiddenException('No puede asignar categorias de otra sucursal.');
       }
       producto.categoria = nuevaCategoria;
       producto.sucursal = nuevaCategoria.sucursal;
@@ -145,17 +120,13 @@ export class ProductosService {
     userSucursalId: number | null,
     requestedSucursalId: number | null,
   ): number | null {
-    if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN) {
+    if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN || userRol === Rol.CLIENTE) {
       return requestedSucursalId;
     }
     return userSucursalId;
   }
 
-  private assertSucursalAccess(
-    producto: Producto,
-    userRol: string,
-    userSucursalId: number | null,
-  ) {
+  private assertSucursalAccess(producto: Producto, userRol: string, userSucursalId: number | null) {
     if (userRol === Rol.SUPER_ADMIN || userRol === Rol.ADMIN) {
       return;
     }

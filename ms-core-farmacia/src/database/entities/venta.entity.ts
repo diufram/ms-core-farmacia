@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  Unique,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { BaseEntity } from '../../core/entities/base.entity';
 import { Sucursal } from './sucursal.entity';
 import { Usuario } from './usuario.entity';
@@ -49,6 +42,9 @@ export class Venta extends BaseEntity {
 
   @Column({ type: 'varchar', length: 60, nullable: true })
   cliente_codigo?: string | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  tx_hash?: string | null;
 
   @OneToMany(() => VentaDetalle, (detalle) => detalle.venta)
   detalles!: VentaDetalle[];

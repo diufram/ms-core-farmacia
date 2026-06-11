@@ -47,8 +47,7 @@ export const adminsSucursalSeed: Seed = {
     const usuarioRepository = seedDataSource.getRepository(Usuario);
     const personaRepository = seedDataSource.getRepository(Persona);
     const sucursalRepository = seedDataSource.getRepository(Sucursal);
-    const usuarioSucursalRepository =
-      seedDataSource.getRepository(UsuarioSucursal);
+    const usuarioSucursalRepository = seedDataSource.getRepository(UsuarioSucursal);
     const password = process.env.SEED_ADMIN_SUCURSAL_PASSWORD || '123123';
 
     for (const item of ADMIN_POR_SUCURSAL) {
@@ -61,10 +60,7 @@ export const adminsSucursalSeed: Seed = {
       }
 
       let usuario = await usuarioRepository.findOne({
-        where: [
-          { correo_electronico: item.correo },
-          { nombre_usuario: item.username },
-        ],
+        where: [{ correo_electronico: item.correo }, { nombre_usuario: item.username }],
       });
 
       if (!usuario) {
@@ -105,9 +101,7 @@ export const adminsSucursalSeed: Seed = {
         }),
       );
 
-      console.log(
-        `- Relacion admin-sucursal creada (${item.correo} -> ${item.sucursalSlug}).`,
-      );
+      console.log(`- Relacion admin-sucursal creada (${item.correo} -> ${item.sucursalSlug}).`);
     }
   },
 };

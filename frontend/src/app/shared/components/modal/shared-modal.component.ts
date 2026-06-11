@@ -13,11 +13,11 @@ import { ButtonModule } from 'primeng/button';
 export class SharedModalComponent {
   @Input() visible = false;
   @Output() visibleChange = new EventEmitter<boolean>();
-  
+
   @Input() header = '';
-  
+
   // Ancho por defecto para escritorio (un poco más ancho que 450px para formularios cómodos)
-  @Input() width = '30rem'; 
+  @Input() width = '30rem';
 
   close() {
     this.visible = false;

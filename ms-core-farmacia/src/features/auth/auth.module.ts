@@ -12,19 +12,15 @@ import { AuthRepository } from './auth.repository';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     ConfigModule,
     PassportModule,
     JwtModule.register({}),
-    TypeOrmModule.forFeature([
-      Usuario,
-      Persona,
-      RefreshToken,
-      UsuarioSucursal,
-      TokenDispositivo,
-    ]),
+    TypeOrmModule.forFeature([Usuario, Persona, RefreshToken, UsuarioSucursal, TokenDispositivo]),
+    NotificationsModule,
   ],
   providers: [AuthService, AuthRepository, AuthResolver, JwtStrategy],
 })

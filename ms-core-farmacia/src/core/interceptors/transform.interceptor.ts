@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -19,14 +14,8 @@ type ResponseWithMessage = {
 };
 
 @Injectable()
-export class TransformInterceptor<T> implements NestInterceptor<
-  T,
-  Response<T>
-> {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<Response<T>> {
+export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
     if (context.getType<string>() === 'graphql') {
       return next.handle() as Observable<Response<T>>;
     }
@@ -42,7 +31,8 @@ export class TransformInterceptor<T> implements NestInterceptor<
             message = responseData.message;
           }
 
-          const { message: _message, ...rest } = responseData;
+          const rest = { ...responseData };
+          delete rest.message;
           payload = rest as T;
         }
 

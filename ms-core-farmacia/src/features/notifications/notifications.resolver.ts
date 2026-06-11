@@ -9,9 +9,7 @@ import { NotificationsService } from './notifications.service';
 
 @Resolver()
 export class NotificationsResolver {
-  constructor(
-    private readonly notificationsService: NotificationsService,
-  ) {}
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   @Mutation(() => TokenDispositivoType)
   @UseGuards(JwtAuthGuard)
@@ -19,10 +17,7 @@ export class NotificationsResolver {
     @CurrentUser() user: JwtPayload,
     @Args('input') input: RegistrarTokenDispositivoInput,
   ): Promise<TokenDispositivoType> {
-    const guardado = await this.notificationsService.registrarToken(
-      user.sub,
-      input.token,
-    );
+    const guardado = await this.notificationsService.registrarToken(user.sub, input.token);
     return {
       id: guardado.id,
       token: guardado.token,
@@ -33,18 +28,14 @@ export class NotificationsResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
-  async eliminarTodosMisTokens(
-    @CurrentUser() user: JwtPayload,
-  ): Promise<boolean> {
+  async eliminarTodosMisTokens(@CurrentUser() user: JwtPayload): Promise<boolean> {
     await this.notificationsService.desregistrarTodosTokens(user.sub);
     return true;
   }
 
   @Query(() => [TokenDispositivoType])
   @UseGuards(JwtAuthGuard)
-  async misDispositivos(
-    @CurrentUser() user: JwtPayload,
-  ): Promise<TokenDispositivoType[]> {
+  async misDispositivos(@CurrentUser() user: JwtPayload): Promise<TokenDispositivoType[]> {
     const tokens = await this.notificationsService.obtenerTokens(user.sub);
     return tokens.map((t) => ({
       id: t.id,

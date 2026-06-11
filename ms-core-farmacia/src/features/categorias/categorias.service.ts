@@ -14,27 +14,13 @@ import { CategoriasRepository } from './categorias.repository';
 export class CategoriasService {
   constructor(private readonly categoriasRepository: CategoriasRepository) {}
 
-  async findAll(
-    userRol: string,
-    userSucursalId: number | null,
-    filterSucursalId: number | null,
-  ) {
-    const targetSucursalId = this.resolveSucursalId(
-      userRol,
-      userSucursalId,
-      filterSucursalId,
-    );
-    const categorias = await this.categoriasRepository.findAll(
-      targetSucursalId ?? undefined,
-    );
+  async findAll(userRol: string, userSucursalId: number | null, filterSucursalId: number | null) {
+    const targetSucursalId = this.resolveSucursalId(userRol, userSucursalId, filterSucursalId);
+    const categorias = await this.categoriasRepository.findAll(targetSucursalId ?? undefined);
     return categorias.map((c) => this.serializeCategoria(c));
   }
 
-  async findOne(
-    id: number,
-    userRol: string,
-    userSucursalId: number | null,
-  ) {
+  async findOne(id: number, userRol: string, userSucursalId: number | null) {
     const categoria = await this.categoriasRepository.findById(id);
     if (!categoria) {
       throw new NotFoundException('Categoria no encontrada.');
@@ -43,22 +29,12 @@ export class CategoriasService {
     return this.serializeCategoria(categoria);
   }
 
-  async create(
-    dto: CreateCategoriaDto,
-    userRol: string,
-    userSucursalId: number | null,
-  ) {
+  async create(dto: CreateCategoriaDto, userRol: string, userSucursalId: number | null) {
     this.assertCanUseSucursal(userRol, userSucursalId, dto.sucursalId);
-    const targetSucursalId = this.resolveSucursalId(
-      userRol,
-      userSucursalId,
-      dto.sucursalId,
-    );
+    const targetSucursalId = this.resolveSucursalId(userRol, userSucursalId, dto.sucursalId);
 
     if (!targetSucursalId) {
-      throw new ForbiddenException(
-        'Debe indicar una sucursal valida para crear la categoria.',
-      );
+      throw new ForbiddenException('Debe indicar una sucursal valida para crear la categoria.');
     }
 
     const existing = await this.categoriasRepository.findByCodigoAndSucursal(
@@ -66,9 +42,7 @@ export class CategoriasService {
       targetSucursalId,
     );
     if (existing) {
-      throw new ConflictException(
-        'Ya existe una categoria con ese codigo en esta sucursal.',
-      );
+      throw new ConflictException('Ya existe una categoria con ese codigo en esta sucursal.');
     }
 
     const categoria = this.categoriasRepository.create({
@@ -101,9 +75,7 @@ export class CategoriasService {
         categoria.sucursal.id,
       );
       if (existing && existing.id !== id) {
-        throw new ConflictException(
-          'Ya existe una categoria con ese codigo en esta sucursal.',
-        );
+        throw new ConflictException('Ya existe una categoria con ese codigo en esta sucursal.');
       }
     }
 
@@ -114,11 +86,7 @@ export class CategoriasService {
     return this.serializeCategoria(saved);
   }
 
-  async delete(
-    id: number,
-    userRol: string,
-    userSucursalId: number | null,
-  ) {
+  async delete(id: number, userRol: string, userSucursalId: number | null) {
     const categoria = await this.categoriasRepository.findById(id);
     if (!categoria) {
       throw new NotFoundException('Categoria no encontrada.');
@@ -167,9 +135,7 @@ export class CategoriasService {
       return;
     }
     if (requestedSucursalId !== userSucursalId) {
-      throw new ForbiddenException(
-        'Solo puede operar sobre categorias de su propia sucursal.',
-      );
+      throw new ForbiddenException('Solo puede operar sobre categorias de su propia sucursal.');
     }
   }
 

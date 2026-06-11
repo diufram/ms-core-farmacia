@@ -33,10 +33,7 @@ export class Usuario extends BaseEntity {
   @JoinColumn({ name: 'persona_id' })
   persona!: Persona;
 
-  @OneToMany(
-    () => UsuarioSucursal,
-    (usuarioSucursal) => usuarioSucursal.usuario,
-  )
+  @OneToMany(() => UsuarioSucursal, (usuarioSucursal) => usuarioSucursal.usuario)
   sucursales!: UsuarioSucursal[];
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.usuario)

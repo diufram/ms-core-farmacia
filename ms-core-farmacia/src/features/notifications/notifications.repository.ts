@@ -36,7 +36,7 @@ export class NotificationsRepository {
     }
     const nuevo = this.tokenDispositivoRepository.create({
       token,
-      usuario: { id: usuarioId } as any,
+      usuario: { id: usuarioId },
     });
     return this.tokenDispositivoRepository.save(nuevo);
   }

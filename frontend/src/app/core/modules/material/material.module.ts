@@ -26,12 +26,12 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatRadioModule} from '@angular/material/radio';
-import {MatStepperModule} from '@angular/material/stepper';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import {MatTimepickerModule} from '@angular/material/timepicker';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTimepickerModule } from '@angular/material/timepicker';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [],
@@ -69,7 +69,6 @@ import {MatTooltipModule} from '@angular/material/tooltip';
     MatSlideToggleModule,
     MatTimepickerModule,
     MatTooltipModule
-
   ]
 })
-export class MaterialModule { }
+export class MaterialModule {}

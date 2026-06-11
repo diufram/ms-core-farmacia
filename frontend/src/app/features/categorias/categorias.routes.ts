@@ -4,25 +4,25 @@ import { CategoriasListComponent } from './pages/categorias-list/categorias-list
 import { CategoriaFormComponent } from './pages/categoria-form/categoria-form.component';
 
 export const CATEGORIAS_ROUTES: Routes = [
-    {
+  {
+    path: '',
+    canActivate: [authGuard],
+    children: [
+      {
         path: '',
-        canActivate: [authGuard],
-        children: [
-            {
-                path: '',
-                component: CategoriasListComponent,
-                title: 'Categorías',
-            },
-            {
-                path: 'nueva',
-                component: CategoriaFormComponent,
-                title: 'Nueva Categoría',
-            },
-            {
-                path: ':id/editar',
-                component: CategoriaFormComponent,
-                title: 'Editar Categoría',
-            },
-        ],
-    },
+        component: CategoriasListComponent,
+        title: 'Categorías'
+      },
+      {
+        path: 'nueva',
+        component: CategoriaFormComponent,
+        title: 'Nueva Categoría'
+      },
+      {
+        path: ':id/editar',
+        component: CategoriaFormComponent,
+        title: 'Editar Categoría'
+      }
+    ]
+  }
 ];

@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules/
+
+# Build and compile outputs
+dist/
+build/
+/blockchain/artifacts/
+/blockchain/cache/
+
+# Local logs and files
+*.log
+.env
+.env.blockchain
+.env.production
+.env.development
+.env.local
+.env.*.local
+hardhat-node.log
+
+# OS & IDEs
+.DS_Store
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

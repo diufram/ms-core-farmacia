@@ -36,10 +36,7 @@ export class ProfileRepository {
     return usuario;
   }
 
-  async isUsernameTaken(
-    username: string,
-    excludeUserId?: number,
-  ): Promise<boolean> {
+  async isUsernameTaken(username: string, excludeUserId?: number): Promise<boolean> {
     const query = this.usuarioRepository
       .createQueryBuilder('u')
       .where('LOWER(u.nombre_usuario) = LOWER(:username)', { username });

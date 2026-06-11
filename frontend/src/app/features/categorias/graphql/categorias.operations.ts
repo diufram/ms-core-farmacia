@@ -43,13 +43,13 @@ export const UPDATE_CATEGORIA_MUTATION = gql`
 `;
 
 export const DELETE_CATEGORIA_MUTATION = gql`
-    mutation DeleteCategoria($id: Int!) {
-        deleteCategoria(id: $id) {
-            message
-            categoria {
-                id
-                nombre
-            }
-        }
+  mutation DeleteCategoria($id: Int!) {
+    deleteCategoria(id: $id) {
+      message
+      categoria {
+        id
+        nombre
+      }
     }
+  }
 `;

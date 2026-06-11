@@ -7,11 +7,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
 import { CreateVentaDto } from './dto/create-venta.dto';
-import {
-  VentaPayloadType,
-  VentaType,
-} from './graphql/ventas.types';
-import { VentasService } from './ventas.service';
+import { VentaPayloadType, VentaType, VentaVerificationType } from './graphql/ventas.types';
+import { VentasService, EstadoVenta } from './ventas.service';
 
 @Resolver()
 @UseGuards(JwtAuthGuard)
@@ -36,29 +33,13 @@ export class VentasResolver {
   }
 
   @Query(() => VentaType)
-  venta(
-    @CurrentUser() user: JwtPayload,
-    @Args('id', { type: () => Int }) id: number,
-  ) {
-    return this.ventasService.findOne(
-      id,
-      user.rol,
-      user.sucursal_id,
-      user.sub,
-    );
+  venta(@CurrentUser() user: JwtPayload, @Args('id', { type: () => Int }) id: number) {
+    return this.ventasService.findOne(id, user.rol, user.sucursal_id, user.sub);
   }
 
   @Mutation(() => VentaPayloadType)
-  createVenta(
-    @CurrentUser() user: JwtPayload,
-    @Args('input') input: CreateVentaDto,
-  ) {
-    return this.ventasService.create(
-      input,
-      user.sub,
-      user.rol,
-      user.sucursal_id,
-    );
+  createVenta(@CurrentUser() user: JwtPayload, @Args('input') input: CreateVentaDto) {
+    return this.ventasService.create(input, user.sub, user.rol, user.sucursal_id);
   }
 
   @Mutation(() => VentaPayloadType)
@@ -71,7 +52,7 @@ export class VentasResolver {
   ) {
     return this.ventasService.cambiarEstado(
       id,
-      nuevoEstado as 'CONFIRMADA' | 'RECHAZADA',
+      nuevoEstado as EstadoVenta,
       user.rol,
       user.sucursal_id,
     );
@@ -80,10 +61,15 @@ export class VentasResolver {
   @Mutation(() => VentaPayloadType)
   @UseGuards(RolesGuard)
   @Roles(Rol.SUPER_ADMIN, Rol.ADMIN)
-  deleteVenta(
+  async deleteVenta(@CurrentUser() user: JwtPayload, @Args('id', { type: () => Int }) id: number) {
+    return this.ventasService.delete(id, user.rol, user.sucursal_id);
+  }
+
+  @Query(() => VentaVerificationType)
+  async verificarIntegridadVenta(
     @CurrentUser() user: JwtPayload,
     @Args('id', { type: () => Int }) id: number,
   ) {
-    return this.ventasService.delete(id, user.rol, user.sucursal_id);
+    return this.ventasService.verificarIntegridad(id, user.rol, user.sucursal_id, user.sub);
   }
 }

@@ -5,15 +5,33 @@ import { Seed } from './base.seed';
 import { seedDataSource } from './seed-data-source';
 
 const PRIMER_NOMBRE = [
-  'Carlos', 'Maria', 'Luis', 'Sofia', 'Diego',
-  'Ana', 'Jose', 'Laura', 'Pedro', 'Marta',
-  'Jorge', 'Elena',
+  'Carlos',
+  'Maria',
+  'Luis',
+  'Sofia',
+  'Diego',
+  'Ana',
+  'Jose',
+  'Laura',
+  'Pedro',
+  'Marta',
+  'Jorge',
+  'Elena',
 ];
 
 const PRIMER_APELLIDO = [
-  'Rojas', 'Luna', 'Mendoza', 'Castro', 'Vargas',
-  'Suarez', 'Perez', 'Gomez', 'Diaz', 'Torres',
-  'Romero', 'Alvarez',
+  'Rojas',
+  'Luna',
+  'Mendoza',
+  'Castro',
+  'Vargas',
+  'Suarez',
+  'Perez',
+  'Gomez',
+  'Diaz',
+  'Torres',
+  'Romero',
+  'Alvarez',
 ];
 
 const CLIENTES = Array.from({ length: 12 }, (_, i) => {
@@ -37,10 +55,7 @@ export const clientesSeed: Seed = {
 
     for (const item of CLIENTES) {
       const existing = await usuarioRepository.findOne({
-        where: [
-          { correo_electronico: item.correo },
-          { nombre_usuario: item.username },
-        ],
+        where: [{ correo_electronico: item.correo }, { nombre_usuario: item.username }],
       });
       if (existing) {
         console.log(`- Cliente ya existe (${item.correo}), omitido.`);

@@ -10,15 +10,7 @@ import { DashboardResolver } from './dashboard.resolver';
 import { DashboardService } from './dashboard.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Venta,
-      VentaDetalle,
-      Producto,
-      Sucursal,
-      CategoriaProducto,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Venta, VentaDetalle, Producto, Sucursal, CategoriaProducto])],
   providers: [DashboardService, DashboardRepository, DashboardResolver],
 })
 export class DashboardModule {}

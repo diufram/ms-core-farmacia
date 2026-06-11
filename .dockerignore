@@ -1,0 +1,23 @@
+# Ignore all node_modules
+**/node_modules
+
+# Ignore all builds and outputs
+**/dist
+**/build
+/blockchain/artifacts
+/blockchain/cache
+
+# Ignore git metadata
+.git
+.github
+
+# Ignore configuration and logs
+.env
+.env.*
+*.log
+hardhat-node.log
+
+# Ignore IDE settings
+.vscode
+.idea
+.DS_Store

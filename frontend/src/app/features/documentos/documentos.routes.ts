@@ -5,25 +5,25 @@ import { DocumentoUploadComponent } from './pages/documento-upload/documento-upl
 import { DocumentoDetailComponent } from './pages/documento-detail/documento-detail.component';
 
 export const DOCUMENTOS_ROUTES: Routes = [
-    {
+  {
+    path: '',
+    canActivate: [authGuard],
+    children: [
+      {
         path: '',
-        canActivate: [authGuard],
-        children: [
-            {
-                path: '',
-                component: DocumentosListComponent,
-                title: 'Documentos',
-            },
-            {
-                path: 'subir',
-                component: DocumentoUploadComponent,
-                title: 'Subir Documento',
-            },
-            {
-                path: ':id',
-                component: DocumentoDetailComponent,
-                title: 'Detalle Documento',
-            },
-        ],
-    },
+        component: DocumentosListComponent,
+        title: 'Documentos'
+      },
+      {
+        path: 'subir',
+        component: DocumentoUploadComponent,
+        title: 'Subir Documento'
+      },
+      {
+        path: ':id',
+        component: DocumentoDetailComponent,
+        title: 'Detalle Documento'
+      }
+    ]
+  }
 ];

@@ -263,10 +263,7 @@ export class DashboardRepository {
     return qb.getRawMany();
   }
 
-  async countProductosStockBajo(
-    umbral: number,
-    filters: { sucursalId?: number },
-  ): Promise<number> {
+  async countProductosStockBajo(umbral: number, filters: { sucursalId?: number }): Promise<number> {
     const qb = this.productoRepository
       .createQueryBuilder('p')
       .where('p.stock_actual < :umbral', { umbral });
@@ -289,10 +286,7 @@ export class DashboardRepository {
     return qb.getCount();
   }
 
-  countSucursales(
-    userRol: string,
-    userSucursalId: number | null,
-  ): Promise<number> {
+  countSucursales(userRol: string, userSucursalId: number | null): Promise<number> {
     if (userRol === Rol.SUPER_ADMIN) {
       return this.sucursalRepository.count();
     }
@@ -396,10 +390,9 @@ export class DashboardRepository {
         `COALESCE(DATE_PART('day', NOW() - uv.ultima_venta::timestamp), ${rangoDias})`,
         'dias_sin_venta',
       )
-      .where(
-        '(uv.ultima_venta IS NULL OR uv.ultima_venta < :fechaLimite)',
-        { fechaLimite: fechaLimiteStr },
-      )
+      .where('(uv.ultima_venta IS NULL OR uv.ultima_venta < :fechaLimite)', {
+        fechaLimite: fechaLimiteStr,
+      })
       .orderBy('p.stock_actual', 'DESC')
       .limit(limite);
 
@@ -510,18 +503,13 @@ export class DashboardRepository {
       ventasMap.set(Number(v.categoria_id), Number(v.ventas_periodo));
     }
 
-    const maxVentas = Math.max(
-      1,
-      ...Array.from(ventasMap.values()),
-    );
+    const maxVentas = Math.max(1, ...Array.from(ventasMap.values()));
 
     return productos.map((p) => {
       const totalProductos = Number(p.total_productos);
       const stockBajo = Number(p.productos_stock_bajo);
       const ventasCategoria = ventasMap.get(Number(p.categoria_id)) ?? 0;
-      const ratioStockBajo = totalProductos
-        ? stockBajo / totalProductos
-        : 0;
+      const ratioStockBajo = totalProductos ? stockBajo / totalProductos : 0;
       const ratioSinVenta = 1 - ventasCategoria / maxVentas;
       const score = ratioStockBajo * 0.5 + ratioSinVenta * 0.5;
       return {
@@ -543,7 +531,7 @@ export class DashboardRepository {
       const d = String(value.getUTCDate()).padStart(2, '0');
       return `${y}-${m}-${d}`;
     }
-    const s = String(value);
+    const s = String(value as any);
     return s.length >= 10 ? s.slice(0, 10) : s;
   }
 }
